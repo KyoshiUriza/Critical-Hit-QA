@@ -5,7 +5,11 @@
 // rendered *outside* the header box on any viewport under ~1200px.
 const { test, expect } = require('@playwright/test');
 
-const WIDTHS = [1440, 1280, 1200, 1100, 1024, 900, 768, 600, 414, 375];
+// 1240 and 1239 straddle the collapse breakpoint, and 1241 sits just inside the
+// window where the full nav must fit unaided. Sampling round numbers only is
+// how the 11th nav item shipped a horizontal overflow at 1221–1239 that every
+// other width passed straight over.
+const WIDTHS = [1440, 1280, 1241, 1240, 1239, 1221, 1200, 1100, 1024, 900, 768, 600, 414, 375];
 
 for (const width of WIDTHS) {
   test(`no nav item escapes the header at ${width}px`, async ({ page }) => {
@@ -60,7 +64,7 @@ for (const width of WIDTHS) {
 }
 
 test('wide viewports show the full nav and hide the toggle', async ({ page }) => {
-  // Above the measured 1220px breakpoint.
+  // Above the measured 1239px breakpoint.
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto('/index.html?reset');
 

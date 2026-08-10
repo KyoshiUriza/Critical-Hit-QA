@@ -42,3 +42,10 @@ coverage/
 
 # Regenerable design reference shots (node capture-design-audit.js)
 /design-audit/
+
+# Full page-by-page screenshot set (node capture-screenshots.js).
+# 144 images, ~27 MB — against a 1.7 MB repo. Committing them would grow the
+# history 17x to store files that are stale the moment a style changes and
+# that regenerate in under a minute. The generator is the durable artifact;
+# the images are its output.
+/screenshots/

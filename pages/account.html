@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; object-src 'none'; frame-src 'none'; base-uri 'self'; form-action 'self'" />
+  <meta name="referrer" content="no-referrer" />
+  <title>Your Profile — Critical Hit QA</title>
+  <link rel="stylesheet" href="../css/styles.css" />
+</head>
+<body data-page="account" data-depth="1">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div id="site-header"></div>
+
+  <main id="main" class="container">
+    <div class="page-header">
+      <h1>Your Profile</h1>
+      <p>Create a profile to keep your progress separate from anyone else using this browser — and a sync code to carry it to another device.</p>
+    </div>
+
+    <section class="panel panel-accent">
+      <h2>How this works</h2>
+      <p>
+        This site is a set of static files with no server behind it, so there is
+        nowhere to hold an account and nothing to log in to. Rather than build a
+        login screen that only pretends to be one, profiles are stored in this
+        browser and progress moves by a code you control.
+      </p>
+      <ul>
+        <li><strong>Nothing is uploaded.</strong> No email, no password, no account to be breached.</li>
+        <li><strong>Nothing is shared.</strong> Your progress never leaves this browser unless you copy a code out yourself.</li>
+        <li><strong>It still works offline.</strong> Same as the rest of the site.</li>
+      </ul>
+      <p class="text-dim">
+        The honest trade-off: moving to another device is a deliberate act —
+        copy a sync code and paste it there. There is no automatic sync, because
+        that would need a server holding your data.
+      </p>
+    </section>
+
+    <section class="panel">
+      <div class="lab-ex-head">
+        <h2 style="margin:0;">Profiles</h2>
+        <span class="text-dim" id="profile-count"></span>
+      </div>
+      <div id="profile-list" data-testid="profile-list"></div>
+
+      <h3 class="mt-16">Create a profile</h3>
+      <div class="form-field">
+        <label for="new-name">Profile name</label>
+        <input type="text" id="new-name" maxlength="24" placeholder="e.g. Kyoshi, or Evening study"
+               data-testid="new-profile-name" autocomplete="off" />
+        <p class="text-dim" id="new-hint">Just a label so you can tell profiles apart. Visible only in this browser.</p>
+      </div>
+      <button class="btn btn-primary" id="create-btn" data-testid="create-profile">Create profile</button>
+      <p class="form-error hidden" id="create-error" data-testid="create-error" role="alert"></p>
+    </section>
+
+    <section class="panel">
+      <h2>Move progress to another device</h2>
+      <p class="text-dim">
+        A sync code is your whole profile — quiz history, bug-bounty finds, study
+        plan, and every saved draft — packed into one line of text.
+      </p>
+
+      <h3>Get a code from this device</h3>
+      <button class="btn btn-primary" id="export-btn" data-testid="export-code">Generate sync code</button>
+      <button class="btn btn-ghost" id="copy-btn" data-testid="copy-code" hidden>Copy</button>
+      <p class="text-dim" id="export-meta"></p>
+      <textarea id="export-out" class="hidden" data-testid="export-out" rows="4" readonly
+                aria-label="Your sync code"></textarea>
+
+      <h3 class="mt-16">Load a code on this device</h3>
+      <div class="form-field">
+        <label for="import-in">Paste a sync code</label>
+        <textarea id="import-in" rows="4" data-testid="import-in"
+                  placeholder="CHQ1.…"></textarea>
+      </div>
+      <button class="btn btn-primary" id="preview-btn" data-testid="preview-code">Check this code</button>
+      <p class="form-error hidden" id="import-error" data-testid="import-error" role="alert"></p>
+
+      <div class="panel panel-warn hidden mt-16" id="confirm-box" data-testid="confirm-box">
+        <h3>Replace the progress in <span id="target-name"></span>?</h3>
+        <p id="confirm-summary" data-testid="confirm-summary"></p>
+        <p class="text-dim">
+          This overwrites the active profile. If you have anything here worth
+          keeping, generate a sync code for it first — this cannot be undone.
+        </p>
+        <button class="btn btn-danger" id="apply-btn" data-testid="apply-code">Replace progress</button>
+        <button class="btn btn-ghost" id="cancel-btn" data-testid="cancel-code">Cancel</button>
+      </div>
+      <p class="form-success hidden" id="import-ok" data-testid="import-ok" role="status"></p>
+    </section>
+
+    <section class="panel">
+      <h2>What is stored, exactly</h2>
+      <p class="text-dim">
+        All of it lives in this browser's local storage under keys beginning
+        <code class="inline">qaprep_</code>. Clearing site data removes it. You can read
+        the whole thing on the <a href="progress.html">Progress page</a>, which also
+        exports it as a JSON file if you would rather keep a backup that way.
+      </p>
+      <ul class="text-dim">
+        <li>Quiz runs and per-category scores</li>
+        <li>Which seeded defects you have found</li>
+        <li>Study plan checkboxes</li>
+        <li>Bug report and test case drafts</li>
+        <li>Your daily streak</li>
+      </ul>
+      <p class="text-dim">No analytics, no cookies, no third-party scripts. There is nothing here that reaches the network.</p>
+    </section>
+  </main>
+
+  <div id="site-footer"></div>
+
+  <script src="../js/test-hooks.js"></script>
+  <script src="../js/site-chrome.js"></script>
+  <script src="../js/data/defects.js"></script>
+  <script src="../js/progress-schema.js"></script>
+  <script src="../js/profiles.js"></script>
+  <script src="../js/progress.js"></script>
+  <script src="../js/rpg.js"></script>
+  <script src="../js/account.js"></script>
+</body>
+</html>

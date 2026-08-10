@@ -1,0 +1,53 @@
+Copyright (c) 2026 Kyoshi Uriza. All rights reserved.
+
+Critical Hit QA — https://kyoshiuriza.github.io/Critical-Hit-QA/
+
+This project is source-available, not open source. The source is published so
+that it can be read, inspected, and learned from. It is not licensed for reuse.
+
+WHAT YOU MAY DO
+
+  - Read, browse, and study this source code.
+  - Use the published website at the URL above for your own learning, including
+    commercial job preparation. Studying with it is the entire point.
+  - Quote short excerpts for commentary, review, teaching, or discussion, with
+    attribution.
+  - Fork the repository within GitHub, which is permitted for any public
+    repository under GitHub's Terms of Service, and submit changes back as a
+    pull request.
+
+WHAT YOU MAY NOT DO WITHOUT WRITTEN PERMISSION
+
+  - Copy, republish, mirror, or redistribute this work or a substantial part of
+    it, whether modified or not.
+  - Host your own copy of the site, publicly or privately, beyond a personal
+    local checkout for reading the code.
+  - Use the written content — quiz questions, interview questions, explanations,
+    learning material, seeded defect catalogues, or exercise text — in another
+    product, course, dataset, or publication.
+  - Use the name "Critical Hit QA", the site's branding, or its icon.
+  - Use any of the above to train, fine-tune, or evaluate a machine learning
+    model.
+
+THIRD-PARTY AND RELATED MATERIAL
+
+  The Convergence Chronicles: The Resonance Lattice, and all names, terminology,
+  and lore drawn from it, are separate copyrighted works of the same author and
+  are not licensed here under any terms.
+
+  Names of external tools, standards, and organisations referenced in the
+  content — Playwright, Selenium, ISTQB, OWASP, W3C, and others — belong to
+  their respective owners and are used descriptively only.
+
+NO WARRANTY
+
+  This work is provided "as is", without warranty of any kind, express or
+  implied, including but not limited to the warranties of merchantability,
+  fitness for a particular purpose, and noninfringement. In no event shall the
+  author be liable for any claim, damages, or other liability arising from,
+  out of, or in connection with this work or its use.
+
+PERMISSIONS
+
+  Requests for any use not granted above are welcome. Open an issue at
+  https://github.com/KyoshiUriza/Critical-Hit-QA/issues and ask.

@@ -1,8 +1,8 @@
 {
-  "name": "qa-prep-hub",
+  "name": "critical-hit-qa",
   "version": "1.0.0",
   "private": true,
-  "description": "Static QA interview prep site. The app itself has zero runtime dependencies; devDependencies exist only to run the E2E suite.",
+  "description": "Free practice tools for aspiring software QA engineers.",
   "scripts": {
     "serve": "python -m http.server 8080",
     "test": "playwright test",
@@ -11,5 +11,7 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.49.0"
-  }
+  },
+  "license": "UNLICENSED",
+  "author": "Kyoshi Uriza"
 }

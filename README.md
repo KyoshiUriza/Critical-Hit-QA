@@ -167,3 +167,29 @@ These are deliberate. Breaking one requires an explicit trade-off, not a silent 
 - Seeded defects → [`js/data/defects.js`](js/data/defects.js); they appear in Bug Bounty and the RPG scoring automatically.
 - Nav items → [`js/site-chrome.js`](js/site-chrome.js) `NAV` array, one place.
 - Study plans → the `PLANS` object in `pages/study-plan.html`.
+- Nav items are capped by width, not taste — adding one to `NAV` may push the
+  header past its collapse breakpoint. `tests/header.spec.js` measures it.
+
+## Security
+
+See [SECURITY.md](SECURITY.md) for the threat model, the Content Security
+Policy, how to report a vulnerability, and the repository hardening checklist.
+
+Note that the practice apps contain **intentional** vulnerabilities — that is
+the point of the site. Every seeded defect is catalogued in
+[`js/data/defects.js`](js/data/defects.js) before you report one.
+
+## Licence
+
+Copyright © 2026 Kyoshi Uriza. **All rights reserved** — see [LICENSE](LICENSE).
+
+This project is **source-available, not open source**. The source is published
+so it can be read, inspected, and learned from. It is not licensed for reuse,
+redistribution, or rehosting, and the written content — questions, explanations,
+exercises, and the Resonance Lattice material — is not licensed for use
+elsewhere.
+
+Use the [live site](https://kyoshiuriza.github.io/Critical-Hit-QA/) freely,
+including to prepare for a job. That is what it is for. If you want to do
+something the licence does not permit,
+[open an issue](https://github.com/KyoshiUriza/Critical-Hit-QA/issues) and ask.

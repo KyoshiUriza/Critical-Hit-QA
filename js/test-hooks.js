@@ -30,6 +30,17 @@
     OWNED_KEYS.forEach(function (k) {
       try { localStorage.removeItem(k); } catch (_) {}
     });
+    // Profile data keys are created at runtime, so they cannot be listed
+    // ahead of time. Sweep by prefix instead — still scoped to keys this site
+    // owns, so a reset never touches storage belonging to something else.
+    try {
+      var doomed = [];
+      for (var i = 0; i < localStorage.length; i++) {
+        var k = localStorage.key(i);
+        if (k === "qaprep_profiles_v1" || k.indexOf(PROGRESS_KEY + ":") === 0) doomed.push(k);
+      }
+      doomed.forEach(function (k) { localStorage.removeItem(k); });
+    } catch (_) {}
     OWNED_SESSION_KEYS.forEach(function (k) {
       try { sessionStorage.removeItem(k); } catch (_) {}
     });

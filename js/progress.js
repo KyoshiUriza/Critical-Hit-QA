@@ -3,15 +3,23 @@
 (function () {
   const KEY = "qaprep_progress_v1";
 
+  // Resolved per call rather than captured once, so switching profiles takes
+  // effect immediately instead of after a reload. Falls back to the original
+  // key when profiles.js is not on the page — most practice apps do not load
+  // it, and they must keep working.
+  function key() {
+    return window.Profiles ? window.Profiles.storageKey() : KEY;
+  }
+
   function load() {
     try {
-      return JSON.parse(localStorage.getItem(KEY) || "{}");
+      return JSON.parse(localStorage.getItem(key()) || "{}");
     } catch (_) {
       return {};
     }
   }
   function save(data) {
-    localStorage.setItem(KEY, JSON.stringify(data));
+    localStorage.setItem(key(), JSON.stringify(data));
   }
 
   function ensure(data) {
@@ -57,7 +65,7 @@
 
   const Progress = {
     get() { return ensure(load()); },
-    reset() { localStorage.removeItem(KEY); },
+    reset() { localStorage.removeItem(key()); },
 
     recordQuizRun({ category, correct, total, elapsedMs }) {
       const data = ensure(load());

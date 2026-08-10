@@ -29,7 +29,8 @@
     { key: "automation-lab",label: "Automation", href: "pages/automation-lab.html" },
     { key: "progress",      label: "Progress",   href: "pages/progress.html" },
     { key: "study-plan",    label: "Study Plan", href: "pages/study-plan.html" },
-    { key: "resources",     label: "Resources",  href: "pages/resources.html" }
+    { key: "resources",     label: "Resources",  href: "pages/resources.html" },
+    { key: "account",       label: "Profile",    href: "pages/account.html" }
   ];
 
   // Pages that share a nav highlight with a sibling (e.g. both builders).
@@ -46,6 +47,12 @@
     "learn-sql": "learn",
     "playwright-errors": "automation-lab"
   };
+
+  var AUTHOR = "Kyoshi Uriza";
+  // Hard-coded rather than derived from the clock. A footer that silently
+  // reads "© 2027" on New Year's Day is claiming a copyright date for work
+  // that has not happened yet, and nobody notices until someone checks.
+  var COPYRIGHT_YEAR = "2026";
 
   var DONATE_URL = "https://buymeacoffee.com/kyoshiuriza";
   var REPO_URL = "https://github.com/KyoshiUriza/Critical-Hit-QA";
@@ -189,8 +196,10 @@
     feedback.setAttribute("data-testid", "feedback-link");
     line3.appendChild(feedback);
 
-    // A QA tool that is open source should say so. For anyone evaluating the
-    // author, the repo is a stronger signal than the site.
+    // The source is readable, which for anyone evaluating the author is a
+    // stronger signal than the site itself. "Source on GitHub" rather than
+    // "open source" — the repo is source-available under an all-rights-reserved
+    // licence, and claiming otherwise would be inaccurate.
     line3.appendChild(document.createTextNode("  ·  "));
     var source = document.createElement("a");
     source.href = REPO_URL;
@@ -200,9 +209,17 @@
     source.setAttribute("data-testid", "source-link");
     line3.appendChild(source);
 
+    var line4 = document.createElement("p");
+    line4.className = "text-dim";
+    line4.style.marginTop = "12px";
+    line4.style.fontSize = "var(--fs-xs)";
+    line4.setAttribute("data-testid", "copyright");
+    line4.textContent = "© " + COPYRIGHT_YEAR + " " + AUTHOR + ". All rights reserved.";
+
     container.appendChild(line1);
     container.appendChild(line2);
     container.appendChild(line3);
+    container.appendChild(line4);
     footer.appendChild(container);
     return footer;
   }

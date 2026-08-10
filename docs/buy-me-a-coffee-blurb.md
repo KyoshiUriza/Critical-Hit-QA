@@ -12,7 +12,7 @@ the audience is professional testers, and verifying claims is literally their jo
 
 ## 1. Tagline / "What are you creating?" (one line)
 
-> Free, open-source practice tools for people trying to break into software QA.
+> Free practice tools for people trying to break into software QA.
 
 > I build **Critical Hit QA** — broken apps to hunt bugs in, and the tools to write them up.
 
@@ -68,7 +68,7 @@ the audience is professional testers, and verifying claims is literally their jo
 >   examples
 >
 > No account. No paywall. No tracking. It works offline once loaded, and the
-> whole thing is open source — tests, architecture decisions and all.
+> whole source is public and readable — tests, architecture decisions and all.
 >
 > I'm a QA engineer, and I built the resource I wanted when I was starting out.
 > If it helps you land something, a coffee means I get to keep adding to it.
@@ -103,9 +103,14 @@ Add the repo as a second link if BMC allows it:
 
     https://github.com/KyoshiUriza/Critical-Hit-QA
 
-Worth doing. An open-source project with a test suite and written architecture
-decisions reads very differently from a landing page, and for this audience the
-repo is the stronger artifact.
+Worth doing. A public repo with a test suite and written architecture decisions
+reads very differently from a landing page, and for this audience the repo is
+the stronger artifact.
+
+Note the wording throughout says "public source" and never "open source". The
+repo is source-available under an all-rights-reserved licence — readable, not
+reusable. Calling that open source would be inaccurate, and this audience is
+precisely the one that would notice.
 
 The site footer already links back to BMC, so once both exist the loop closes in
 both directions.
