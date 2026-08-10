@@ -11,11 +11,18 @@
   --warn: #f2c14e;
   --code-bg: #0b1220;
 
-  /* Derived color tokens — never hardcode these in components. */
+  /* Derived color tokens — never hardcode these in components.
+     The --on-* values are theme-dependent: a bright accent needs DARK text,
+     a dark accent needs LIGHT text. Getting this backwards is how we shipped
+     2.76:1 button labels in dark mode. Measured ratios below. */
   --accent-hover: #3b8ae8;
-  --on-accent: #ffffff;      /* text on --accent */
-  --on-accent-2: #0a1a10;    /* text on --accent-2 */
+  --on-accent: #0b1220;      /* on --accent   #4f9dff -> 6.78:1 */
+  --on-accent-2: #0a1a10;    /* on --accent-2 #62d391 -> 9.63:1 */
+  --on-danger: #0b1220;      /* on --danger   #ff6b6b -> 6.75:1 */
+  --on-warn: #1a1200;        /* on --warn     #f2c14e -> 11.07:1 */
   --code-fg: #e2e8f0;
+  --code-accent: #4f9dff;    /* on --code-bg #0b1220 -> 6.78:1. Does NOT flip:
+                                the code surface stays dark in both themes. */
   --brand-donate: #ffdd00;
   --brand-donate-fg: #000000;
 
@@ -47,11 +54,16 @@
 
     /* Semantic colors must be re-derived for light surfaces.
        Dark-mode values fail WCAG AA on white (measured 1.7:1 – 2.8:1). */
-    --accent: #1e6fd9;      /* 4.7:1 on #fff */
+    --accent: #1b64c4;      /* >=5.09:1 on all three light surfaces */
     --accent-2: #0f7a43;    /* 5.4:1 on #fff */
     --danger: #c92a2a;      /* 5.9:1 on #fff */
     --warn: #8a5a00;        /* 6.3:1 on #fff */
     --accent-hover: #1857ac;
+    /* Light surfaces flip the polarity: the accents are dark, so labels go white. */
+    --on-accent: #ffffff;      /* on --accent   #1b64c4 -> 5.73:1 */
+    --on-accent-2: #ffffff;    /* on --accent-2 #0f7a43 -> 5.41:1 */
+    --on-danger: #ffffff;      /* on --danger   #c92a2a -> 5.46:1 */
+    --on-warn: #ffffff;        /* on --warn     #8a5a00 -> 5.93:1 */
     --focus-ring: 0 0 0 3px rgba(30,111,217,0.45);
   }
 }
@@ -83,6 +95,17 @@
 }
 .skip-link:focus {
   left: 0;
+}
+
+/* Links. There was no global rule, so prose links fell back to the browser
+   default (#0000EE) — 1.97:1 on --bg and 1.77:1 on --bg-elev in dark mode.
+   Component classes (.btn, .brand, .nav a, .feature-card, .donation-cta,
+   .skip-link) all set their own colour and outrank this on specificity. */
+a {
+  color: var(--accent);
+}
+a:hover {
+  color: var(--accent-hover);
 }
 
 /* Global focus system. Never remove an outline without providing this. */
@@ -267,7 +290,7 @@ html, body {
 }
 .btn-ghost:hover { background: var(--bg-elev-2); }
 .btn-success { background: var(--accent-2); color: var(--on-accent-2); }
-.btn-danger { background: var(--danger); color: var(--on-accent); }
+.btn-danger { background: var(--danger); color: var(--on-danger); }
 .btn-sm { padding: 6px 12px; font-size: 0.85rem; }
 
 /* Feature grid */
@@ -540,7 +563,7 @@ code.inline {
   font-family: inherit;
   font-size: 0.88rem;
 }
-.code-tab.active { background: var(--code-bg); color: var(--accent); }
+.code-tab.active { background: var(--code-bg); color: var(--code-accent); }
 .code-panel { display: none; }
 .code-panel.active { display: block; }
 .code-copy {
@@ -1108,11 +1131,11 @@ th[data-sort]:focus-visible { box-shadow: var(--focus-ring); }
 .lab-result-pass    { padding: 14px; border-radius: 8px; border: 1px solid var(--accent-2); background: rgba(98,211,145,0.08); }
 .lab-result-pass    .lab-result-icon { background: var(--accent-2); color: var(--on-accent-2); }
 .lab-result-fragile { padding: 14px; border-radius: 8px; border: 1px solid var(--warn); background: rgba(242,193,78,0.08); }
-.lab-result-fragile .lab-result-icon { background: var(--warn); color: #1a1200; }
+.lab-result-fragile .lab-result-icon { background: var(--warn); color: var(--on-warn); }
 .lab-result-strict  { padding: 14px; border-radius: 8px; border: 1px solid var(--accent); background: rgba(79,157,255,0.08); }
 .lab-result-strict  .lab-result-icon { background: var(--accent); color: var(--on-accent); }
 .lab-result-fail    { padding: 14px; border-radius: 8px; border: 1px solid var(--danger); background: rgba(255,107,107,0.08); }
-.lab-result-fail    .lab-result-icon { background: var(--danger); color: var(--on-accent); }
+.lab-result-fail    .lab-result-icon { background: var(--danger); color: var(--on-danger); }
 
 .lab-smells { margin: 12px 0 0; padding-left: 18px; font-size: 0.88rem; color: var(--text-dim); }
 .lab-smells li { margin-bottom: 8px; }
