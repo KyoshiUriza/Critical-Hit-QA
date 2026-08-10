@@ -48,13 +48,17 @@
   };
 
   var DONATE_URL = "https://buymeacoffee.com/kyoshiuriza";
-  // No backend, so feedback is a mailto. Subject is prefilled so replies are
-  // filterable; body seeds the three things that make feedback actionable.
+  var REPO_URL = "https://github.com/KyoshiUriza/QAHub";
+  // Feedback goes to GitHub Issues rather than a mailto. On a public project
+  // that is strictly better: reports are visible and trackable instead of
+  // landing in one inbox, and there is no address for scrapers to harvest.
+  // The template seeds the three things that make a report actionable — the
+  // same discipline this site spends its Bug Report Builder teaching.
   var FEEDBACK_URL =
-    "mailto:kyoushiuriza@gmail.com" +
-    "?subject=" + encodeURIComponent("QA Prep Hub feedback") +
+    REPO_URL + "/issues/new" +
+    "?title=" + encodeURIComponent("Feedback: ") +
     "&body=" + encodeURIComponent(
-      "What page were you on?\n\nWhat did you expect?\n\nWhat happened instead?\n"
+      "**Which page?**\n\n\n**What did you expect?**\n\n\n**What happened instead?**\n\n"
     );
 
   function depth() {
@@ -165,9 +169,22 @@
     line3.style.marginTop = "8px";
     var feedback = document.createElement("a");
     feedback.href = FEEDBACK_URL;
-    feedback.textContent = "Found a bug here or have an idea? Tell me →";
+    feedback.target = "_blank";
+    feedback.rel = "noopener noreferrer";
+    feedback.textContent = "Found a bug here or have an idea? Open an issue →";
     feedback.setAttribute("data-testid", "feedback-link");
     line3.appendChild(feedback);
+
+    // A QA tool that is open source should say so. For anyone evaluating the
+    // author, the repo is a stronger signal than the site.
+    line3.appendChild(document.createTextNode("  ·  "));
+    var source = document.createElement("a");
+    source.href = REPO_URL;
+    source.target = "_blank";
+    source.rel = "noopener noreferrer";
+    source.textContent = "Source on GitHub";
+    source.setAttribute("data-testid", "source-link");
+    line3.appendChild(source);
 
     container.appendChild(line1);
     container.appendChild(line2);

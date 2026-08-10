@@ -84,6 +84,12 @@ Append `?reset` to any URL to clear state before the page initialises:
 await page.goto('/practice-apps/login.html?reset');
 ```
 
+## Feedback
+
+Found a bug in the site itself, or have an idea? [Open an issue](https://github.com/KyoshiUriza/QAHub/issues/new).
+The template asks for the three things that make a report actionable — which is
+the same discipline the Bug Report Builder teaches.
+
 ## Hosting
 
 See [HOSTING.md](HOSTING.md). Netlify Drop is the 60-second path; Netlify-via-git and GitHub Pages both auto-deploy (workflow included).

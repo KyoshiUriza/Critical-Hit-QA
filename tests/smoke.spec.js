@@ -89,3 +89,36 @@ test('the core loop is reachable from the hero in three clicks', async ({ page }
   await page.locator('.site-header nav a', { hasText: 'Portfolio' }).click();
   await expect(page.locator('h1')).toContainText('My Portfolio');
 });
+
+// The site is public. These guard the two things that being public changes.
+test.describe('public-repo hygiene', () => {
+  test('the footer points feedback at GitHub Issues, not a personal inbox', async ({ page }) => {
+    await page.goto('/index.html?reset');
+    const feedback = page.getByTestId('feedback-link');
+    await expect(feedback).toBeVisible();
+    const href = await feedback.getAttribute('href');
+    expect(href, 'feedback should not be a mailto on a public site').not.toMatch(/^mailto:/);
+    expect(href).toContain('github.com/KyoshiUriza/QAHub/issues/new');
+    await expect(feedback).toHaveAttribute('rel', 'noopener noreferrer');
+  });
+
+  test('no personal email address is rendered on any page', async ({ page }) => {
+    // A published address gets scraped. This fails if one is reintroduced.
+    for (const path of ['index.html', 'pages/portfolio.html', 'practice-apps/locator-lab.html']) {
+      await page.goto(`/${path}?reset`);
+      const html = await page.content();
+      const emails = (html.match(/[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/g) || [])
+        // Fixture addresses used by the practice apps and SQL sandbox are fine.
+        .filter((e) => !/test\.example|qa\.test|acme\.com|@x\.com|example\.com|real-customer/i.test(e));
+      expect(emails, `real email address rendered on ${path}`).toEqual([]);
+    }
+  });
+
+  test('the source link is present and safe', async ({ page }) => {
+    await page.goto('/index.html?reset');
+    const src = page.getByTestId('source-link');
+    await expect(src).toBeVisible();
+    await expect(src).toHaveAttribute('href', 'https://github.com/KyoshiUriza/QAHub');
+    await expect(src).toHaveAttribute('rel', 'noopener noreferrer');
+  });
+});
