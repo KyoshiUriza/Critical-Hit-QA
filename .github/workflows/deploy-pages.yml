@@ -24,12 +24,45 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      # Publish only what the site actually needs. Previously the whole repo
+      # went live — tests, ADRs, the design audit script, package.json. None of
+      # it is secret, but it is not the site either, and every extra file is
+      # something a visitor can stumble into.
+      - name: Assemble the site
+        run: |
+          mkdir -p _site
+          cp -r index.html css js pages practice-apps _site/
+          # GitHub Pages runs Jekyll by default, which ignores files and
+          # directories beginning with an underscore. Nothing here starts with
+          # one today, but .nojekyll makes that a guarantee rather than luck.
+          touch _site/.nojekyll
+          echo "Published files:"
+          find _site -type f | wc -l
+
+      - name: Verify the build is complete
+        run: |
+          set -e
+          for f in _site/index.html _site/css/styles.css _site/js/site-chrome.js \
+                   _site/pages/portfolio.html _site/practice-apps/locator-lab.html; do
+            test -f "$f" || { echo "MISSING: $f"; exit 1; }
+          done
+          # A stray absolute path breaks the site under the /QAHub/ subpath and
+          # would only show up after deploy.
+          if grep -rnE '(href|src)="/[^/]' _site --include=*.html --include=*.js; then
+            echo "Found root-relative paths — these break under a project subpath."
+            exit 1
+          fi
+          echo "Build looks good."
+
       - name: Setup Pages
         uses: actions/configure-pages@v5
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: '.'
+          path: '_site'
+
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4

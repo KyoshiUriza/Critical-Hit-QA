@@ -1,12 +1,74 @@
 # Hosting the QA Prep Hub
 
-The site is 100% static — no build step, no server, no database. That means it deploys anywhere for free.
+The site is 100% static — no build step, no server, no database.
 
-Three easy paths, ranked by "least effort first":
+**Live at:** https://kyoshiuriza.github.io/QAHub/
+**Repo:** https://github.com/KyoshiUriza/QAHub
 
 ---
 
-## Option 1 — Netlify Drop (zero setup, ~60 seconds)
+## GitHub Pages (the setup in use)
+
+Deployment is automated by [`.github/workflows/deploy-pages.yml`](.github/workflows/deploy-pages.yml).
+Every push to `main` rebuilds and publishes.
+
+### One-time setup
+
+1. Go to **Settings → Pages**.
+2. Under **Build and deployment → Source**, choose **GitHub Actions**.
+   (Not "Deploy from a branch" — the workflow handles it.)
+3. Push to `main`, or run the workflow manually from the **Actions** tab.
+
+The first run takes 1–2 minutes. Watch it in **Actions → Deploy to GitHub Pages**.
+
+### What actually gets published
+
+The workflow does **not** publish the repository. It assembles a `_site/`
+directory containing only `index.html`, `css/`, `js/`, `pages/` and
+`practice-apps/` — 55 files. Tests, ADRs, the design-audit script, the
+proposals and `package.json` stay in the repo and off the web.
+
+It also runs two checks before uploading, so a broken deploy fails loudly
+rather than going live:
+
+- every critical file is present
+- no root-relative paths (`href="/js/..."`) exist
+
+That second one matters more than it looks. GitHub Pages serves a project site
+from a **subpath** — `/QAHub/`, not `/`. Any root-relative path silently 404s
+in production while working perfectly on `localhost`. Every path in this
+project is relative, and `js/site-chrome.js` derives its own prefix from each
+page's `data-depth`, so the whole site is subpath-safe. The check keeps it that
+way.
+
+`.nojekyll` is written into the build so Pages serves files verbatim instead
+of running them through Jekyll.
+
+### Verifying a deploy
+
+```bash
+curl -sI https://kyoshiuriza.github.io/QAHub/ | head -1
+```
+
+Then click through: home → Practice Apps → Bug Bounty → Portfolio, and confirm
+the nav highlights correctly and no console errors appear.
+
+### If the first run fails
+
+| Symptom | Cause |
+|---|---|
+| `Get Pages site failed` | Source isn't set to **GitHub Actions** yet — step 2 above |
+| 404 at the site URL | Deploy succeeded but Pages is still propagating; wait a minute |
+| CSS missing, HTML renders bare | A root-relative path slipped in — the workflow's check should have caught it |
+| Actions tab shows nothing | Workflows are disabled for the repo, or the push didn't reach `main` |
+
+---
+
+## Other hosts
+
+The site is portable — nothing about it is GitHub-specific.
+
+### Netlify Drop (zero setup, ~60 seconds)
 
 Best if you just want a URL right now.
 
@@ -22,7 +84,7 @@ To update it later, drag the folder again — same URL, replaces the site.
 
 ---
 
-## Option 2 — Netlify with git-based deploys (~5 minutes)
+### Netlify with git-based deploys
 
 Best if you want automatic redeploys whenever you edit a file locally and push.
 
@@ -50,34 +112,7 @@ The included `netlify.toml` at the root configures the publish directory and add
 
 ---
 
-## Option 3 — GitHub Pages (free, GitHub-native)
-
-Best if you want your site under `https://YOUR-USERNAME.github.io/qa-prep-hub/`.
-
-Prereqs: a free GitHub account.
-
-```bash
-# From the project folder
-git init
-git add -A
-git commit -m "Initial commit"
-git branch -M main
-# Create the empty repo on github.com first
-git remote add origin https://github.com/YOUR-USERNAME/qa-prep-hub.git
-git push -u origin main
-```
-
-Then on GitHub:
-1. Go to your repo → **Settings → Pages**
-2. Under **Build and deployment → Source**, pick **GitHub Actions**
-3. The included `.github/workflows/deploy-pages.yml` runs automatically on push and publishes the site.
-4. First deploy takes ~1–2 minutes. Then visit `https://YOUR-USERNAME.github.io/qa-prep-hub/`.
-
-**Note:** because GitHub Pages serves under a subpath, all links in this project use relative paths (`../pages/foo.html`, `pages/foo.html`) — they work correctly.
-
----
-
-## Option 4 — Cloudflare Pages / Vercel (also free)
+### Cloudflare Pages / Vercel
 
 Same shape as Netlify:
 - **Cloudflare Pages** → https://pages.cloudflare.com/ — connect GitHub, framework preset "None", build output directory `.`
@@ -91,13 +126,15 @@ Both give you a free custom subdomain plus HTTPS.
 
 Open the deployed URL and run through:
 
-1. Home page → all 10 feature cards visible.
+1. Home page → hero, the three grouped card sections, and the stats strip render.
 2. Practice Tests → start a quiz → answer a question → results screen.
 3. Practice Apps → open Login (clean) → sign in with `demo@qa.test` / `Passw0rd!`.
 4. Bug Bounty → tick a defect → progress bar advances.
 5. Progress → your finds and quiz runs appear.
 6. Study Plan → check a day → completion % increases.
-7. Open DevTools → Application → Local Storage → confirm `qaprep_progress_v1` key is being written.
+7. Bug Report Builder → type a title, wait a second, reload → the draft is still there.
+8. Portfolio → Export all as Markdown → a document appears.
+9. Open DevTools → Application → Local Storage → confirm `qaprep_progress_v1` is written.
 
 If any page 404s, check that the file paths on disk match what the HTML links to (case-sensitive on Linux hosts, case-insensitive on Netlify Drop / GitHub Pages by default — but assume case matters).
 
