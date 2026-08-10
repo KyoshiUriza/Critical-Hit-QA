@@ -211,18 +211,72 @@
     el("quiz-screen").classList.add("hidden");
     el("results-screen").classList.add("hidden");
     el("setup-screen").classList.remove("hidden");
+    syncPool();
   }
 
-  // Deep link support: practice-tests.html?category=manual preselects the drill.
-  function applyCategoryFromUrl() {
-    const want = new URLSearchParams(location.search).get("category");
-    if (!want) return;
+  // Deep link support: practice-tests.html?category=manual preselects the drill,
+  // and ?count=all starts with the whole bank.
+  function applyUrlParams() {
+    const params = new URLSearchParams(location.search);
+
+    const want = params.get("category");
     const sel = el("category-select");
-    if (sel && [...sel.options].some((o) => o.value === want)) sel.value = want;
+    if (want && sel && [...sel.options].some((o) => o.value === want)) sel.value = want;
+
+    syncPool();
+
+    const count = params.get("count");
+    if (count === "all") useAll();
+    else if (count && !isNaN(parseInt(count, 10))) {
+      el("question-count").value = String(Math.min(parseInt(count, 10), poolSize()));
+    }
+  }
+
+  // How many questions the current category actually offers.
+  function poolSize() {
+    const cat = el("category-select").value;
+    const all = window.QUIZ_QUESTIONS || [];
+    return cat === "all" ? all.length : all.filter((q) => q.category === cat).length;
+  }
+
+  // Keep the max, the All button, and the hint truthful as the category changes.
+  function syncPool() {
+    const total = poolSize();
+    const input = el("question-count");
+    const allBtn = el("use-all");
+    const hint = el("pool-hint");
+
+    input.max = String(total);
+    allBtn.textContent = "All (" + total + ")";
+    allBtn.disabled = total === 0;
+
+    const current = parseInt(input.value, 10);
+    // Silently truncating a request for 10 when only 4 exist is confusing —
+    // clamp it so the field always shows what you will actually get.
+    if (!isNaN(current) && current > total) input.value = String(total);
+    if (total > 0 && (isNaN(current) || current < 1)) input.value = "1";
+
+    const catLabel = el("category-select").selectedOptions[0].textContent;
+    if (total === 0) {
+      hint.textContent = "No questions in " + catLabel + " yet.";
+    } else {
+      const asking = parseInt(input.value, 10) || total;
+      hint.textContent = asking >= total
+        ? catLabel + " — all " + total + " question" + (total === 1 ? "" : "s") + " selected."
+        : catLabel + " — " + total + " available.";
+    }
+  }
+
+  function useAll() {
+    el("question-count").value = String(poolSize());
+    syncPool();
   }
 
   document.addEventListener("DOMContentLoaded", () => {
-    applyCategoryFromUrl();
+    applyUrlParams();
+    el("category-select").addEventListener("change", syncPool);
+    el("question-count").addEventListener("input", syncPool);
+    el("use-all").addEventListener("click", useAll);
     el("start-btn").addEventListener("click", startQuiz);
     el("check-btn").addEventListener("click", checkAnswer);
     el("next-btn").addEventListener("click", nextQuestion);
@@ -230,6 +284,7 @@
     el("restart-btn").addEventListener("click", () => {
       el("results-screen").classList.add("hidden");
       el("setup-screen").classList.remove("hidden");
+      syncPool();
     });
     el("review-btn").addEventListener("click", renderReview);
   });

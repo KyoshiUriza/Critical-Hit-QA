@@ -162,6 +162,71 @@ test.describe('progress + continuation (sprint-2)', () => {
   });
 });
 
+test.describe('quiz question count', () => {
+  // The count input used to carry a hardcoded max="30". Once the bank passed 30
+  // questions, "every question" became unreachable.
+  test('the All button selects the entire bank', async ({ page }) => {
+    await page.goto('/pages/practice-tests.html?reset');
+
+    const total = await page.evaluate(() => window.QUIZ_QUESTIONS.length);
+    expect(total).toBeGreaterThan(30);   // guards the original bug
+
+    await expect(page.getByTestId('use-all')).toHaveText(`All (${total})`);
+    await page.getByTestId('use-all').click();
+    await expect(page.getByTestId('question-count')).toHaveValue(String(total));
+    await expect(page.getByTestId('pool-hint')).toContainText(`all ${total} questions selected`);
+  });
+
+  test('a full-bank run starts and finishes', async ({ page }) => {
+    await page.goto('/pages/practice-tests.html?reset');
+    const total = await page.evaluate(() => window.QUIZ_QUESTIONS.length);
+
+    await page.getByTestId('use-all').click();
+    await page.locator('#time-limit').fill('0');
+    await page.getByTestId('start-quiz').click();
+
+    await expect(page.locator('#progress-label')).toHaveText(`Question 1 of ${total}`);
+  });
+
+  test('switching to a smaller category clamps the count', async ({ page }) => {
+    await page.goto('/pages/practice-tests.html?reset');
+    await page.getByTestId('use-all').click();
+
+    await page.locator('#category-select').selectOption('api');
+
+    const apiTotal = await page.evaluate(
+      () => window.QUIZ_QUESTIONS.filter((q) => q.category === 'api').length
+    );
+    // Previously the field kept a number larger than the pool and the app
+    // silently handed back fewer questions than requested.
+    await expect(page.getByTestId('question-count')).toHaveValue(String(apiTotal));
+    await expect(page.getByTestId('use-all')).toHaveText(`All (${apiTotal})`);
+  });
+
+  test('an over-large typed value is clamped to the pool', async ({ page }) => {
+    await page.goto('/pages/practice-tests.html?reset');
+    const total = await page.evaluate(() => window.QUIZ_QUESTIONS.length);
+
+    await page.getByTestId('question-count').fill('999');
+    await expect(page.getByTestId('question-count')).toHaveValue(String(total));
+  });
+
+  test('?count=all deep-links straight to the full bank', async ({ page }) => {
+    await page.goto('/pages/practice-tests.html?reset&count=all');
+    const total = await page.evaluate(() => window.QUIZ_QUESTIONS.length);
+    await expect(page.getByTestId('question-count')).toHaveValue(String(total));
+  });
+
+  test('?category and ?count=all compose', async ({ page }) => {
+    await page.goto('/pages/practice-tests.html?reset&category=sql&count=all');
+    const sqlTotal = await page.evaluate(
+      () => window.QUIZ_QUESTIONS.filter((q) => q.category === 'sql').length
+    );
+    await expect(page.locator('#category-select')).toHaveValue('sql');
+    await expect(page.getByTestId('question-count')).toHaveValue(String(sqlTotal));
+  });
+});
+
 test.describe('bug bounty scoring', () => {
   test('records a find and reflects it on the progress dashboard', async ({ page }) => {
     await page.goto('/pages/bug-bounty.html?reset');

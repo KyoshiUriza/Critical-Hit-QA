@@ -34,14 +34,18 @@
         </label>
         <label>
           <span class="text-dim">Number of questions:</span>
-          <input id="question-count" type="number" min="1" max="30" value="10" />
+          <span class="count-row">
+            <input id="question-count" type="number" min="1" value="10" data-testid="question-count" />
+            <button type="button" class="btn btn-ghost btn-sm" id="use-all" data-testid="use-all">All</button>
+          </span>
         </label>
         <label>
           <span class="text-dim">Time limit (minutes, 0 = none):</span>
           <input id="time-limit" type="number" min="0" max="60" value="10" />
         </label>
-        <button class="btn btn-primary" id="start-btn">Start quiz</button>
+        <button class="btn btn-primary" id="start-btn" data-testid="start-quiz">Start quiz</button>
       </div>
+      <p class="text-dim quiz-pool-hint" id="pool-hint" data-testid="pool-hint" aria-live="polite"></p>
     </section>
 
     <section id="quiz-screen" class="panel hidden">

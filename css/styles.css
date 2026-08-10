@@ -1223,3 +1223,12 @@ th[data-sort]:focus-visible { box-shadow: var(--focus-ring); }
 .sql-schema-item .text-dim { font-family: var(--font-mono); font-size: 0.78rem; margin-top: 2px; }
 
 #sql-output { margin-top: 14px; }
+
+/* Quiz setup — question count with an "All" shortcut. */
+.count-row { display: inline-flex; gap: 6px; align-items: center; }
+.count-row input { width: 5.5rem; }
+.quiz-pool-hint {
+  margin: 10px 0 0;
+  font-size: 0.85rem;
+  font-family: var(--font-mono);
+}
