@@ -642,7 +642,7 @@ If you are early in your career, a bug you found in a practice app is a legitima
 
 1. **Read the failure properly.** Modern runners name the locator and what it resolved to. That is often the whole answer, and skipping it is how people lose afternoons.
 2. **Get the artifacts.** Trace, screenshot, video, console log from the CI run. A trace viewer gives you the DOM at the moment of failure — this turns "no idea" into a fact.
-3. **Ask what differs.** The usual suspects: timing (CI is slower or faster), viewport size (headless defaults differ, and an element can be off-screen), timezone and locale, seeded data, test ordering and parallelism, environment variables, browser version.
+3. **Ask what differs.** The usual suspects: timing (CI is slower or faster), window size and device scale (the viewport is 1280x720 headed or headless, so suspect the window and scaling rather than the viewport), timezone and locale, seeded data, test ordering and parallelism, environment variables, browser version.
 4. **Isolate.** Run that test alone in CI. Passing alone but failing in the suite means state leaking between tests — a shared account, an unclean database, a global left mutated.
 5. **Reproduce locally in CI-like conditions.** Headless, same viewport, same worker count, "--repeat-each" to measure the real flake rate. "Sometimes" is not a diagnosis; 7 in 100 is.
 
@@ -665,7 +665,7 @@ If you are early in your career, a bug you found in a practice app is a legitima
 3. **Kill fixed waits.** Sleeps are pure latency. Auto-retrying assertions wait exactly as long as needed.
 4. **Move setup off the UI.** Logging in through the interface for every test is the classic tax — authenticate once via API or a stored session, and start each test at the state it actually tests.
 5. **Push tests down the pyramid.** A validation rule verified in a UI test is slow and fragile; the same rule at unit level is instant. Ask what each E2E test is really proving.
-6. **Delete tests.** The unpopular one. Tests that have never failed, duplicate coverage, or verify removed features cost time forever and buy nothing.
+6. **Delete tests.** The unpopular one. Duplicate coverage and tests for removed features cost time forever and buy nothing. Be careful with the "never failed" argument, though — a test that has never failed may be guarding something nobody has broken yet, which is the job. Judge it on what it would catch, not on its history.
 
 **Then protect it.** Track suite duration as a metric and treat a regression in runtime like any other regression. Otherwise you will be here again in six months.`
   }

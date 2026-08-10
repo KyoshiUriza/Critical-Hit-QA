@@ -26,7 +26,7 @@
       <strong>Testing charter —</strong> money is the highest-severity domain
       there is, so test it like one. Try transfers at and past the balance, at
       zero and below, to the same account, with more than two decimal places,
-      and with the daily limit already spent. Then check the statement actually
+      and with the session limit already spent. Then check the statement actually
       reflects what you did. Every figure on this page is derived from one
       integer-pence ledger — if you can make the header total disagree with the
       statement, that is a critical find.
@@ -36,7 +36,7 @@
       <h2>Accounts</h2>
       <div class="two-col" id="accounts" data-testid="accounts"></div>
       <p class="mt-2">Total across accounts: <strong data-testid="total-balance"></strong></p>
-      <p class="text-dim text-sm">Daily transfer limit: <strong>£1,000.00</strong> · used today: <span data-testid="limit-used">£0.00</span></p>
+      <p class="text-dim text-sm">Transfer limit: <strong>£1,000.00</strong> per session · used: <span data-testid="limit-used">£0.00</span></p>
     </section>
 
     <section class="app-frame">
@@ -127,12 +127,13 @@
     // ── Money is stored in integer pence, never floats. ───────────────────
     // 0.1 + 0.2 !== 0.3 in binary floating point, and a bank that adds
     // balances in pounds accumulates error. This build is the correct
-    // reference; the buggy variant is where that rule gets broken.
+    // reference. There is no buggy variant of this app yet — if one is added,
+    // breaking this rule is the first defect to seed.
     var ACCOUNTS = [
       { id: "cur", name: "Everyday Current", number: "•••• 4417", pence: 128455 },
       { id: "sav", name: "Rainy Day Saver",  number: "•••• 9032", pence: 542000 }
     ];
-    var DAILY_LIMIT_PENCE = 100000;
+    var SESSION_LIMIT_PENCE = 100000;
     var OTP_THRESHOLD_PENCE = 50000;
     var VALID_OTP = "246810";
 
@@ -175,7 +176,7 @@
         num.className = "text-dim text-sm";
         num.textContent = a.number;
         var bal = document.createElement("div");
-        bal.className = "quiz-score";
+        bal.className = "account-balance";
         bal.setAttribute("data-testid", "balance-" + a.id);
         bal.textContent = money(a.pence);
         card.append(h, num, bal);
@@ -232,8 +233,8 @@
       if (from === to) return { error: "Choose two different accounts." };
       if (parsed.error) return { error: parsed.error };
       if (parsed.pence > acct(from).pence) return { error: "Insufficient funds in " + acct(from).name + "." };
-      if (limitUsedPence + parsed.pence > DAILY_LIMIT_PENCE) {
-        return { error: "That exceeds the £1,000.00 daily limit (" + money(limitUsedPence) + " already used today)." };
+      if (limitUsedPence + parsed.pence > SESSION_LIMIT_PENCE) {
+        return { error: "That exceeds the £1,000.00 session limit (" + money(limitUsedPence) + " already used)." };
       }
       return { from: from, to: to, pence: parsed.pence, ref: testid("reference").value.trim() };
     }
@@ -298,7 +299,11 @@
       acct(pending.to).pence += pending.pence;
       limitUsedPence += pending.pence;
 
-      var today = "2026-08-10";
+      // Real date. A hardcoded one stamps every transfer with the same day
+      // forever, which is itself a defect on a build billed as the reference.
+      var d = new Date();
+      var today = d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") +
+        "-" + String(d.getDate()).padStart(2, "0");
       var ref = pending.ref || "Transfer";
       TX.unshift({ date: today, acct: pending.from, ref: ref, pence: -pending.pence, after: acct(pending.from).pence });
       TX.unshift({ date: today, acct: pending.to, ref: ref, pence: pending.pence, after: acct(pending.to).pence });
@@ -320,7 +325,12 @@
       var t = testid("filter-type").value;
       var q = testid("filter-text").value.trim().toLowerCase();
 
-      var rows = TX.filter(function (tx) {
+      var rows = TX.slice().sort(function (x, y) {
+        // Newest first, always. The seeded rows are stored oldest-first and new
+        // transfers were unshifted, so the table had two orderings at once —
+        // a defect in a build that is meant to be the correct reference.
+        return x.date === y.date ? 0 : (x.date < y.date ? 1 : -1);
+      }).filter(function (tx) {
         if (a !== "all" && tx.acct !== a) return false;
         if (t === "in" && tx.pence <= 0) return false;
         if (t === "out" && tx.pence >= 0) return false;

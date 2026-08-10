@@ -119,4 +119,33 @@ test.describe('Code Review Gauntlet', () => {
     const inside = await page.getByTestId('cr-code').evaluate((el) => el.children.length);
     expect(inside, 'code block should contain text only').toBe(0);
   });
+
+  test('a false positive lowers the recorded score', async ({ page }) => {
+    // The page claims over-flagging costs you. The first version recorded
+    // found/realTotal, so ticking everything banked full marks while the
+    // verdict scolded the user — the prose and the number disagreed.
+    await page.goto(PAGE + '?reset');
+    const boxes = page.locator('[data-issue-box]');
+    const n = await boxes.count();
+    for (let i = 0; i < n; i++) await boxes.nth(i).check();
+    await page.getByTestId('cr-grade').click();
+
+    const run = await page.evaluate(() => window.Progress.get().quiz.runs[0]);
+    expect(run.correct, 'all real defects were ticked').toBeGreaterThan(0);
+    expect(run.total, 'decoys must inflate the denominator').toBeGreaterThan(run.correct);
+  });
+
+  test('the two failure states do not share a glyph', async ({ page }) => {
+    // Colour alone separated "missed" from "wrongly flagged" (they measured
+    // 1.01:1 apart), and both used the same mark.
+    await page.goto(PAGE + '?reset');
+    const decoy = await page.evaluate(() =>
+      window.CODE_REVIEW_EXERCISES[0].issues.find((i) => !i.present).id
+    );
+    await page.locator(`[data-issue-box="${decoy}"]`).check();
+    await page.getByTestId('cr-grade').click();
+
+    await expect(page.locator(`[data-why="${decoy}"]`)).toContainText('⚠');
+    await expect(page.locator('.cr-missed').first().locator('.cr-why')).toContainText('✗');
+  });
 });

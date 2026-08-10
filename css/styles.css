@@ -243,6 +243,7 @@ h1, h2, h3, h4, h5, h6 {
 .mb-4 { margin-bottom: var(--sp-4); }
 .mb-6 { margin-bottom: var(--sp-6); }
 .mb-8 { margin-bottom: var(--sp-8); }
+.mt-8 { margin-top: var(--sp-8); }
 .ml-2 { margin-left: var(--sp-2); }
 
 .p-2 { padding: var(--sp-2); }
@@ -1299,6 +1300,29 @@ code.inline {
 }
 .btn-sort:hover { color: var(--accent); }
 
+/* Own classes, not borrowed ones. The autosuggest first reused .cr-issues from
+   the Code Review Gauntlet, which meant a change to that page's styling would
+   silently restyle a widget here. */
+.suggest-list {
+  list-style: none;
+  padding: 0;
+  margin: var(--sp-2) 0 0;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--rad-md);
+  overflow: hidden;
+  max-width: 320px;
+}
+.suggest-item + .suggest-item { border-top: 1px solid var(--border); }
+
+/* An account balance is a figure, not a quiz score — .quiz-score is --fs-5xl
+   (48px) and carried the wrong meaning as well as the wrong size. */
+.account-balance {
+  font-family: var(--font-mono);
+  font-size: var(--text-2xl);
+  font-weight: 700;
+  margin-top: var(--sp-2);
+}
+
 .btn-suggest {
   background: none;
   border: 0;
@@ -1353,9 +1377,9 @@ code.inline {
   margin-top: var(--sp-2);
   line-height: 1.5;
 }
-.cr-correct { border-left-color: var(--accent-2); background: color-mix(in srgb, var(--accent-2) 8%, transparent); }
-.cr-missed  { border-left-color: var(--danger);   background: color-mix(in srgb, var(--danger) 8%, transparent); }
-.cr-false   { border-left-color: var(--warn);     background: color-mix(in srgb, var(--warn) 8%, transparent); }
+.cr-correct { border-left-color: var(--accent-2); background: color-mix(in srgb, var(--accent-2) 18%, transparent); }
+.cr-missed  { border-left-color: var(--danger);   background: color-mix(in srgb, var(--danger) 18%, transparent); }
+.cr-false   { border-left-color: var(--warn);     background: color-mix(in srgb, var(--warn) 18%, transparent); }
 .cr-ok      { border-left-color: var(--border-strong); }
 .cr-score {
   font-family: var(--font-mono);

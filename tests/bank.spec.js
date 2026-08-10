@@ -52,11 +52,11 @@ test.describe('Meridian Bank', () => {
     await expect(page.getByTestId('transfer-error')).toContainText('two different accounts');
   });
 
-  test('boundaries: balance and daily limit are reported separately', async ({ page }) => {
+  test('boundaries: balance and session limit are reported separately', async ({ page }) => {
     await page.goto(APP + '?reset');
 
     // A penny over the £1,284.55 balance. Both rules are broken here, and the
-    // message must name the balance — telling someone they hit a daily limit
+    // message must name the balance — telling someone they hit a session limit
     // when they are actually out of money sends them to the wrong fix.
     await page.getByTestId('amount').fill('1284.56');
     await page.getByTestId('review-transfer').click();
@@ -65,7 +65,7 @@ test.describe('Meridian Bank', () => {
     // Within balance but over the £1,000 limit: now the limit is the reason.
     await page.getByTestId('amount').fill('1100.00');
     await page.getByTestId('review-transfer').click();
-    await expect(page.getByTestId('transfer-error')).toContainText('daily limit');
+    await expect(page.getByTestId('transfer-error')).toContainText('session limit');
 
     // Exactly on the limit is allowed — the boundary itself, not past it.
     await page.getByTestId('amount').fill('1000.00');
@@ -98,14 +98,14 @@ test.describe('Meridian Bank', () => {
     await expect(page.getByTestId('otp-field')).toBeHidden();
   });
 
-  test('the daily limit accumulates across transfers', async ({ page }) => {
+  test('the session limit accumulates across transfers', async ({ page }) => {
     await page.goto(APP + '?reset');
     await transfer(page, { amount: '600.00', otp: '246810' });
     await expect(page.getByTestId('limit-used')).toHaveText('£600.00');
 
     await page.getByTestId('amount').fill('500.00');
     await page.getByTestId('review-transfer').click();
-    await expect(page.getByTestId('transfer-error')).toContainText('daily limit');
+    await expect(page.getByTestId('transfer-error')).toContainText('session limit');
   });
 
   test('cancelling leaves balances untouched', async ({ page }) => {

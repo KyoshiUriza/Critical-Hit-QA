@@ -105,7 +105,7 @@
       var why = document.querySelector('[data-why="' + issue.id + '"]');
       var prefix = issue.present
         ? (ticked ? "✓ Real defect — " : "✗ Missed — ")
-        : (ticked ? "✗ Not a defect here — " : "◦ Correctly left alone — ");
+        : (ticked ? "⚠ Not a defect here — " : "◦ Correctly left alone — ");
       why.textContent = prefix + issue.why;
       why.classList.remove("hidden");
     });
@@ -136,13 +136,21 @@
     byId("fixed-wrap").className = "";
     byId("grade-btn").disabled = true;
 
-    // Reviews are portfolio-worthy work, so they earn Star-Dust the same way a
-    // quiz does — scored on defects found out of defects present.
+    // Scored on BOTH directions, because the page claims over-flagging costs
+    // you and a score that ignored it would make that claim false. Wrongly
+    // flagged items are added to the denominator, so ticking every box gets
+    // every real defect and still scores badly — which is the lesson.
+    //
+    //   found / (realTotal + wrong)
+    //
+    // Getting this wrong once already: the first version recorded
+    // found/realTotal, so "tick everything" banked full marks while the
+    // verdict text told the user off. The prose and the number now agree.
     if (window.Progress && window.Progress.recordQuizRun) {
       window.Progress.recordQuizRun({
         category: "automation",
         correct: found,
-        total: realTotal,
+        total: realTotal + wrong,
         elapsedMs: 0
       });
     }
@@ -156,7 +164,23 @@
     byId("ex-title").scrollIntoView({ block: "center" });
   }
 
-  if (!EX.length) return;
+  // If the data file fails to load, the page previously rendered a blank title,
+  // a blank code block, an empty checklist and an enabled Submit button — a
+  // broken page pretending to be an exercise. Say what happened instead.
+  if (!EX.length) {
+    var brief = byId("ex-brief");
+    if (brief) {
+      byId("ex-title").textContent = "Exercises could not be loaded";
+      brief.textContent =
+        "The exercise data did not load. Reload the page; if it keeps happening, " +
+        "the file js/data/code-review-exercises.js is not being served.";
+      byId("grade-btn").disabled = true;
+      byId("prev-btn").disabled = true;
+      byId("next-btn").disabled = true;
+    }
+    return;
+  }
+
   byId("grade-btn").addEventListener("click", grade);
   byId("prev-btn").addEventListener("click", function () { move(-1); });
   byId("next-btn").addEventListener("click", function () { move(1); });

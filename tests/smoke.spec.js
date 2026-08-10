@@ -86,7 +86,11 @@ test('learn subpages resolve their nav links from two levels deep', async ({ pag
 test('the core loop is reachable from the hero in three clicks', async ({ page }) => {
   await page.goto('/index.html?reset');
   await page.getByTestId('hero-primary-cta').click();
-  await expect(page).toHaveURL(/practice-apps\.html#buggy$/);
+  // #start, not #buggy. A user persona found that #buggy scrolled PAST the
+  // "Not sure where to start?" panel, so the site's biggest button skipped the
+  // only copy written for a beginner.
+  await expect(page).toHaveURL(/practice-apps\.html#start$/);
+  await expect(page.locator('#start')).toBeVisible();
 
   await page.locator('.site-header nav a', { hasText: 'Bug Bounty' }).click();
   await expect(page.locator('h1')).toContainText('Bug Bounty');

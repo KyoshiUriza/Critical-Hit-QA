@@ -21,7 +21,7 @@
     <!-- Sixteen cards over five screens is a wall, and this page is where the
          home page's primary CTA lands. Named starting points come first so a
          newcomer never has to choose between sixteen equal-looking options. -->
-    <div class="panel panel-accent">
+    <div class="panel panel-accent" id="start" tabindex="-1">
       <h3 class="m-0">Not sure where to start?</h3>
       <p class="text-dim">Pick the one that matches where you are. You can wander the rest afterwards.</p>
       <div class="flex gap-3 flex-wrap">
@@ -44,11 +44,11 @@
         <li>Write test cases covering positive, negative, boundary, security, and accessibility scenarios (see the <a href="test-case-builder.html">Test Case Builder</a>).</li>
         <li>Automate them against the same app — locators use <code class="inline">data-testid</code> so your selectors stay stable. See the <a href="automation-lab.html">Automation Lab</a>.</li>
         <li>Read the "Try to find..." hints to discover intentional bugs and edge cases.</li>
-        <li>Try the <strong>Buggy</strong> variant of each app — it works like the clean version but has intentional defects. See how many you can catalog before revealing the answer key.</li>
+        <li>Try the <strong>Buggy</strong> variant of each app — it works like the clean version but has intentional defects. See how many you can catalog, then score yourself in <a href="bug-bounty.html">Bug Bounty</a> — that is where the answer key lives.</li>
       </ol>
     </div>
 
-    <h2 style="margin-top:32px;">Clean builds — write positive test cases</h2>
+    <h2 class="mt-8">Clean builds — write positive test cases</h2>
     <div class="apps-grid">
       <div class="app-card">
         <h3>Login Form</h3>
@@ -141,7 +141,7 @@
         <ul>
           <li>Try to break: amounts at, and one penny past, the balance</li>
           <li>Try to break: three decimal places, zero, same-account transfer</li>
-          <li>Try to break: the daily limit and the step-up code flow</li>
+          <li>Try to break: the session limit and the step-up code flow</li>
         </ul>
         <a class="btn btn-primary btn-sm" href="../practice-apps/bank.html">Open app →</a>
       </div>
@@ -195,8 +195,8 @@
       </div>
     </div>
 
-    <h2 id="buggy" style="margin-top:40px;">Buggy builds — find and file the defects</h2>
-    <p class="text-dim">Each app below is a mirror of the clean version above but with intentional bugs seeded across validation, calculation, security, and state. Test against the same behavior spec — every deviation is a bug. When you're done, reveal the answer key at the bottom of the page to score yourself.</p>
+    <h2 id="buggy" class="mt-8">Buggy builds — find and file the defects</h2>
+    <p class="text-dim">Each app below is a mirror of the clean version above but with intentional bugs seeded across validation, calculation, security, and state. Test against the same behavior spec — every deviation is a bug. When you are done, score yourself in <a href="bug-bounty.html">Bug Bounty</a> — the answer key is there, weighted by severity. Every buggy app also has a <strong>🐛 Bug Bounty</strong> tab on its right edge, so you can tick finds without leaving the app.</p>
 
     <div class="apps-grid">
       <div class="app-card" style="border-color: var(--danger);">
@@ -255,7 +255,7 @@
         <li><strong>Charter your session.</strong> Time-box (20-30 min), pick a focus (validation? calculations? security?), take notes as you go.</li>
         <li><strong>Try to break it.</strong> Boundary values, invalid types, empty submits, whitespace, unicode, huge inputs, rapid clicks, refresh mid-flow, back button.</li>
         <li><strong>Log each defect properly.</strong> Title (what + where + observed), steps to reproduce, expected vs. actual, severity/priority, evidence. Use the <a href="test-case-builder.html">Test Case Builder</a> — its format works for bug reports too.</li>
-        <li><strong>Reveal the answer key ONLY after you've drafted your list.</strong> Then compare: what did you catch? What did you miss? What did you find that isn't on the key (bonus points)?</li>
+        <li><strong>Open the answer key in <a href="bug-bounty.html">Bug Bounty</a> ONLY after you have drafted your list.</strong> Then compare: what did you catch? What did you miss? What did you find that isn't on the key (bonus points)?</li>
       </ol>
     </div>
 

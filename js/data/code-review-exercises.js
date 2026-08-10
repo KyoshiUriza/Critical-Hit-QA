@@ -76,8 +76,8 @@ test('deletes the user', async ({ request }) => {
     issues: [
       { id: "order-dep", present: true, label: "The second test depends on state from the first",
         why: "Run them in parallel, or run the second alone with `--grep`, and `createdUserId` is undefined. Tests that only pass in one order are not tests, they are a script with assertions." },
-      { id: "parallel", present: true, label: "Shared mutable module state breaks under parallel workers",
-        why: "Playwright runs files in parallel by default, and each worker gets its own module instance — so the variable is not even shared the way the author assumes. This is the specific reason it passes locally (often serial) and fails in CI (parallel)." },
+      { id: "parallel", present: true, label: "The shared variable survives only under the default execution mode",
+        why: "Worth being precise, because the folklore version is wrong. By default Playwright parallelises across FILES, while tests within one file run in order in the same worker — so `createdUserId` genuinely is shared, and that is exactly why the file passes. It breaks the moment execution changes: `fullyParallel: true`, `describe.configure({ mode: 'parallel' })`, sharding across machines, running the second test alone with `--grep`, or a retry of just the failing test. Note also that the scaffolded config sets `workers: 1` on CI, so 'it fails in CI because CI is parallel' is usually backwards — reach for retries, sharding or grep as the likelier trigger." },
       { id: "fixed-email", present: true, label: "A fixed email address collides on re-run",
         why: "The first run creates dup@test.example; if cleanup fails, the next run gets a 409 and the test fails for a reason unrelated to the change. Unique data per run — a timestamp or uuid in the local part — removes a whole class of false failures." },
       { id: "no-cleanup", present: true, label: "Cleanup happens in a test, so a failure leaks data",
@@ -181,14 +181,21 @@ test('deletes the user', async ({ request }) => {
     fixed: `test('checkout total equals the sum of line items', async ({ page }) => {
   await page.goto('/checkout');
 
-  const prices = await page.getByTestId('line-total').allTextContents();
-  const expected = prices
-    .map((p) => Number(p.replace(/[^0-9.]/g, '')))
+  const lines = page.getByTestId('line-total');
+  // allTextContents() does NOT retry. Reading before the rows render returns
+  // [], the sum is 0, and the test happily asserts £0.00 — the same stale
+  // snapshot this exercise marks as a defect. Wait for the rows first.
+  await expect(lines).toHaveCount(3);
+
+  // Sum in integer pence, and keep the minus sign so a discount subtracts
+  // instead of being added as a credit.
+  const pence = (await lines.allTextContents())
+    .map((t) => Math.round(Number(t.replace(/[^0-9.-]/g, '')) * 100))
     .reduce((a, b) => a + b, 0);
 
   // No try/catch: a failure here is the signal we are paying for.
   await expect(page.getByTestId('order-total'))
-    .toHaveText(\`£\${expected.toFixed(2)}\`);
+    .toHaveText(\`£\${(pence / 100).toFixed(2)}\`);
 });`
   },
   {
@@ -221,8 +228,8 @@ test('deletes the user', async ({ request }) => {
         why: "It penalises every test that logs in, and hides whatever race it was added for. Waiting on a real post-login condition removes both problems." },
       { id: "return-true", present: true, label: "Returning a bare `true` conveys nothing",
         why: "It can only ever be true — the method throws otherwise. Either return something useful (the next page object) or nothing at all. `if (await login())` reads as a real check while being a constant." },
-      { id: "mixed-style", present: true, label: "Half the fields use stored handles, half use inline page.fill",
-        why: "Not a bug in itself, but inconsistency in a base class propagates. Pick locators as fields and use them everywhere, so there is one pattern to learn." },
+      { id: "mixed-style", present: false, label: "Half the fields use stored handles, half use inline page.fill",
+        why: "Decoy, and a deliberately fine-grained one. The inconsistency is real and worth a comment — but it is a nit, not a defect, and this exercise's contract is that a ticked box means a defect. Say 'nit:' out loud in a real review and move on; spending your reviewer's attention here while a stale ElementHandle sits three lines above is the mistake being tested." },
       { id: "pom-bad", present: false, label: "Page Objects are an outdated pattern and should not be used",
         why: "Decoy, and a trap in interviews. POM is alive and widely used; Playwright also offers fixtures as an alternative for some cases. Confidently dismissing a pattern the team uses reads as inflexibility, not seniority." }
     ],

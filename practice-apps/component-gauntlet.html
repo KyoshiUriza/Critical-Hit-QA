@@ -19,7 +19,7 @@
   <main id="main" class="container">
     <div class="page-header">
       <h1>Component Gauntlet</h1>
-      <p>Every widget automation interviews ask about, on one page. Clean build — nothing here is deliberately broken.</p>
+      <p>Every widget automation interviews ask about, on one page. A range, not a test: nothing here is scored, and the only thing deliberately broken is the one 404 in section 14, which is there to be detected.</p>
     </div>
 
     <div class="panel panel-accent">
@@ -63,7 +63,7 @@
         <label for="country">Country (type at least 2 letters)</label>
         <input type="text" id="country" data-testid="autosuggest-input" autocomplete="off" placeholder="e.g. ind" />
       </div>
-      <ul class="cr-issues hidden" id="suggestions" data-testid="suggestions"></ul>
+      <ul class="suggest-list hidden" id="suggestions" data-testid="suggestions"></ul>
       <p class="text-dim mt-2" data-testid="autosuggest-output">Nothing chosen</p>
 
       <h2 class="mt-6">3 · Dropdown</h2>
@@ -262,7 +262,7 @@
       if (!hits.length) { sugg.classList.add("hidden"); return; }
       hits.forEach(function (c) {
         var li = document.createElement("li");
-        li.className = "cr-issue";
+        li.className = "suggest-item";
         var b = document.createElement("button");
         b.className = "btn-suggest";
         b.type = "button";
@@ -462,9 +462,19 @@
       var host = testid("shadow-host");
       var root = host.attachShadow({ mode: "open" });
       var style = document.createElement("style");
+      // Custom properties inherit THROUGH the shadow boundary, so the tokens
+      // work in here and raw hex does not need to exist. The first version
+      // hardcoded #71717a and 6px and left the button at UA default, which
+      // made section 17 the one control on the site that ignored the theme —
+      // and rendered a light-grey button in dark mode.
       style.textContent =
-        ".sd { padding:12px; border:1px dashed #71717a; border-radius:6px; font-family:inherit; }" +
-        "button { font: inherit; padding:6px 12px; border-radius:6px; cursor:pointer; }";
+        ".sd { padding: var(--sp-3); border: 1px dashed var(--border-control);" +
+        "      border-radius: var(--rad-md); background: var(--bg-elev-2); font-family: inherit; }" +
+        "button { font: inherit; padding: var(--sp-2) var(--sp-3);" +
+        "         border-radius: var(--rad-md); cursor: pointer;" +
+        "         background: var(--bg-elev); color: var(--text);" +
+        "         border: 1px solid var(--border-control); }" +
+        "button:focus-visible { outline: 3px solid var(--focus-ring-color); outline-offset: 2px; }";
       var wrap = document.createElement("div");
       wrap.className = "sd";
       var label = document.createElement("p");
