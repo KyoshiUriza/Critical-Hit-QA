@@ -140,11 +140,18 @@ function check(ok, label, detail) {
   const links = await page.evaluate(() => {
     const f = document.querySelector('[data-testid="feedback-link"]');
     const s = document.querySelector('[data-testid="source-link"]');
-    return { feedback: f && f.getAttribute('href'), source: s && s.getAttribute('href') };
+    const b = document.querySelector('[data-testid="book-link"]');
+    return {
+      feedback: f && f.getAttribute('href'),
+      source: s && s.getAttribute('href'),
+      book: b && b.getAttribute('href'),
+    };
   });
   check(!!links.feedback && !links.feedback.startsWith('mailto:'),
         'feedback points at Issues, not a mailto', links.feedback || 'missing');
   check(!!links.source, 'source link present', links.source || 'missing');
+  check(!!links.book && links.book.includes('royalroad.com/fiction/159344/'),
+        'source serial is credited and linked', links.book || 'missing');
 
   await browser.close();
 

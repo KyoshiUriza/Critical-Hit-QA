@@ -121,6 +121,18 @@ test.describe('public-repo hygiene', () => {
     await expect(src).toHaveAttribute('href', 'https://github.com/KyoshiUriza/Critical-Hit-QA');
     await expect(src).toHaveAttribute('rel', 'noopener noreferrer');
   });
+
+  test('the footer credits the source serial and links it', async ({ page }) => {
+    // The Lattice vocabulary is borrowed from a published work. Attribution
+    // that links back is the whole point, so a broken or missing href here is
+    // a real defect rather than cosmetic.
+    await page.goto('/index.html?reset');
+    const book = page.getByTestId('book-link');
+    await expect(book).toBeVisible();
+    await expect(book).toHaveAttribute('href', /royalroad\.com\/fiction\/159344\//);
+    await expect(book).toHaveAttribute('rel', 'noopener noreferrer');
+    await expect(book).toContainText('The Resonance Lattice');
+  });
 });
 
 test.describe('favicon', () => {

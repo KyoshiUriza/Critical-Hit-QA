@@ -49,6 +49,11 @@
 
   var DONATE_URL = "https://buymeacoffee.com/kyoshiuriza";
   var REPO_URL = "https://github.com/KyoshiUriza/Critical-Hit-QA";
+  // The serial this site's Lattice vocabulary comes from. Linked because the
+  // theme is not decoration — it is the reason the progression system exists,
+  // and a reader who wants the source should not have to go looking.
+  var BOOK_URL =
+    "https://www.royalroad.com/fiction/159344/the-resonance-lattice-book-1-integration";
   // Feedback goes to GitHub Issues rather than a mailto. On a public project
   // that is strictly better: reports are visible and trackable instead of
   // landing in one inbox, and there is no address for scrapers to harvest.
@@ -148,10 +153,19 @@
 
     var line1 = document.createElement("p");
     line1.appendChild(document.createTextNode("Critical Hit QA — a local study companion. Themed on "));
+    // The title itself is the link rather than a separate "read it here" —
+    // the sentence already names the thing being linked, so a second one
+    // would just be footer clutter.
+    var book = document.createElement("a");
+    book.href = BOOK_URL;
+    book.target = "_blank";
+    book.rel = "noopener noreferrer";
+    book.setAttribute("data-testid", "book-link");
     var em = document.createElement("em");
     em.textContent = "The Convergence Chronicles: The Resonance Lattice";
-    line1.appendChild(em);
-    line1.appendChild(document.createTextNode("."));
+    book.appendChild(em);
+    line1.appendChild(book);
+    line1.appendChild(document.createTextNode(" on Royal Road."));
 
     var line2 = document.createElement("p");
     line2.style.marginTop = "12px";
