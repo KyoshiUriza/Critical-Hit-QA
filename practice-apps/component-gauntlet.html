@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- frame-src 'self' rather than 'none' here, and ONLY here: the iframe
+       exercise is the point of section 12, and frame switching is one of the
+       most-asked automation skills. The frame loads a same-origin page in
+       this repo, so nothing third-party can be embedded. -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; object-src 'none'; frame-src 'self'; base-uri 'self'; form-action 'self'" />
+  <meta name="referrer" content="no-referrer" />
+  <title>Component Gauntlet — Critical Hit QA</title>
+  <link rel="stylesheet" href="../css/styles.css" />
+</head>
+<body data-page="practice-app-detail" data-depth="1">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div id="site-header"></div>
+
+  <main id="main" class="container">
+    <div class="page-header">
+      <h1>Component Gauntlet</h1>
+      <p>Every widget automation interviews ask about, on one page. Clean build — nothing here is deliberately broken.</p>
+    </div>
+
+    <div class="panel panel-accent">
+      <strong>Testing charter —</strong> automate one interaction per section
+      below. Every control has a stable <code class="inline">data-testid</code>,
+      so the exercise is the <em>technique</em> (frames, windows, waits, shadow
+      roots), not hunting for a selector. The awkward ones are 6, 12, 13 and 16:
+      alerts, frames, windows and shadow DOM each need something beyond a
+      locator.
+    </div>
+
+    <div class="section-toc">
+      <h4>◈ Sections</h4>
+      <ul>
+        <li><a href="#basics">1–5 · Form controls</a></li>
+        <li><a href="#dialogs">6–8 · Alerts, windows, visibility</a></li>
+        <li><a href="#tables">9–11 · Tables: sort, totals, pagination</a></li>
+        <li><a href="#hover">12–14 · Hover, frames, links</a></li>
+        <li><a href="#async">15–17 · Async, drag, shadow DOM</a></li>
+      </ul>
+    </div>
+
+    <!-- ══════════ 1–5 form controls ══════════ -->
+    <section id="basics" class="app-frame">
+      <h2>1 · Radio buttons</h2>
+      <div class="flex gap-4 flex-wrap">
+        <label><input type="radio" name="plan" value="free" data-testid="radio-free" /> Free</label>
+        <label><input type="radio" name="plan" value="pro" data-testid="radio-pro" /> Pro</label>
+        <label><input type="radio" name="plan" value="team" data-testid="radio-team" /> Team</label>
+      </div>
+      <p class="text-dim mt-2" data-testid="radio-output">No plan selected</p>
+
+      <h2 class="mt-6">2 · Autosuggest</h2>
+      <div class="form-field">
+        <label for="country">Country (type at least 2 letters)</label>
+        <input type="text" id="country" data-testid="autosuggest-input" autocomplete="off" placeholder="e.g. ind" />
+      </div>
+      <ul class="cr-issues hidden" id="suggestions" data-testid="suggestions"></ul>
+      <p class="text-dim mt-2" data-testid="autosuggest-output">Nothing chosen</p>
+
+      <h2 class="mt-6">3 · Dropdown</h2>
+      <div class="form-field">
+        <label for="severity">Severity</label>
+        <select id="severity" data-testid="dropdown">
+          <option value="">Select…</option>
+          <option value="low">Low</option>
+          <option value="medium">Medium</option>
+          <option value="high">High</option>
+          <option value="critical">Critical</option>
+        </select>
+      </div>
+      <p class="text-dim" data-testid="dropdown-output">Nothing selected</p>
+
+      <h2 class="mt-6">4 · Multi-select</h2>
+      <div class="form-field">
+        <label for="browsers">Browsers (multiple)</label>
+        <select id="browsers" multiple size="4" data-testid="multiselect">
+          <option value="chromium">Chromium</option>
+          <option value="firefox">Firefox</option>
+          <option value="webkit">WebKit</option>
+          <option value="edge">Edge</option>
+        </select>
+      </div>
+      <p class="text-dim" data-testid="multiselect-output">None selected</p>
+
+      <h2 class="mt-6">5 · Checkboxes with select-all</h2>
+      <label><input type="checkbox" id="check-all" data-testid="check-all" /> <strong>Select all</strong></label>
+      <div class="flex gap-4 flex-wrap mt-2">
+        <label><input type="checkbox" class="opt" value="a" data-testid="check-a" /> Smoke</label>
+        <label><input type="checkbox" class="opt" value="b" data-testid="check-b" /> Regression</label>
+        <label><input type="checkbox" class="opt" value="c" data-testid="check-c" /> Exploratory</label>
+      </div>
+      <p class="text-dim mt-2" data-testid="check-output">0 selected</p>
+    </section>
+
+    <!-- ══════════ 6–8 dialogs / windows / visibility ══════════ -->
+    <section id="dialogs" class="app-frame">
+      <h2>6 · Native dialogs</h2>
+      <p class="text-dim text-sm">These block the page. Your framework must register a handler <em>before</em> the click.</p>
+      <div class="flex gap-2 flex-wrap">
+        <button class="btn btn-ghost btn-sm" data-testid="alert-btn">Alert</button>
+        <button class="btn btn-ghost btn-sm" data-testid="confirm-btn">Confirm</button>
+        <button class="btn btn-ghost btn-sm" data-testid="prompt-btn">Prompt</button>
+      </div>
+      <p class="text-dim mt-2" data-testid="dialog-output">No dialog yet</p>
+
+      <h2 class="mt-6">7 · New window and new tab</h2>
+      <div class="flex gap-2 flex-wrap">
+        <button class="btn btn-ghost btn-sm" data-testid="open-window">Open window</button>
+        <a class="btn btn-ghost btn-sm" href="frame-content.html" target="_blank" rel="noopener" data-testid="open-tab">Open tab ↗</a>
+      </div>
+      <p class="text-dim text-sm mt-2">Start waiting for the popup <em>before</em> clicking, or you will miss the event.</p>
+
+      <h2 class="mt-6">8 · Show / hide</h2>
+      <button class="btn btn-ghost btn-sm" data-testid="toggle-btn">Hide the box</button>
+      <div class="panel mt-2" id="toggle-target" data-testid="toggle-target">
+        I am visible. Assert on visibility, not on presence — I stay in the DOM.
+      </div>
+    </section>
+
+    <!-- ══════════ 9–11 tables ══════════ -->
+    <section id="tables" class="app-frame">
+      <h2>9 · Sortable table</h2>
+      <p class="text-dim text-sm">Click a header to sort. Row order changes — so any locator using row position is wrong by construction.</p>
+      <table class="data-table" data-testid="sortable-table">
+        <thead>
+          <tr>
+            <th><button class="btn-sort" data-sort="name" data-testid="sort-name">Instructor ⇅</button></th>
+            <th><button class="btn-sort" data-sort="course" data-testid="sort-course">Course ⇅</button></th>
+            <th><button class="btn-sort" data-sort="price" data-testid="sort-price">Price ⇅</button></th>
+          </tr>
+        </thead>
+        <tbody id="sortable-body"></tbody>
+      </table>
+
+      <h2 class="mt-6">10 · Scrolling table with a computed total</h2>
+      <p class="text-dim text-sm">Sum the Amount column and compare against the stated total. Rows below the fold still count.</p>
+      <div style="max-height:220px; overflow-y:auto; border:1px solid var(--border-strong); border-radius:var(--rad-md);">
+        <table class="data-table" data-testid="scroll-table">
+          <thead><tr><th>Name</th><th>Role</th><th>City</th><th>Amount</th></tr></thead>
+          <tbody id="scroll-body"></tbody>
+        </table>
+      </div>
+      <p class="mt-2">Total collected: <strong data-testid="scroll-total">0</strong></p>
+
+      <h2 class="mt-6">11 · Pagination</h2>
+      <table class="data-table" data-testid="paged-table">
+        <thead><tr><th>ID</th><th>Ticket</th><th>Status</th></tr></thead>
+        <tbody id="paged-body"></tbody>
+      </table>
+      <div class="flex gap-2 items-center mt-2">
+        <button class="btn btn-ghost btn-sm" data-testid="page-prev">← Prev</button>
+        <span class="text-dim text-sm" data-testid="page-label"></span>
+        <button class="btn btn-ghost btn-sm" data-testid="page-next">Next →</button>
+      </div>
+      <p class="text-dim text-sm">Find ticket <strong>T-017</strong>. It is not on page 1 — paging is part of the exercise.</p>
+    </section>
+
+    <!-- ══════════ 12–14 hover / frame / links ══════════ -->
+    <section id="hover" class="app-frame">
+      <h2>12 · Mouse hover menu</h2>
+      <div class="hover-wrap" data-testid="hover-target">
+        <button class="btn btn-ghost btn-sm">Hover over me</button>
+        <div class="hover-menu" data-testid="hover-menu">
+          <a href="#hover" data-testid="hover-item-1">Top rated</a>
+          <a href="#hover" data-testid="hover-item-2">Most recent</a>
+        </div>
+      </div>
+      <p class="text-dim text-sm mt-2">The menu is not in the layout until you hover. A plain click will miss it.</p>
+
+      <h2 class="mt-6">13 · iframe</h2>
+      <iframe id="demo-frame" data-testid="demo-frame" src="frame-content.html"
+              title="Framed practice content"
+              style="width:100%; height:280px; border:1px solid var(--border-strong); border-radius:var(--rad-md);"></iframe>
+
+      <h2 class="mt-6">14 · Link checking</h2>
+      <ul class="text-dim">
+        <li><a href="../index.html" data-testid="link-ok">Working internal link</a></li>
+        <li><a href="does-not-exist.html" data-testid="link-broken">Broken link (404)</a></li>
+        <li><a href="../pages/learn.html" data-testid="link-ok-2">Another working link</a></li>
+      </ul>
+      <p class="text-dim text-sm">Collect every href, request each, and assert on status. One of these returns 404.</p>
+    </section>
+
+    <!-- ══════════ 15–17 async / drag / shadow ══════════ -->
+    <section id="async" class="app-frame">
+      <h2>15 · Dynamic loading</h2>
+      <button class="btn btn-primary btn-sm" data-testid="load-btn">Load data</button>
+      <div class="mt-2" id="loading" data-testid="loading" hidden>
+        <span class="text-dim">Loading…</span>
+      </div>
+      <div class="panel mt-2 hidden" id="loaded" data-testid="loaded-content">
+        Loaded after a delay. Wait for THIS, never for a fixed number of seconds.
+      </div>
+
+      <h2 class="mt-6">16 · Drag and drop</h2>
+      <div class="flex gap-4 flex-wrap items-start">
+        <div class="drop-zone" id="drag-source" data-testid="drag-source">
+          <div class="drag-item" draggable="true" data-testid="drag-item">Defect card</div>
+        </div>
+        <div class="drop-zone" id="drop-target" data-testid="drop-target">
+          <span class="text-dim text-sm">Drop here</span>
+        </div>
+      </div>
+      <p class="text-dim mt-2" data-testid="drag-output">Not dropped</p>
+
+      <h2 class="mt-6">17 · Shadow DOM</h2>
+      <p class="text-dim text-sm">
+        This control lives inside an open shadow root. Ordinary CSS from the
+        page cannot reach it — Playwright pierces shadow roots automatically,
+        Selenium needs <code class="inline">shadow_root</code>.
+      </p>
+      <div id="shadow-host" data-testid="shadow-host"></div>
+      <p class="text-dim mt-2" data-testid="shadow-output">Shadow button not clicked</p>
+    </section>
+
+    <div class="panel app-next-steps">
+      <span class="text-dim">Related:</span>
+      <a class="btn btn-primary btn-sm" href="locator-lab.html">Locator Lab →</a>
+      <a class="btn btn-ghost btn-sm" href="../pages/automation-lab.html">Automation Lab</a>
+      <a class="btn btn-ghost btn-sm" href="../pages/code-review.html">Code Review Gauntlet</a>
+    </div>
+  </main>
+
+  <div id="site-footer"></div>
+
+  <script src="../js/test-hooks.js"></script>
+  <script src="../js/site-chrome.js"></script>
+  <script src="../js/data/defects.js"></script>
+  <script src="../js/profiles.js"></script>
+  <script src="../js/progress.js"></script>
+  <script src="../js/rpg.js"></script>
+  <script>
+    var $ = function (s) { return document.querySelector(s); };
+    var $$ = function (s) { return Array.prototype.slice.call(document.querySelectorAll(s)); };
+    var testid = function (id) { return document.querySelector('[data-testid="' + id + '"]'); };
+
+    // ── 1 radio ──────────────────────────────────────────────────────────
+    $$('input[name="plan"]').forEach(function (r) {
+      r.addEventListener("change", function () {
+        testid("radio-output").textContent = "Selected: " + r.value;
+      });
+    });
+
+    // ── 2 autosuggest ────────────────────────────────────────────────────
+    var COUNTRIES = ["India", "Indonesia", "Ireland", "Iceland", "Israel",
+      "United Kingdom", "United States", "Uruguay", "Canada", "Cameroon", "Chile"];
+    var sugg = testid("suggestions");
+    testid("autosuggest-input").addEventListener("input", function (e) {
+      var q = e.target.value.trim().toLowerCase();
+      sugg.textContent = "";
+      if (q.length < 2) { sugg.classList.add("hidden"); return; }
+      var hits = COUNTRIES.filter(function (c) { return c.toLowerCase().indexOf(q) === 0; });
+      if (!hits.length) { sugg.classList.add("hidden"); return; }
+      hits.forEach(function (c) {
+        var li = document.createElement("li");
+        li.className = "cr-issue";
+        var b = document.createElement("button");
+        b.className = "btn-suggest";
+        b.type = "button";
+        b.textContent = c;
+        b.setAttribute("data-testid", "suggestion-" + c.toLowerCase().replace(/\s+/g, "-"));
+        b.addEventListener("click", function () {
+          testid("autosuggest-input").value = c;
+          testid("autosuggest-output").textContent = "Chosen: " + c;
+          sugg.classList.add("hidden");
+        });
+        li.appendChild(b);
+        sugg.appendChild(li);
+      });
+      sugg.classList.remove("hidden");
+    });
+
+    // ── 3/4 selects ──────────────────────────────────────────────────────
+    testid("dropdown").addEventListener("change", function (e) {
+      testid("dropdown-output").textContent = e.target.value
+        ? "Severity: " + e.target.value : "Nothing selected";
+    });
+    testid("multiselect").addEventListener("change", function (e) {
+      var picked = Array.prototype.filter.call(e.target.options, function (o) { return o.selected; })
+        .map(function (o) { return o.value; });
+      testid("multiselect-output").textContent = picked.length
+        ? "Selected: " + picked.join(", ") : "None selected";
+    });
+
+    // ── 5 checkboxes ─────────────────────────────────────────────────────
+    function syncChecks() {
+      var boxes = $$(".opt");
+      var n = boxes.filter(function (b) { return b.checked; }).length;
+      testid("check-output").textContent = n + " selected";
+      testid("check-all").checked = n === boxes.length;
+      // Indeterminate is a real state automation forgets: checked is false
+      // here, so asserting on `checked` alone reports "nothing selected".
+      testid("check-all").indeterminate = n > 0 && n < boxes.length;
+    }
+    testid("check-all").addEventListener("change", function (e) {
+      $$(".opt").forEach(function (b) { b.checked = e.target.checked; });
+      syncChecks();
+    });
+    $$(".opt").forEach(function (b) { b.addEventListener("change", syncChecks); });
+
+    // ── 6 dialogs ────────────────────────────────────────────────────────
+    testid("alert-btn").addEventListener("click", function () {
+      window.alert("This is an alert. Accept it.");
+      testid("dialog-output").textContent = "Alert accepted";
+    });
+    testid("confirm-btn").addEventListener("click", function () {
+      var ok = window.confirm("Delete this record?");
+      testid("dialog-output").textContent = ok ? "Confirmed" : "Dismissed";
+    });
+    testid("prompt-btn").addEventListener("click", function () {
+      var v = window.prompt("Enter a ticket ID:", "");
+      testid("dialog-output").textContent = v ? "Prompt value: " + v : "Prompt dismissed";
+    });
+
+    // ── 7 window ─────────────────────────────────────────────────────────
+    testid("open-window").addEventListener("click", function () {
+      window.open("frame-content.html", "_blank", "width=520,height=420");
+    });
+
+    // ── 8 visibility ─────────────────────────────────────────────────────
+    testid("toggle-btn").addEventListener("click", function () {
+      var box = testid("toggle-target");
+      var hidden = box.style.display === "none";
+      box.style.display = hidden ? "" : "none";
+      this.textContent = hidden ? "Hide the box" : "Show the box";
+    });
+
+    // ── 9 sortable table ─────────────────────────────────────────────────
+    var COURSES = [
+      { name: "Ada Okonkwo", course: "Playwright from scratch", price: 30 },
+      { name: "Ben Iversen", course: "SQL for testers", price: 25 },
+      { name: "Chen Wei", course: "Mobile automation", price: 35 },
+      { name: "Dara Singh", course: "API testing with REST", price: 20 },
+      { name: "Eli Moreau", course: "Performance testing basics", price: 25 },
+      { name: "Farah Aziz", course: "Accessibility for QA", price: 15 }
+    ];
+    var sortDir = {};
+    function renderSortable(key) {
+      var rows = COURSES.slice();
+      if (key) {
+        sortDir[key] = !sortDir[key];
+        rows.sort(function (a, b) {
+          var x = a[key], y = b[key];
+          var r = typeof x === "number" ? x - y : String(x).localeCompare(String(y));
+          return sortDir[key] ? r : -r;
+        });
+      }
+      var body = $("#sortable-body");
+      body.textContent = "";
+      rows.forEach(function (r) {
+        var tr = document.createElement("tr");
+        tr.setAttribute("data-instructor", r.name);
+        [r.name, r.course, "$" + r.price].forEach(function (v) {
+          var td = document.createElement("td");
+          td.textContent = v;
+          tr.appendChild(td);
+        });
+        body.appendChild(tr);
+      });
+    }
+    $$("[data-sort]").forEach(function (b) {
+      b.addEventListener("click", function () { renderSortable(b.getAttribute("data-sort")); });
+    });
+    renderSortable();
+
+    // ── 10 scrolling table ───────────────────────────────────────────────
+    var PEOPLE = [
+      ["Alex", "Engineer", "Chennai", 28], ["Ben", "Mechanic", "Bengaluru", 23],
+      ["Dwayne", "Manager", "Kolkata", 48], ["Ivory", "Receptionist", "Chennai", 18],
+      ["Jack", "Engineer", "Pune", 32], ["Joe", "Postman", "Chennai", 46],
+      ["Raymond", "Analyst", "Mumbai", 37], ["Ronaldo", "Coach", "Chennai", 31],
+      ["Smith", "Cricketer", "Delhi", 33], ["Tara", "Designer", "Pune", 27],
+      ["Uma", "Architect", "Hyderabad", 41], ["Vik", "Support", "Kochi", 19]
+    ];
+    var sBody = $("#scroll-body"), total = 0;
+    PEOPLE.forEach(function (p) {
+      total += p[3];
+      var tr = document.createElement("tr");
+      p.forEach(function (v, i) {
+        var td = document.createElement("td");
+        td.textContent = v;
+        if (i === 3) td.setAttribute("data-testid", "amount-cell");
+        tr.appendChild(td);
+      });
+      sBody.appendChild(tr);
+    });
+    testid("scroll-total").textContent = String(total);
+
+    // ── 11 pagination ────────────────────────────────────────────────────
+    var TICKETS = [];
+    for (var i = 1; i <= 23; i++) {
+      TICKETS.push({
+        id: "T-" + String(i).padStart(3, "0"),
+        title: ["Login fails", "Cart total wrong", "Slow report", "Bad label", "Timeout"][i % 5],
+        status: ["Open", "In progress", "Closed"][i % 3]
+      });
+    }
+    var PAGE_SIZE = 5, pageIndex = 0;
+    function renderPage() {
+      var pages = Math.ceil(TICKETS.length / PAGE_SIZE);
+      pageIndex = Math.max(0, Math.min(pageIndex, pages - 1));
+      var slice = TICKETS.slice(pageIndex * PAGE_SIZE, pageIndex * PAGE_SIZE + PAGE_SIZE);
+      var body = $("#paged-body");
+      body.textContent = "";
+      slice.forEach(function (t) {
+        var tr = document.createElement("tr");
+        tr.setAttribute("data-ticket", t.id);
+        [t.id, t.title, t.status].forEach(function (v) {
+          var td = document.createElement("td");
+          td.textContent = v;
+          tr.appendChild(td);
+        });
+        body.appendChild(tr);
+      });
+      testid("page-label").textContent = "Page " + (pageIndex + 1) + " of " + pages;
+      testid("page-prev").disabled = pageIndex === 0;
+      testid("page-next").disabled = pageIndex === pages - 1;
+    }
+    testid("page-prev").addEventListener("click", function () { pageIndex--; renderPage(); });
+    testid("page-next").addEventListener("click", function () { pageIndex++; renderPage(); });
+    renderPage();
+
+    // ── 15 dynamic loading ───────────────────────────────────────────────
+    testid("load-btn").addEventListener("click", function () {
+      var spin = testid("loading"), out = testid("loaded-content");
+      out.classList.add("hidden");
+      spin.hidden = false;
+      setTimeout(function () {
+        spin.hidden = true;
+        out.classList.remove("hidden");
+      }, 1200);
+    });
+
+    // ── 16 drag and drop ─────────────────────────────────────────────────
+    var item = testid("drag-item"), target = testid("drop-target");
+    item.addEventListener("dragstart", function (e) {
+      e.dataTransfer.setData("text/plain", "defect-card");
+      e.dataTransfer.effectAllowed = "move";
+    });
+    target.addEventListener("dragover", function (e) { e.preventDefault(); target.classList.add("drop-over"); });
+    target.addEventListener("dragleave", function () { target.classList.remove("drop-over"); });
+    target.addEventListener("drop", function (e) {
+      e.preventDefault();
+      target.classList.remove("drop-over");
+      if (e.dataTransfer.getData("text/plain") !== "defect-card") return;
+      target.textContent = "";
+      target.appendChild(item);
+      testid("drag-output").textContent = "Dropped successfully";
+    });
+
+    // ── 17 shadow DOM ────────────────────────────────────────────────────
+    (function () {
+      var host = testid("shadow-host");
+      var root = host.attachShadow({ mode: "open" });
+      var style = document.createElement("style");
+      style.textContent =
+        ".sd { padding:12px; border:1px dashed #71717a; border-radius:6px; font-family:inherit; }" +
+        "button { font: inherit; padding:6px 12px; border-radius:6px; cursor:pointer; }";
+      var wrap = document.createElement("div");
+      wrap.className = "sd";
+      var label = document.createElement("p");
+      label.textContent = "I live in a shadow root.";
+      label.style.margin = "0 0 8px";
+      var btn = document.createElement("button");
+      btn.textContent = "Shadow button";
+      btn.setAttribute("data-testid", "shadow-button");
+      btn.addEventListener("click", function () {
+        testid("shadow-output").textContent = "Shadow button clicked";
+      });
+      wrap.append(label, btn);
+      root.append(style, wrap);
+    })();
+  </script>
+</body>
+</html>

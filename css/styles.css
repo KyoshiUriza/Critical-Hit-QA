@@ -1265,6 +1265,69 @@ code.inline {
    rather than a hardcoded rgba of a colour that no longer exists. */
 .rank-current { background: color-mix(in srgb, var(--accent) 10%, transparent); }
 
+/* ── Component Gauntlet widgets ──────────────────────────────────────────
+   The hover menu is display:none until hover on purpose: an element that is
+   merely transparent is still clickable, which would let a test "pass" without
+   ever performing the hover the exercise is about. */
+.hover-wrap { position: relative; display: inline-block; }
+.hover-menu {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 5;
+  min-width: 180px;
+  background: var(--bg-elev);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--rad-md);
+  box-shadow: var(--shadow-md);
+  padding: var(--sp-2);
+}
+.hover-wrap:hover .hover-menu,
+.hover-wrap:focus-within .hover-menu { display: block; }
+.hover-menu a { display: block; padding: 6px 8px; border-radius: var(--rad-sm); text-decoration: none; }
+.hover-menu a:hover { background: var(--bg-elev-2); }
+
+.btn-sort {
+  background: none;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  font-weight: 600;
+  color: var(--text);
+  cursor: pointer;
+}
+.btn-sort:hover { color: var(--accent); }
+
+.btn-suggest {
+  background: none;
+  border: 0;
+  width: 100%;
+  text-align: left;
+  padding: var(--sp-2) var(--sp-3);
+  font: inherit;
+  color: var(--text);
+  cursor: pointer;
+}
+.btn-suggest:hover { background: var(--bg-elev-2); }
+
+.drop-zone {
+  min-width: 200px;
+  min-height: 90px;
+  padding: var(--sp-3);
+  border: 2px dashed var(--border-control);
+  border-radius: var(--rad-md);
+  background: var(--bg-elev-2);
+}
+.drop-zone.drop-over { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, transparent); }
+.drag-item {
+  padding: var(--sp-2) var(--sp-3);
+  background: var(--bg-elev);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--rad-sm);
+  cursor: grab;
+}
+
 /* ── Code Review Gauntlet ────────────────────────────────────────────────
    Result colours use the semantic tokens rather than raw hex so they invert
    correctly in light mode. The left border carries the state as well as the

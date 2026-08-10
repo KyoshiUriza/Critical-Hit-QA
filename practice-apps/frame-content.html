@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; object-src 'none'; frame-src 'none'; base-uri 'self'; form-action 'self'" />
+  <meta name="referrer" content="no-referrer" />
+  <title>Framed content — Critical Hit QA</title>
+  <link rel="stylesheet" href="../css/styles.css" />
+</head>
+<!-- Loaded inside the Component Gauntlet's iframe. Standalone on purpose:
+     it must render on its own so a tester can open it directly and compare
+     what the frame shows against the real page. -->
+<body data-page="frame-content" data-depth="1" style="padding:16px;">
+  <h2 class="m-0">Inside the frame</h2>
+  <p class="text-dim text-sm">
+    This document is a separate browsing context. Your driver must switch into
+    it before any of these elements exist — a locator alone will not reach them.
+  </p>
+
+  <div class="form-field">
+    <label for="frame-name">Name (inside frame)</label>
+    <input type="text" id="frame-name" data-testid="frame-name" placeholder="Type here" />
+  </div>
+
+  <button class="btn btn-primary btn-sm" id="frame-btn" data-testid="frame-button">Click me in the frame</button>
+  <p id="frame-result" data-testid="frame-result" class="mt-2"></p>
+
+  <p class="text-dim text-xs mt-4">
+    Playwright: <code class="inline">page.frameLocator('#demo-frame').getByTestId('frame-button')</code><br />
+    Selenium: <code class="inline">driver.switch_to.frame('demo-frame')</code> then locate, then
+    <code class="inline">switch_to.default_content()</code>.
+  </p>
+
+  <script>
+    document.getElementById("frame-btn").addEventListener("click", function () {
+      var name = document.getElementById("frame-name").value.trim();
+      document.getElementById("frame-result").textContent =
+        name ? "Frame received: " + name : "Frame button clicked (no name entered)";
+    });
+  </script>
+</body>
+</html>

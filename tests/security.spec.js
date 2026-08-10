@@ -20,6 +20,12 @@ const FILES = htmlFiles();
 // These run against the files rather than the browser so that every page is
 // covered, not just the sample the smoke suite loads. A page added without a
 // policy is the realistic regression here.
+// One page relaxes frame-src, on purpose and no further than 'self': the
+// Component Gauntlet embeds a same-origin practice frame, because frame
+// switching is one of the most-asked automation skills and cannot be taught
+// without a frame. Every other page stays at 'none'.
+const FRAME_EXCEPTION = 'practice-apps/component-gauntlet.html';
+
 test.describe('Content Security Policy', () => {
   test('every page has one', () => {
     expect(FILES.length).toBeGreaterThan(30);
@@ -40,7 +46,6 @@ test.describe('Content Security Policy', () => {
       // anything, which is the single strongest line in this policy.
       "connect-src 'none'",
       "object-src 'none'",
-      "frame-src 'none'",
       // Stops an injected <base> from re-pointing every relative URL on the
       // page, which would otherwise defeat 'self' entirely.
       "base-uri 'self'",
@@ -51,7 +56,37 @@ test.describe('Content Security Policy', () => {
       for (const directive of required) {
         expect(src, `${f} is missing: ${directive}`).toContain(directive);
       }
+
+      // frame-src is handled separately so the one exception is explicit
+      // rather than absent from the required list.
+      const expected = f === FRAME_EXCEPTION ? "frame-src 'self'" : "frame-src 'none'";
+      expect(src, `${f} should declare ${expected}`).toContain(expected);
     }
+  });
+
+  test('the frame-src exception cannot spread or widen', () => {
+    // Two failure modes worth catching separately: another page quietly
+    // gaining a frame, and this page widening beyond same-origin.
+    // Read the policy out of the meta tag, not the file. Matching raw text
+    // caught the explanatory HTML comment above the tag, which mentions both
+    // 'self' and 'none' — the test failed on prose rather than on policy.
+    const policyOf = (f) => {
+      const src = fs.readFileSync(path.join(ROOT, f), 'utf8');
+      const m = src.match(/http-equiv="Content-Security-Policy"\s+content="([^"]+)"/);
+      return m ? m[1] : '';
+    };
+
+    const relaxed = FILES.filter((f) => /frame-src (?!'none')/.test(policyOf(f)));
+    expect(relaxed, 'pages relaxing frame-src').toEqual([FRAME_EXCEPTION]);
+
+    const value = (policyOf(FRAME_EXCEPTION).match(/frame-src ([^;]+)/) || [])[1].trim();
+    expect(value, 'the exception must stay same-origin only').toBe("'self'");
+
+    // And the frame it embeds must itself be a same-origin relative path.
+    const html = fs.readFileSync(path.join(ROOT, FRAME_EXCEPTION), 'utf8');
+    const frameSrc = (html.match(/<iframe[^>]*\ssrc="([^"]+)"/) || [])[1];
+    expect(frameSrc, 'iframe src should be relative').toBeTruthy();
+    expect(/^https?:|^\/\//.test(frameSrc), 'iframe must not point off-origin').toBe(false);
   });
 
   test('no page loads script or styles from a third party', () => {
