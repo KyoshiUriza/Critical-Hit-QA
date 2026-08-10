@@ -97,11 +97,11 @@ the audience is professional testers, and verifying claims is literally their jo
 
 Once the site is live:
 
-    https://kyoshiuriza.github.io/critical-hit-qa/
+    https://kyoshiuriza.github.io/Critical-Hit-QA/
 
 Add the repo as a second link if BMC allows it:
 
-    https://github.com/KyoshiUriza/critical-hit-qa
+    https://github.com/KyoshiUriza/Critical-Hit-QA
 
 Worth doing. An open-source project with a test suite and written architecture
 decisions reads very differently from a landing page, and for this audience the

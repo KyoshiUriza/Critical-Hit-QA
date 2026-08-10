@@ -48,7 +48,7 @@
   };
 
   var DONATE_URL = "https://buymeacoffee.com/kyoshiuriza";
-  var REPO_URL = "https://github.com/KyoshiUriza/critical-hit-qa";
+  var REPO_URL = "https://github.com/KyoshiUriza/Critical-Hit-QA";
   // Feedback goes to GitHub Issues rather than a mailto. On a public project
   // that is strictly better: reports are visible and trackable instead of
   // landing in one inbox, and there is no address for scrapers to harvest.
@@ -197,7 +197,7 @@
   // same reason the header does: duplicated markup drifts. Injecting from JS
   // costs a few ms before the tab icon appears, which is a fair trade for one
   // source of truth. Paths are depth-derived, so they resolve on a project
-  // subpath like /critical-hit-qa/ too.
+  // subpath like /Critical-Hit-QA/ too.
   function mountFavicons() {
     if (document.querySelector('link[rel="icon"]')) return;
     var p = prefix();

@@ -1,7 +1,7 @@
 # Critical Hit QA
 
-[![E2E tests](https://github.com/KyoshiUriza/critical-hit-qa/actions/workflows/e2e.yml/badge.svg?branch=main)](https://github.com/KyoshiUriza/critical-hit-qa/actions/workflows/e2e.yml)
-[![Deploy](https://github.com/KyoshiUriza/critical-hit-qa/actions/workflows/deploy-pages.yml/badge.svg?branch=main)](https://github.com/KyoshiUriza/critical-hit-qa/actions/workflows/deploy-pages.yml)
+[![E2E tests](https://github.com/KyoshiUriza/Critical-Hit-QA/actions/workflows/e2e.yml/badge.svg?branch=main)](https://github.com/KyoshiUriza/Critical-Hit-QA/actions/workflows/e2e.yml)
+[![Deploy](https://github.com/KyoshiUriza/Critical-Hit-QA/actions/workflows/deploy-pages.yml/badge.svg?branch=main)](https://github.com/KyoshiUriza/Critical-Hit-QA/actions/workflows/deploy-pages.yml)
 
 A self-contained static web app for Software QA interview prep. No build step, no backend, no signup, works offline.
 
@@ -86,7 +86,7 @@ await page.goto('/practice-apps/login.html?reset');
 
 ## Feedback
 
-Found a bug in the site itself, or have an idea? [Open an issue](https://github.com/KyoshiUriza/critical-hit-qa/issues/new).
+Found a bug in the site itself, or have an idea? [Open an issue](https://github.com/KyoshiUriza/Critical-Hit-QA/issues/new).
 The template asks for the three things that make a report actionable — which is
 the same discipline the Bug Report Builder teaches.
 

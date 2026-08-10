@@ -1,7 +1,7 @@
 // Post-deploy verification against the live GitHub Pages site.
 //
 // Local passing tests do not prove a deploy is good. Pages serves from the
-// /critical-hit-qa/ subpath, is case-sensitive (Windows is not), and publishes only what
+// /Critical-Hit-QA/ subpath, is case-sensitive (Windows is not), and publishes only what
 // the workflow assembled — so this checks the things that can only break in
 // production.
 //
@@ -15,7 +15,7 @@
 // difference is exactly what the block exists to detect.
 const { chromium } = require('@playwright/test');
 
-const BASE = (process.argv[2] || 'https://kyoshiuriza.github.io/critical-hit-qa').replace(/\/$/, '');
+const BASE = (process.argv[2] || 'https://kyoshiuriza.github.io/Critical-Hit-QA').replace(/\/$/, '');
 
 const PAGES = [
   '/index.html',
@@ -80,7 +80,7 @@ function check(ok, label, detail) {
         styled: getComputedStyle(document.body).backgroundColor !== 'rgba(0, 0, 0, 0)',
         escaped: [...document.querySelectorAll('.site-header nav a')]
           .map((a) => a.getAttribute('href'))
-          .filter((h) => h && h.startsWith('/') && !h.startsWith('/critical-hit-qa/')),
+          .filter((h) => h && h.startsWith('/') && !h.startsWith('/Critical-Hit-QA/')),
       };
     });
 

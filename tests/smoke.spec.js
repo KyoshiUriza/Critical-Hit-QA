@@ -98,7 +98,7 @@ test.describe('public-repo hygiene', () => {
     await expect(feedback).toBeVisible();
     const href = await feedback.getAttribute('href');
     expect(href, 'feedback should not be a mailto on a public site').not.toMatch(/^mailto:/);
-    expect(href).toContain('github.com/KyoshiUriza/critical-hit-qa/issues/new');
+    expect(href).toContain('github.com/KyoshiUriza/Critical-Hit-QA/issues/new');
     await expect(feedback).toHaveAttribute('rel', 'noopener noreferrer');
   });
 
@@ -118,7 +118,7 @@ test.describe('public-repo hygiene', () => {
     await page.goto('/index.html?reset');
     const src = page.getByTestId('source-link');
     await expect(src).toBeVisible();
-    await expect(src).toHaveAttribute('href', 'https://github.com/KyoshiUriza/critical-hit-qa');
+    await expect(src).toHaveAttribute('href', 'https://github.com/KyoshiUriza/Critical-Hit-QA');
     await expect(src).toHaveAttribute('rel', 'noopener noreferrer');
   });
 });
