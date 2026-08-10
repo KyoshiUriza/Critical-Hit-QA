@@ -17,6 +17,7 @@
   var EX = window.CODE_REVIEW_EXERCISES || [];
   var index = 0;
   var graded = false;
+  var lastScore = "";
 
   function el(tag, cls, text) {
     var n = document.createElement(tag);
@@ -77,6 +78,10 @@
     byId("cr-verdict").className = "hidden";
     byId("cr-verdict").textContent = "";
     byId("fixed-wrap").className = "hidden";
+    byId("save-wrap").className = "hidden";
+    byId("save-msg").textContent = "";
+    byId("cr-notes").value = "";
+    byId("cr-notes").disabled = false;
     byId("grade-btn").disabled = false;
     byId("prev-btn").disabled = index === 0;
     byId("next-btn").disabled = index === EX.length - 1;
@@ -136,6 +141,14 @@
     byId("fixed-wrap").className = "";
     byId("grade-btn").disabled = true;
 
+    // Lock the notes at grading time. The value of the artifact is that it
+    // records your unaided judgement — editing it after reading the answer key
+    // would turn a review into a transcription.
+    var notes = byId("cr-notes");
+    notes.disabled = true;
+    lastScore = found + "/" + (realTotal + wrong);
+    if (notes.value.trim()) byId("save-wrap").className = "mt-4";
+
     // Scored on BOTH directions, because the page claims over-flagging costs
     // you and a score that ignored it would make that claim false. Wrongly
     // flagged items are added to the denominator, so ticking every box gets
@@ -182,6 +195,18 @@
   }
 
   byId("grade-btn").addEventListener("click", grade);
+
+  byId("save-btn").addEventListener("click", function () {
+    var notes = byId("cr-notes").value.trim();
+    if (!notes || !window.Progress || !window.Progress.saveArtifact) return;
+    window.Progress.saveArtifact({
+      type: "code-review",
+      title: "Code review — " + current().title,
+      fields: { "cr-notes": notes, "cr-score": lastScore }
+    });
+    byId("save-msg").textContent = "Saved. It is in your portfolio.";
+    byId("save-btn").disabled = true;
+  });
   byId("prev-btn").addEventListener("click", function () { move(-1); });
   byId("next-btn").addEventListener("click", function () { move(1); });
   render();

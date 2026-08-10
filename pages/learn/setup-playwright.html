@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; object-src 'none'; frame-src 'none'; base-uri 'self'; form-action 'self'" />
+  <meta name="referrer" content="no-referrer" />
+  <title>Install Playwright — Learn — Critical Hit QA</title>
+  <link rel="stylesheet" href="../../css/styles.css" />
+</head>
+<body data-page="learn-setup" data-depth="2">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div id="site-header"></div>
+
+  <main id="main" class="container">
+    <div class="page-header">
+      <h1>Install Playwright and run your first test</h1>
+      <p>Every other task on this site links to a page that does the thing. This one asks you to leave and set up a toolchain — so here is the whole path, with nothing assumed.</p>
+    </div>
+
+    <div class="panel panel-accent">
+      <strong>Written for someone who has never installed a developer tool.</strong>
+      If you already have Node and a terminal you use, skip to step 3. If the
+      word "terminal" is doing a lot of work in that sentence, start at step 1 —
+      that is what this page is for, and needing it is not a gap in you.
+    </div>
+
+    <div class="section-toc">
+      <h4>◈ On this page</h4>
+      <ul>
+        <li><a href="#terminal">1 · Open a terminal</a></li>
+        <li><a href="#node">2 · Install Node.js</a></li>
+        <li><a href="#project">3 · Create the project</a></li>
+        <li><a href="#first">4 · Run the example test</a></li>
+        <li><a href="#ours">5 · Point it at this site</a></li>
+        <li><a href="#trouble">When it goes wrong</a></li>
+      </ul>
+    </div>
+
+    <section id="terminal" class="panel">
+      <h2>1 · Open a terminal</h2>
+      <p>A terminal is a window where you type commands instead of clicking. You need it because the tooling has no buttons.</p>
+      <ul>
+        <li><strong>Windows:</strong> press the Start key, type <code class="inline">powershell</code>, press Enter.</li>
+        <li><strong>macOS:</strong> press Cmd+Space, type <code class="inline">terminal</code>, press Enter.</li>
+        <li><strong>Linux:</strong> Ctrl+Alt+T on most desktops.</li>
+      </ul>
+      <p class="text-dim">You will see a line ending in <code class="inline">&gt;</code> or <code class="inline">$</code>. That is the prompt, waiting for you. Nothing you type here can break your computer by accident.</p>
+    </section>
+
+    <section id="node" class="panel">
+      <h2>2 · Install Node.js</h2>
+      <p>Playwright is written in JavaScript, and Node is what runs JavaScript outside a browser. Check whether you already have it:</p>
+      <pre class="code">node --version</pre>
+      <p>
+        A version number of <strong>v18 or higher</strong> means you are done —
+        go to step 3. An error like "command not found" or "not recognized"
+        means Node is not installed.
+      </p>
+      <p>
+        If you need it, download the <strong>LTS</strong> build from
+        <a href="https://nodejs.org/" target="_blank" rel="noopener noreferrer">nodejs.org</a>.
+        LTS means Long Term Support — the stable one. Accept every default in
+        the installer, then <strong>close your terminal and open a new one</strong>
+        (it only reads your PATH at startup, which is the single most common
+        reason people think the install failed) and run
+        <code class="inline">node --version</code> again.
+      </p>
+    </section>
+
+    <section id="project" class="panel">
+      <h2>3 · Create the project</h2>
+      <p>Make a folder for your tests and move into it. <code class="inline">cd</code> means "change directory".</p>
+      <pre class="code">mkdir qa-practice
+cd qa-practice</pre>
+      <p>Now scaffold Playwright:</p>
+      <pre class="code">npm init playwright@latest</pre>
+      <p>It asks four questions. The answers that matter:</p>
+      <table class="data-table">
+        <thead><tr><th>Question</th><th>Answer</th><th>Why</th></tr></thead>
+        <tbody>
+          <tr><td>TypeScript or JavaScript?</td><td><strong>JavaScript</strong></td><td>This site's examples are JavaScript. You can switch later; the concepts do not change.</td></tr>
+          <tr><td>Name of your tests folder</td><td><strong>tests</strong> (default)</td><td>Convention. Take the default.</td></tr>
+          <tr><td>Add a GitHub Actions workflow?</td><td><strong>Yes</strong></td><td>Costs nothing now, and it is the file an interviewer likes seeing in your repo.</td></tr>
+          <tr><td>Install browsers?</td><td><strong>Yes</strong></td><td>Playwright ships its own browser builds so runs are reproducible. It is a few hundred MB.</td></tr>
+        </tbody>
+      </table>
+      <p class="text-dim">This takes a few minutes and prints a lot of text. That is normal.</p>
+    </section>
+
+    <section id="first" class="panel">
+      <h2>4 · Run the example test</h2>
+      <p>The scaffold includes working tests. Run them before writing anything, so that when something breaks later you know the setup itself was fine:</p>
+      <pre class="code">npx playwright test</pre>
+      <p>You should see something like <code class="inline">6 passed</code>. Then open the report:</p>
+      <pre class="code">npx playwright show-report</pre>
+      <p>
+        If both worked, you have a functioning automation environment — which
+        is a genuine milestone, and the thing most people trying to learn
+        automation never get past.
+      </p>
+      <p>Now try the mode you will actually live in:</p>
+      <pre class="code">npx playwright test --ui</pre>
+      <p class="text-dim">UI mode lets you run one test, watch it step through, and see the DOM at each action. It is the single most useful command on this page.</p>
+    </section>
+
+    <section id="ours" class="panel">
+      <h2>5 · Point it at this site</h2>
+      <p>
+        The practice apps are static pages, so you can run tests against the
+        live site with no server of your own. Create
+        <code class="inline">tests/login.spec.js</code> and paste this:
+      </p>
+      <pre class="code">const { test, expect } = require('@playwright/test');
+
+const APP = 'https://kyoshiuriza.github.io/Critical-Hit-QA/practice-apps/login.html';
+
+test('valid credentials sign in', async ({ page }) => {
+  await page.goto(APP);
+  await page.getByTestId('login-email').fill('demo@qa.test');
+  await page.getByTestId('login-password').fill('Passw0rd!');
+  await page.getByTestId('login-submit').click();
+
+  await expect(page.getByTestId('login-result')).toContainText('Welcome');
+});</pre>
+      <p>Run just that file:</p>
+      <pre class="code">npx playwright test login.spec.js --headed</pre>
+      <p>
+        <code class="inline">--headed</code> shows the browser so you can watch
+        it happen. Once you trust it, drop the flag and it runs invisibly and
+        faster.
+      </p>
+      <p>
+        That is a real automated test against a real deployed page. Next: open
+        the <a href="../automation-lab.html">Automation Lab</a> for specs
+        covering the other apps, and the
+        <a href="locators.html">Locators track</a> for why every selector above
+        is a <code class="inline">getByTestId</code> and not a CSS path.
+      </p>
+    </section>
+
+    <section id="trouble" class="panel">
+      <h2>When it goes wrong</h2>
+      <p>These four cover most first-time failures.</p>
+      <table class="data-table">
+        <thead><tr><th>What you see</th><th>What it means</th><th>Fix</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><code class="inline">'npm' is not recognized</code></td>
+            <td>Node is installed but this terminal does not know it yet.</td>
+            <td>Close the terminal, open a new one. If it persists, reinstall Node with defaults.</td>
+          </tr>
+          <tr>
+            <td><code class="inline">Executable doesn't exist at …</code></td>
+            <td>The browser binaries did not download.</td>
+            <td>Run <code class="inline">npx playwright install</code>.</td>
+          </tr>
+          <tr>
+            <td><code class="inline">EACCES</code> / permission denied</td>
+            <td>You are installing somewhere your user cannot write.</td>
+            <td>Work in your home folder. Do <em>not</em> reach for <code class="inline">sudo npm</code> — it causes more problems than it solves.</td>
+          </tr>
+          <tr>
+            <td>Test fails with <code class="inline">TimeoutError</code></td>
+            <td>The locator never matched.</td>
+            <td>Check the selector before touching the timeout. <a href="../playwright-errors.html">Playwright Errors</a> walks the whole diagnosis order.</td>
+          </tr>
+        </tbody>
+      </table>
+      <p class="text-dim">
+        Stuck on something not listed? That is a bug report waiting to happen —
+        which is convenient, because writing good ones is the skill. Note what
+        you did, what you expected, what you got, and open an issue on the repo.
+      </p>
+    </section>
+
+    <div class="panel app-next-steps">
+      <span class="text-dim">Next:</span>
+      <a class="btn btn-primary btn-sm" href="../automation-lab.html">Automation Lab →</a>
+      <a class="btn btn-ghost btn-sm" href="locators.html">Locators &amp; Flaky Tests</a>
+      <a class="btn btn-ghost btn-sm" href="../code-review.html">Code Review Gauntlet</a>
+      <a class="btn btn-ghost btn-sm" href="../study-plan.html">Back to the Study Plan</a>
+    </div>
+  </main>
+
+  <div id="site-footer"></div>
+
+  <script src="../../js/test-hooks.js"></script>
+  <script src="../../js/site-chrome.js"></script>
+  <script src="../../js/data/defects.js"></script>
+  <script src="../../js/profiles.js"></script>
+  <script src="../../js/progress.js"></script>
+  <script src="../../js/rpg.js"></script>
+</body>
+</html>

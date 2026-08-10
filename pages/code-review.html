@@ -55,12 +55,33 @@
 
       <pre class="code" id="ex-code" data-testid="cr-code"></pre>
 
-      <h3>What would you raise in review?</h3>
+      <!-- Written BEFORE the checkboxes are graded, deliberately. Once you
+           have seen the answer key you cannot un-see it, and a review written
+           afterwards is a transcription rather than a judgement. Interviews
+           are spoken; this is the closest a checkbox exercise gets to
+           practising articulation. -->
+      <div class="form-field mt-4">
+        <label for="cr-notes">
+          First, in your own words: what would you raise, in priority order?
+          <span class="text-dim">(optional, but it is the part interviews actually test)</span>
+        </label>
+        <textarea id="cr-notes" rows="5" data-testid="cr-notes"
+                  placeholder="1. The test cannot fail — try/catch swallows everything…&#10;2. nit: the screenshot call is redundant…"></textarea>
+      </div>
+
+      <h3>Now tick what applies</h3>
       <ul class="cr-issues" id="issue-list" data-testid="cr-issues"></ul>
 
       <button class="btn btn-primary" id="grade-btn" data-testid="cr-grade">Submit review</button>
 
       <div class="hidden mt-4" id="cr-verdict" data-testid="cr-verdict" role="status" aria-live="polite"></div>
+
+      <div class="hidden mt-4" id="save-wrap" data-testid="cr-save-wrap">
+        <button class="btn btn-ghost btn-sm" id="save-btn" data-testid="cr-save">
+          Save this review to my portfolio →
+        </button>
+        <span class="text-dim text-sm" id="save-msg" data-testid="cr-save-msg"></span>
+      </div>
 
       <div class="hidden mt-4" id="fixed-wrap" data-testid="cr-fixed">
         <h3>How it reads after the fix</h3>

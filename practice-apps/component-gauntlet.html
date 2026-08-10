@@ -49,8 +49,9 @@
     </div>
 
     <!-- ══════════ 1–5 form controls ══════════ -->
-    <section id="basics" class="app-frame">
-      <h2>1 · Radio buttons</h2>
+    <section id="basics" class="app-frame gauntlet-group">
+      <h2 class="gauntlet-group-title">Form controls</h2>
+      <h3>1 · Radio buttons</h3>
       <div class="flex gap-4 flex-wrap">
         <label><input type="radio" name="plan" value="free" data-testid="radio-free" /> Free</label>
         <label><input type="radio" name="plan" value="pro" data-testid="radio-pro" /> Pro</label>
@@ -58,7 +59,7 @@
       </div>
       <p class="text-dim mt-2" data-testid="radio-output">No plan selected</p>
 
-      <h2 class="mt-6">2 · Autosuggest</h2>
+      <h3 class="mt-6">2 · Autosuggest</h3>
       <div class="form-field">
         <label for="country">Country (type at least 2 letters)</label>
         <input type="text" id="country" data-testid="autosuggest-input" autocomplete="off" placeholder="e.g. ind" />
@@ -66,7 +67,7 @@
       <ul class="suggest-list hidden" id="suggestions" data-testid="suggestions"></ul>
       <p class="text-dim mt-2" data-testid="autosuggest-output">Nothing chosen</p>
 
-      <h2 class="mt-6">3 · Dropdown</h2>
+      <h3 class="mt-6">3 · Dropdown</h3>
       <div class="form-field">
         <label for="severity">Severity</label>
         <select id="severity" data-testid="dropdown">
@@ -79,7 +80,7 @@
       </div>
       <p class="text-dim" data-testid="dropdown-output">Nothing selected</p>
 
-      <h2 class="mt-6">4 · Multi-select</h2>
+      <h3 class="mt-6">4 · Multi-select</h3>
       <div class="form-field">
         <label for="browsers">Browsers (multiple)</label>
         <select id="browsers" multiple size="4" data-testid="multiselect">
@@ -91,7 +92,7 @@
       </div>
       <p class="text-dim" data-testid="multiselect-output">None selected</p>
 
-      <h2 class="mt-6">5 · Checkboxes with select-all</h2>
+      <h3 class="mt-6">5 · Checkboxes with select-all</h3>
       <label><input type="checkbox" id="check-all" data-testid="check-all" /> <strong>Select all</strong></label>
       <div class="flex gap-4 flex-wrap mt-2">
         <label><input type="checkbox" class="opt" value="a" data-testid="check-a" /> Smoke</label>
@@ -102,8 +103,9 @@
     </section>
 
     <!-- ══════════ 6–8 dialogs / windows / visibility ══════════ -->
-    <section id="dialogs" class="app-frame">
-      <h2>6 · Native dialogs</h2>
+    <section id="dialogs" class="app-frame gauntlet-group">
+      <h2 class="gauntlet-group-title">Alerts, windows, visibility</h2>
+      <h3>6 · Native dialogs</h3>
       <p class="text-dim text-sm">These block the page. Your framework must register a handler <em>before</em> the click.</p>
       <div class="flex gap-2 flex-wrap">
         <button class="btn btn-ghost btn-sm" data-testid="alert-btn">Alert</button>
@@ -112,14 +114,14 @@
       </div>
       <p class="text-dim mt-2" data-testid="dialog-output">No dialog yet</p>
 
-      <h2 class="mt-6">7 · New window and new tab</h2>
+      <h3 class="mt-6">7 · New window and new tab</h3>
       <div class="flex gap-2 flex-wrap">
         <button class="btn btn-ghost btn-sm" data-testid="open-window">Open window</button>
         <a class="btn btn-ghost btn-sm" href="frame-content.html" target="_blank" rel="noopener" data-testid="open-tab">Open tab ↗</a>
       </div>
       <p class="text-dim text-sm mt-2">Start waiting for the popup <em>before</em> clicking, or you will miss the event.</p>
 
-      <h2 class="mt-6">8 · Show / hide</h2>
+      <h3 class="mt-6">8 · Show / hide</h3>
       <button class="btn btn-ghost btn-sm" data-testid="toggle-btn">Hide the box</button>
       <div class="panel mt-2" id="toggle-target" data-testid="toggle-target">
         I am visible. Assert on visibility, not on presence — I stay in the DOM.
@@ -127,8 +129,9 @@
     </section>
 
     <!-- ══════════ 9–11 tables ══════════ -->
-    <section id="tables" class="app-frame">
-      <h2>9 · Sortable table</h2>
+    <section id="tables" class="app-frame gauntlet-group">
+      <h2 class="gauntlet-group-title">Tables: sort, totals, pagination</h2>
+      <h3>9 · Sortable table</h3>
       <p class="text-dim text-sm">Click a header to sort. Row order changes — so any locator using row position is wrong by construction.</p>
       <table class="data-table" data-testid="sortable-table">
         <thead>
@@ -141,7 +144,7 @@
         <tbody id="sortable-body"></tbody>
       </table>
 
-      <h2 class="mt-6">10 · Scrolling table with a computed total</h2>
+      <h3 class="mt-6">10 · Scrolling table with a computed total</h3>
       <p class="text-dim text-sm">Sum the Amount column and compare against the stated total. Rows below the fold still count.</p>
       <div style="max-height:220px; overflow-y:auto; border:1px solid var(--border-strong); border-radius:var(--rad-md);">
         <table class="data-table" data-testid="scroll-table">
@@ -151,7 +154,7 @@
       </div>
       <p class="mt-2">Total collected: <strong data-testid="scroll-total">0</strong></p>
 
-      <h2 class="mt-6">11 · Pagination</h2>
+      <h3 class="mt-6">11 · Pagination</h3>
       <table class="data-table" data-testid="paged-table">
         <thead><tr><th>ID</th><th>Ticket</th><th>Status</th></tr></thead>
         <tbody id="paged-body"></tbody>
@@ -165,8 +168,9 @@
     </section>
 
     <!-- ══════════ 12–14 hover / frame / links ══════════ -->
-    <section id="hover" class="app-frame">
-      <h2>12 · Mouse hover menu</h2>
+    <section id="hover" class="app-frame gauntlet-group">
+      <h2 class="gauntlet-group-title">Hover, frames, links</h2>
+      <h3>12 · Mouse hover menu</h3>
       <div class="hover-wrap" data-testid="hover-target">
         <button class="btn btn-ghost btn-sm">Hover over me</button>
         <div class="hover-menu" data-testid="hover-menu">
@@ -176,12 +180,12 @@
       </div>
       <p class="text-dim text-sm mt-2">The menu is not in the layout until you hover. A plain click will miss it.</p>
 
-      <h2 class="mt-6">13 · iframe</h2>
+      <h3 class="mt-6">13 · iframe</h3>
       <iframe id="demo-frame" data-testid="demo-frame" src="frame-content.html"
               title="Framed practice content"
               style="width:100%; height:280px; border:1px solid var(--border-strong); border-radius:var(--rad-md);"></iframe>
 
-      <h2 class="mt-6">14 · Link checking</h2>
+      <h3 class="mt-6">14 · Link checking</h3>
       <ul class="text-dim">
         <li><a href="../index.html" data-testid="link-ok">Working internal link</a></li>
         <li><a href="does-not-exist.html" data-testid="link-broken">Broken link (404)</a></li>
@@ -191,8 +195,9 @@
     </section>
 
     <!-- ══════════ 15–17 async / drag / shadow ══════════ -->
-    <section id="async" class="app-frame">
-      <h2>15 · Dynamic loading</h2>
+    <section id="async" class="app-frame gauntlet-group">
+      <h2 class="gauntlet-group-title">Async, drag, shadow DOM</h2>
+      <h3>15 · Dynamic loading</h3>
       <button class="btn btn-primary btn-sm" data-testid="load-btn">Load data</button>
       <div class="mt-2" id="loading" data-testid="loading" hidden>
         <span class="text-dim">Loading…</span>
@@ -201,7 +206,7 @@
         Loaded after a delay. Wait for THIS, never for a fixed number of seconds.
       </div>
 
-      <h2 class="mt-6">16 · Drag and drop</h2>
+      <h3 class="mt-6">16 · Drag and drop</h3>
       <div class="flex gap-4 flex-wrap items-start">
         <div class="drop-zone" id="drag-source" data-testid="drag-source">
           <div class="drag-item" draggable="true" data-testid="drag-item">Defect card</div>
@@ -212,7 +217,7 @@
       </div>
       <p class="text-dim mt-2" data-testid="drag-output">Not dropped</p>
 
-      <h2 class="mt-6">17 · Shadow DOM</h2>
+      <h3 class="mt-6">17 · Shadow DOM</h3>
       <p class="text-dim text-sm">
         This control lives inside an open shadow root. Ordinary CSS from the
         page cannot reach it — Playwright pierces shadow roots automatically,

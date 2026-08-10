@@ -15,7 +15,11 @@
 
   var ALLOWED_CATEGORIES = ["fundamentals", "manual", "automation", "api", "agile", "performance", "sql", "ai"];
   var ALLOWED_PLANS = ["3-day", "1-week", "1-month"];
-  var ALLOWED_ARTIFACT_TYPES = ["bug-report", "test-case"];
+  // "code-review" is the Code Review Gauntlet's written verdict. It exists
+  // because a QA lead's review made the point plainly: the Gauntlet simulates
+  // an interview round they actually run, and produced nothing a candidate
+  // could show afterwards.
+  var ALLOWED_ARTIFACT_TYPES = ["bug-report", "test-case", "code-review"];
 
   // Caps exist so a hostile code cannot fill the origin's storage quota and
   // wedge the site for the person who pasted it.

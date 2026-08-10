@@ -85,14 +85,30 @@
     ].filter(function (x) { return x !== null; }).join("\n");
   }
 
+  // A written review, exported as the document it would be in a real PR.
+  function reviewToMd(a) {
+    var f = a.fields || {};
+    return [
+      "## " + (a.title || "Code review"),
+      "",
+      "**What I would raise, in priority order**",
+      "",
+      f["cr-notes"] || "_Not recorded._",
+      "",
+      f["cr-score"] ? "_Scored " + f["cr-score"] + " against the answer key._" : null
+    ].filter(function (x) { return x !== null; }).join("\n");
+  }
+
   function buildMarkdown() {
     var bugs = window.Progress.listArtifacts("bug-report");
     var cases = window.Progress.listArtifacts("test-case");
+    var reviews = window.Progress.listArtifacts("code-review");
     var out = [
       "# QA Portfolio",
       "",
       "_" + bugs.length + " bug report" + (bugs.length === 1 ? "" : "s") +
-      " and " + cases.length + " test case" + (cases.length === 1 ? "" : "s") +
+      ", " + cases.length + " test case" + (cases.length === 1 ? "" : "s") +
+      " and " + reviews.length + " code review" + (reviews.length === 1 ? "" : "s") +
       ", written against the practice applications at Critical Hit QA._",
       ""
     ];
@@ -103,6 +119,10 @@
     if (cases.length) {
       out.push("---", "", "# Test cases", "");
       cases.forEach(function (a) { out.push(caseToMd(a), ""); });
+    }
+    if (reviews.length) {
+      out.push("---", "", "# Code reviews", "");
+      reviews.forEach(function (a) { out.push(reviewToMd(a), ""); });
     }
     return out.join("\n");
   }
@@ -162,12 +182,14 @@
   function render() {
     var bugs = renderList("list-bugs", "bug-report", "bug-report-builder.html");
     var cases = renderList("list-cases", "test-case", "test-case-builder.html");
-    var total = bugs + cases;
+    var reviews = renderList("list-reviews", "code-review", "code-review.html");
+    var total = bugs + cases + reviews;
 
     el("empty-state").classList.toggle("hidden", total > 0);
     el("portfolio-body").classList.toggle("hidden", total === 0);
     el("count-bugs").textContent = bugs ? "· " + bugs : "";
     el("count-cases").textContent = cases ? "· " + cases : "";
+    el("count-reviews").textContent = reviews ? "· " + reviews : "";
   }
 
   function showExport(text) {

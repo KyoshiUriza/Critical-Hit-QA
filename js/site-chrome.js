@@ -44,6 +44,7 @@
     "learn-codeless": "learn",
     "learn-frameworks": "learn",
     "learn-locators": "learn",
+    "learn-setup": "learn",
     "learn-sql": "learn",
     "playwright-errors": "automation-lab",
     // Deliberately NOT a 12th nav item. The header needs 1200px for 11 items

@@ -148,4 +148,40 @@ test.describe('Code Review Gauntlet', () => {
     await expect(page.locator(`[data-why="${decoy}"]`)).toContainText('⚠');
     await expect(page.locator('.cr-missed').first().locator('.cr-why')).toContainText('✗');
   });
+
+  test('a written review is saved as a portfolio artifact', async ({ page }) => {
+    // Amara's point: the Gauntlet simulated an interview round and produced
+    // nothing a candidate could show afterwards.
+    await page.goto(PAGE + '?reset');
+    await page.getByTestId('cr-notes').fill('1. The test cannot fail. 2. nit: screenshot is redundant.');
+    await page.getByTestId('cr-grade').click();
+
+    await expect(page.getByTestId('cr-save-wrap')).toBeVisible();
+    await page.getByTestId('cr-save').click();
+    await expect(page.getByTestId('cr-save-msg')).toContainText('Saved');
+
+    await page.goto('/pages/portfolio.html');
+    await expect(page.getByTestId('artifact-code-review')).toHaveCount(1);
+
+    await page.getByTestId('export-markdown').click();
+    const md = await page.getByTestId('export-out').textContent();
+    expect(md).toContain('# Code reviews');
+    expect(md).toContain('The test cannot fail');
+    expect(md, 'the score should travel with the review').toMatch(/Scored \d+\/\d+/);
+  });
+
+  test('notes lock at grading so the artifact is unaided judgement', async ({ page }) => {
+    // Editing after seeing the answer key would turn a review into a
+    // transcription, which is worth nothing to the person reading it.
+    await page.goto(PAGE + '?reset');
+    await page.getByTestId('cr-notes').fill('my unaided read');
+    await page.getByTestId('cr-grade').click();
+    await expect(page.getByTestId('cr-notes')).toBeDisabled();
+  });
+
+  test('no save option is offered when nothing was written', async ({ page }) => {
+    await page.goto(PAGE + '?reset');
+    await page.getByTestId('cr-grade').click();
+    await expect(page.getByTestId('cr-save-wrap')).toBeHidden();
+  });
 });
