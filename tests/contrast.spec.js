@@ -141,3 +141,52 @@ test.describe('button label contrast (token pairs)', () => {
     });
   }
 });
+
+// WCAG 1.4.11 — non-text contrast. A form control's border is what identifies
+// it as a control, so it needs 3:1 against both its own fill and the surface
+// behind it. The text walker above cannot see this.
+test.describe('control boundary contrast (WCAG 1.4.11)', () => {
+  for (const scheme of ['dark', 'light']) {
+    test(`form controls have a 3:1 boundary in ${scheme} mode`, async ({ page }) => {
+      await page.emulateMedia({ colorScheme: scheme });
+      await page.goto('/pages/test-case-builder.html?reset');
+
+      const results = await page.evaluate(() => {
+        const relLum = (rgb) => {
+          const [r, g, b] = rgb.map((v) => {
+            const s = v / 255;
+            return s <= 0.03928 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4);
+          });
+          return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+        };
+        const parse = (s) => (s.match(/[\d.]+/g) || []).map(Number).slice(0, 3);
+        const ratio = (a, b) => {
+          const l1 = relLum(a), l2 = relLum(b);
+          return (Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05);
+        };
+        const out = [];
+        for (const el of document.querySelectorAll('.form-field input, .form-field select, .form-field textarea')) {
+          if (!el.getClientRects().length) continue;
+          const cs = getComputedStyle(el);
+          if (parseFloat(cs.borderTopWidth) === 0) continue;
+          const border = parse(cs.borderTopColor);
+          const fill = parse(cs.backgroundColor);
+          // Surface behind the control.
+          let behind = [255, 255, 255];
+          for (let n = el.parentElement; n; n = n.parentElement) {
+            const c = (getComputedStyle(n).backgroundColor.match(/[\d.]+/g) || []).map(Number);
+            if (c.length >= 3 && (c.length < 4 || c[3] > 0.95)) { behind = c.slice(0, 3); break; }
+          }
+          const vsFill = ratio(border, fill);
+          const vsBehind = ratio(border, behind);
+          if (Math.min(vsFill, vsBehind) < 3) {
+            out.push(`${el.tagName.toLowerCase()}#${el.id || '?'} border ${vsFill.toFixed(2)}:1 vs fill, ${vsBehind.toFixed(2)}:1 vs surface`);
+          }
+        }
+        return [...new Set(out)];
+      });
+
+      expect(results, `control boundaries below 3:1 in ${scheme}`).toEqual([]);
+    });
+  }
+});

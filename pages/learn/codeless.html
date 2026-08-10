@@ -30,7 +30,7 @@
     </div>
 
     <section id="what" class="panel">
-      <h2 style="margin-top:0;">What "codeless" actually means</h2>
+      <h2>What "codeless" actually means</h2>
       <p>"Codeless" is a spectrum, not a binary. Nearly every "no-code" tool lets you drop into script for the hard cases; nearly every code framework has recorders and generators for the easy ones. What differs is the <em>default author experience</em>:</p>
       <ul>
         <li><strong>True codeless</strong> — you build tests by selecting elements, choosing actions from a menu, and typing data. No syntax. The tool generates and runs the underlying automation.</li>
@@ -41,7 +41,7 @@
     </section>
 
     <section id="accelq" class="panel">
-      <h2 style="margin-top:0;">AccelQ — the pitch and the reality</h2>
+      <h2>AccelQ — the pitch and the reality</h2>
       <p><strong>AccelQ</strong> is an AI-powered, cloud-hosted codeless automation platform aimed at enterprise QA teams. Its differentiators, in order:</p>
       <ol>
         <li><strong>Action-based modeling.</strong> You describe application logic as reusable Actions ("Log in as admin", "Add product to cart") — the framework encapsulates locators and steps. Tests become sequences of Actions plus data. See below.</li>
@@ -54,7 +54,7 @@
     </section>
 
     <section id="action-based" class="panel">
-      <h2 style="margin-top:0;">Action-based modeling — the concept that matters</h2>
+      <h2>Action-based modeling — the concept that matters</h2>
       <p>Even if you never use AccelQ, understanding action-based modeling makes you a better automation engineer:</p>
       <ul>
         <li>An <strong>Action</strong> encapsulates a piece of business logic — its inputs, outputs, steps, and preconditions. "Place order" is an Action. So is "log in as admin."</li>
@@ -65,7 +65,7 @@
     </section>
 
     <section id="fits" class="panel">
-      <h2 style="margin-top:0;">When codeless fits</h2>
+      <h2>When codeless fits</h2>
       <ul>
         <li>You have <strong>subject-matter experts</strong> (business analysts, manual testers) who understand what to test but don't program. Codeless lets them author.</li>
         <li>Your app is a <strong>stable enterprise product</strong> — banking, ERP, healthcare — where the UI doesn't change every sprint and coverage requirements are massive.</li>
@@ -76,7 +76,7 @@
     </section>
 
     <section id="doesnt" class="panel">
-      <h2 style="margin-top:0;">When codeless doesn't fit</h2>
+      <h2>When codeless doesn't fit</h2>
       <ul>
         <li><strong>Fast-moving product</strong> with heavy UI churn — self-healing helps but doesn't erase maintenance; the visual authoring loop can be slower than a strong Playwright suite.</li>
         <li><strong>Team is already skilled in code.</strong> Adding a codeless layer buys you nothing and adds a licensing bill.</li>
@@ -87,7 +87,7 @@
     </section>
 
     <section id="others" class="panel">
-      <h2 style="margin-top:0;">The rest of the codeless landscape</h2>
+      <h2>The rest of the codeless landscape</h2>
       <p>Know that these exist and roughly what each is best at:</p>
       <ul>
         <li><strong>Testsigma</strong> — natural-language-first authoring (write "Enter admin@x.com in the Email field"). Cloud-hosted; strong for teams standardizing on plain-English steps.</li>
@@ -100,7 +100,7 @@
     </section>
 
     <section id="practice" class="panel" style="border-color: var(--accent);">
-      <h2 style="margin-top:0;">Practice — earn Star-Dust</h2>
+      <h2>Practice — earn Star-Dust</h2>
       <ol>
         <li>Sign up for the <a href="https://www.accelq.com/" target="_blank" rel="noopener noreferrer">AccelQ free trial</a> (or a Testsigma free tier) and complete their guided quickstart against a sample app.</li>
         <li>Model the clean login flow on our <a href="../../practice-apps/login.html">practice login</a> as an Action: <em>login(email, password)</em>. Then write 3 tests that reuse it (valid, wrong password, empty).</li>

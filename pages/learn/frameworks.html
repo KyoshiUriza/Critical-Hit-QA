@@ -30,7 +30,7 @@
     </div>
 
     <section id="compare" class="panel">
-      <h2 style="margin-top:0;">Playwright vs. Selenium — the actual comparison</h2>
+      <h2>Playwright vs. Selenium — the actual comparison</h2>
       <table style="width:100%; border-collapse:collapse;">
         <thead>
           <tr style="border-bottom:1px solid var(--border); text-align:left;">
@@ -55,7 +55,7 @@
     </section>
 
     <section id="playwright" class="panel">
-      <h2 style="margin-top:0;">Playwright deep dive</h2>
+      <h2>Playwright deep dive</h2>
       <p>Microsoft-backed, released 2020, written by the team that previously built Puppeteer at Google. Designed from the start around the pain points a decade of Selenium exposed.</p>
 
       <h3>Install and run</h3>
@@ -96,7 +96,7 @@ page.locator('css=.some-class')                  // last resort</pre>
     </section>
 
     <section id="selenium" class="panel">
-      <h2 style="margin-top:0;">Selenium deep dive</h2>
+      <h2>Selenium deep dive</h2>
       <p>The granddaddy. WebDriver became a W3C standard in 2018 largely because of Selenium's ubiquity. Selenium 4+ ships true W3C WebDriver, relative locators, and a modernized Grid.</p>
 
       <h3>Install (Python)</h3>
@@ -136,7 +136,7 @@ el.click()</pre>
     </section>
 
     <section id="locators" class="panel">
-      <h2 style="margin-top:0;">Locator strategies that survive UI change</h2>
+      <h2>Locator strategies that survive UI change</h2>
       <p>Locator brittleness is the single largest maintenance cost in UI automation. Rank your locator choices from best to worst:</p>
       <ol>
         <li><strong>Semantic queries.</strong> <code class="inline">getByRole('button', { name: 'Sign in' })</code> — what a screen reader sees. Cheapest to maintain; also tests accessibility as a side effect.</li>
@@ -151,7 +151,7 @@ el.click()</pre>
     </section>
 
     <section id="waits" class="panel">
-      <h2 style="margin-top:0;">Waits, done right</h2>
+      <h2>Waits, done right</h2>
       <ul>
         <li><strong>Never sleep.</strong> A fixed <code class="inline">sleep(2)</code> is both too slow (when things are fast) and still flaky (when things are slow). Zero justifications.</li>
         <li><strong>Wait for a specific condition</strong> — element visible, network request done, ARIA attribute changed, text present.</li>
@@ -162,7 +162,7 @@ el.click()</pre>
     </section>
 
     <section id="choosing" class="panel">
-      <h2 style="margin-top:0;">Choosing between them (2026 view)</h2>
+      <h2>Choosing between them (2026 view)</h2>
       <ul>
         <li><strong>Greenfield project, JS/TS-native team, modern web app</strong> → Playwright. Lower ceremony, faster feedback, trace viewer alone is worth it.</li>
         <li><strong>Team is Java/Python/C# by default</strong> and you want first-class language support → Playwright works in all of these too. Playwright is the safer pick for greenfield across the board today.</li>
@@ -174,7 +174,7 @@ el.click()</pre>
     </section>
 
     <section id="practice" class="panel" style="border-color: var(--accent);">
-      <h2 style="margin-top:0;">Practice — earn Star-Dust</h2>
+      <h2>Practice — earn Star-Dust</h2>
       <ol>
         <li>Take the <a href="../practice-tests.html?category=automation">Automation quiz</a> — aim ≥ 85%.</li>
         <li>Install Playwright locally. Serve this project (<code class="inline">python -m http.server 8080</code>) and run the login spec from the <a href="../automation-lab.html">Automation Lab</a>.</li>

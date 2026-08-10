@@ -30,13 +30,13 @@
     </div>
 
     <section id="why" class="panel">
-      <h2 style="margin-top:0;">Why automate at all</h2>
+      <h2>Why automate at all</h2>
       <p>Automation is not about speed. It's about <em>trust in a changing codebase</em>. Every new feature risks breaking every old one. Manual regression at any real scale is impossibly expensive; automated regression is the only way to keep the safety net proportional to the code you own.</p>
       <p>The economics are simple: the test costs once to write, then near-zero to run. If it runs 50 times over the life of the feature, the automation cost is 2% per run compared to a manual re-execution.</p>
     </section>
 
     <section id="pyramid" class="panel">
-      <h2 style="margin-top:0;">The test pyramid</h2>
+      <h2>The test pyramid</h2>
       <p>Coined by Mike Cohn. A healthy suite is pyramid-shaped:</p>
       <ul>
         <li><strong>Base — many unit tests.</strong> Fast (ms), cheap, deterministic, isolated. Written alongside code by developers. Runs on every save.</li>
@@ -48,7 +48,7 @@
     </section>
 
     <section id="what-not" class="panel">
-      <h2 style="margin-top:0;">What NOT to automate</h2>
+      <h2>What NOT to automate</h2>
       <ul>
         <li><strong>Features still in churn.</strong> Cost of maintaining the test exceeds the cost of running it manually. Wait until the design stabilizes.</li>
         <li><strong>Exploratory testing.</strong> The value is human judgment. Automation removes exactly what makes it work.</li>
@@ -60,7 +60,7 @@
     </section>
 
     <section id="pom" class="panel">
-      <h2 style="margin-top:0;">The Page Object Model</h2>
+      <h2>The Page Object Model</h2>
       <p>Wrap each page (or major component) in a class exposing element locators and high-level actions. Tests become readable and maintenance concentrates in one place.</p>
       <pre class="code">// LoginPage.js
 class LoginPage {
@@ -89,7 +89,7 @@ test('bad password shows error', async ({ page }) => {
     </section>
 
     <section id="flake" class="panel">
-      <h2 style="margin-top:0;">Flaky tests — real causes and real fixes</h2>
+      <h2>Flaky tests — real causes and real fixes</h2>
       <p>Flake is not "the test framework is unreliable." Flake is almost always a real bug in either the test or the app. Do NOT default to retry.</p>
       <p><strong>Root causes and fixes:</strong></p>
       <ul>
@@ -103,7 +103,7 @@ test('bad password shows error', async ({ page }) => {
     </section>
 
     <section id="ci" class="panel">
-      <h2 style="margin-top:0;">CI integration</h2>
+      <h2>CI integration</h2>
       <p>Tests you don't run don't protect you. Automated tests must run:</p>
       <ul>
         <li>On every pull request (block merge if red).</li>
@@ -120,7 +120,7 @@ test('bad password shows error', async ({ page }) => {
     </section>
 
     <section id="practice" class="panel" style="border-color: var(--accent);">
-      <h2 style="margin-top:0;">Practice — earn Star-Dust</h2>
+      <h2>Practice — earn Star-Dust</h2>
       <ol>
         <li>Take the <a href="../practice-tests.html?category=automation">Automation quiz</a> — aim ≥ 80%.</li>
         <li>Open the <a href="../automation-lab.html">Automation Lab</a>. Copy the Playwright login spec, install Playwright locally, point it at the clean login app.</li>
