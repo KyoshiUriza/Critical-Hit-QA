@@ -131,7 +131,13 @@ function check(ok, label, detail) {
   await page.goto(BASE + '/pages/practice-tests.html?reset', { waitUntil: 'networkidle' });
   await page.getByTestId('use-all').click();
   const total = await page.locator('#question-count').inputValue();
-  check(Number(total) > 30, 'quiz "All" selects the full bank', 'got ' + total);
+  // Compare against the bank the page actually loaded, not a fixed floor.
+  // A `> 30` threshold passed while the browser was serving a stale cached
+  // quiz-questions.js — the check reported healthy on the wrong data, which
+  // is the failure mode a deploy check exists to prevent.
+  const bankSize = await page.evaluate(() => (window.QUIZ_QUESTIONS || []).length);
+  check(bankSize > 0 && Number(total) === bankSize,
+        'quiz "All" selects the full bank', total + ' of ' + bankSize);
 
   // The Locator Lab depends on its own data file loading.
   await page.goto(BASE + '/practice-apps/locator-lab.html?reset', { waitUntil: 'networkidle' });
