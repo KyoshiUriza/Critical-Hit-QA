@@ -10,6 +10,10 @@
   };
 
   const el = (id) => document.getElementById(id);
+  // Defensive escape — quiz data is currently a bundled static file, but if a future
+  // feature ever loads user-supplied questions this keeps the renderer safe.
+  const esc = (s) => String(s).replace(/[&<>"']/g, (c) =>
+    ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 
   function shuffle(arr) {
     const a = arr.slice();
@@ -82,7 +86,10 @@
     q.choices.forEach((choice, i) => {
       const label = document.createElement("label");
       label.className = "quiz-choice";
-      label.innerHTML = `<input type="radio" name="choice" value="${i}" /> ${choice}`;
+      const input = document.createElement("input");
+      input.type = "radio"; input.name = "choice"; input.value = String(i);
+      label.appendChild(input);
+      label.appendChild(document.createTextNode(" " + choice));
       label.addEventListener("click", () => selectChoice(i, label));
       list.appendChild(label);
     });
@@ -114,7 +121,11 @@
       else if (i === chosen) c.classList.add("wrong");
     });
     const box = el("explanation-box");
-    box.innerHTML = `<strong>${isCorrect ? "✓ Correct." : "✗ Incorrect."}</strong> ${q.explanation}`;
+    box.innerHTML = "";
+    const verdict = document.createElement("strong");
+    verdict.textContent = isCorrect ? "✓ Correct." : "✗ Incorrect.";
+    box.appendChild(verdict);
+    box.appendChild(document.createTextNode(" " + q.explanation));
     box.classList.remove("hidden");
     state.checked = true;
     el("check-btn").classList.add("hidden");
@@ -161,19 +172,34 @@
       list.classList.add("hidden");
       return;
     }
-    list.innerHTML = "<h3>Review</h3>";
+    list.innerHTML = "";
+    const heading = document.createElement("h3");
+    heading.textContent = "Review";
+    list.appendChild(heading);
     state.answers.forEach((a, i) => {
       const div = document.createElement("div");
       div.className = "panel";
-      div.innerHTML = `
-        <div class="quiz-meta">Q${i + 1} · ${a.q.category} · ${a.q.difficulty}</div>
-        <p><strong>${a.q.question}</strong></p>
-        <p class="${a.correct ? "" : "difficulty-hard"}">
-          Your answer: ${a.q.choices[a.chosen]} ${a.correct ? "✓" : "✗"}
-        </p>
-        ${a.correct ? "" : `<p class="difficulty-easy">Correct answer: ${a.q.choices[a.q.answer]}</p>`}
-        <div class="quiz-explanation">${a.q.explanation}</div>
-      `;
+      const meta = document.createElement("div");
+      meta.className = "quiz-meta";
+      meta.textContent = `Q${i + 1} · ${a.q.category} · ${a.q.difficulty}`;
+      const question = document.createElement("p");
+      const strong = document.createElement("strong");
+      strong.textContent = a.q.question;
+      question.appendChild(strong);
+      const yourAns = document.createElement("p");
+      yourAns.className = a.correct ? "" : "difficulty-hard";
+      yourAns.textContent = `Your answer: ${a.q.choices[a.chosen]} ${a.correct ? "✓" : "✗"}`;
+      div.append(meta, question, yourAns);
+      if (!a.correct) {
+        const correctAns = document.createElement("p");
+        correctAns.className = "difficulty-easy";
+        correctAns.textContent = `Correct answer: ${a.q.choices[a.q.answer]}`;
+        div.appendChild(correctAns);
+      }
+      const expl = document.createElement("div");
+      expl.className = "quiz-explanation";
+      expl.textContent = a.q.explanation;
+      div.appendChild(expl);
       list.appendChild(div);
     });
     list.classList.remove("hidden");

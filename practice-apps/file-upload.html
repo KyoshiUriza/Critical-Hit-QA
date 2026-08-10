@@ -128,18 +128,60 @@
     }
 
     function render() {
-      list.innerHTML = state.valid.length === 0
-        ? `<p class="text-dim" data-testid="empty-list">No files selected.</p>`
-        : state.valid.map((f, i) => `
-          <div class="file-row" data-testid="file-row" data-name="${f.name}">
-            <span class="fname">${f.name}</span>
-            <span class="text-dim" style="font-size:0.82rem;">${(f.size / 1024).toFixed(1)} KB</span>
-            <div class="file-progress"><div class="file-progress-bar" style="width:${f.progress}%"></div></div>
-            <button class="btn btn-ghost btn-sm" data-remove="${i}" aria-label="Remove ${f.name}">×</button>
-          </div>
-        `).join("");
-      errorsEl.innerHTML = state.errors.length === 0 ? "" :
-        `<div class="form-error visible" data-testid="error-list">${state.errors.map((e) => `<div>${e}</div>`).join("")}</div>`;
+      // Filenames come from user-supplied File objects — build DOM safely to avoid XSS.
+      list.textContent = "";
+      if (state.valid.length === 0) {
+        const empty = document.createElement("p");
+        empty.className = "text-dim";
+        empty.setAttribute("data-testid", "empty-list");
+        empty.textContent = "No files selected.";
+        list.appendChild(empty);
+      } else {
+        state.valid.forEach((f, i) => {
+          const row = document.createElement("div");
+          row.className = "file-row";
+          row.setAttribute("data-testid", "file-row");
+          row.dataset.name = f.name;
+
+          const name = document.createElement("span");
+          name.className = "fname";
+          name.textContent = f.name;
+
+          const size = document.createElement("span");
+          size.className = "text-dim";
+          size.style.fontSize = "0.82rem";
+          size.textContent = (f.size / 1024).toFixed(1) + " KB";
+
+          const prog = document.createElement("div");
+          prog.className = "file-progress";
+          const bar = document.createElement("div");
+          bar.className = "file-progress-bar";
+          bar.style.width = f.progress + "%";
+          prog.appendChild(bar);
+
+          const remove = document.createElement("button");
+          remove.className = "btn btn-ghost btn-sm";
+          remove.dataset.remove = i;
+          remove.setAttribute("aria-label", "Remove " + f.name);
+          remove.textContent = "×";
+
+          row.append(name, size, prog, remove);
+          list.appendChild(row);
+        });
+      }
+
+      errorsEl.textContent = "";
+      if (state.errors.length > 0) {
+        const box = document.createElement("div");
+        box.className = "form-error visible";
+        box.setAttribute("data-testid", "error-list");
+        state.errors.forEach((e) => {
+          const line = document.createElement("div");
+          line.textContent = e;
+          box.appendChild(line);
+        });
+        errorsEl.appendChild(box);
+      }
       uploadBtn.disabled = state.valid.filter((f) => !f.uploaded).length === 0;
     }
 
@@ -197,5 +239,8 @@
 
     render();
   </script>
+  <script src="../js/data/defects.js"></script>
+  <script src="../js/progress.js"></script>
+  <script src="../js/rpg.js"></script>
 </body>
 </html>

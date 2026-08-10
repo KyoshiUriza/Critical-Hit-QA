@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Manual Testing — Learn — QA Prep Hub</title>
+  <link rel="stylesheet" href="../../css/styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="../../index.html" class="brand">QA Prep Hub</a>
+      <nav class="nav">
+        <a href="../../index.html">Home</a>
+        <a href="../learn.html" class="active">Learn</a>
+        <a href="../practice-tests.html">Practice Tests</a>
+        <a href="../practice-apps.html">Practice Apps</a>
+        <a href="../tester-lattice.html">Lattice</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="page-header">
+      <h1>Manual Testing</h1>
+      <p>The foundation. Every automation engineer is a better one for having done this well first.</p>
+    </div>
+
+    <div class="section-toc">
+      <h4>◈ On this page</h4>
+      <ul>
+        <li><a href="#what">What manual testing actually is</a></li>
+        <li><a href="#techniques">Test design techniques</a></li>
+        <li><a href="#exploratory">Exploratory testing</a></li>
+        <li><a href="#bug-reports">Bug reports that survive triage</a></li>
+        <li><a href="#practice">Practice</a></li>
+      </ul>
+    </div>
+
+    <section id="what" class="panel">
+      <h2 style="margin-top:0;">What manual testing actually is</h2>
+      <p>Manual testing is a human executing the software with the intent to find defects — not just "clicking around." Done well, it's disciplined, hypothesis-driven, and produces a paper trail that survives handoff.</p>
+      <p>Two flavors that get conflated:</p>
+      <ul>
+        <li><strong>Scripted testing</strong> — pre-written test cases with defined steps, inputs, and expected results. Deterministic. Suited for regression suites, acceptance criteria verification, and anywhere reproducibility matters.</li>
+        <li><strong>Exploratory testing</strong> — simultaneous learning, test design, and execution. Discovery-driven. Suited for new features, ambiguous requirements, and finding what scripted tests missed.</li>
+      </ul>
+      <p>You do both. The mix depends on the product's maturity, regulatory constraints, and how quickly requirements change.</p>
+    </section>
+
+    <section id="techniques" class="panel">
+      <h2 style="margin-top:0;">Test design techniques (the shortlist that matters)</h2>
+
+      <h3>Equivalence partitioning</h3>
+      <p>Divide inputs into classes where the system should behave the same. Test one representative per class instead of every possible value.</p>
+      <p><em>Example:</em> Age field 18–65 for adult ticket pricing → partitions are <code class="inline">&lt; 18</code>, <code class="inline">18–65</code>, <code class="inline">&gt; 65</code>, and <code class="inline">non-numeric</code>. Four test cases instead of hundreds.</p>
+
+      <h3>Boundary value analysis</h3>
+      <p>Bugs cluster at boundaries. Test just below, at, and just above each boundary.</p>
+      <p><em>Example:</em> Same age field → test <code class="inline">17, 18, 19</code> and <code class="inline">64, 65, 66</code>. Pair this with equivalence partitioning; they're stronger together.</p>
+
+      <h3>Decision tables</h3>
+      <p>When behavior depends on combinations of conditions, enumerate them. Rows = conditions and actions; columns = rules. Any row with the same expected output for every combination is a candidate to collapse.</p>
+
+      <h3>State transition testing</h3>
+      <p>For features that have modes (draft → in review → published → archived). Diagram the states and transitions, test each legal transition, then explicitly test the illegal ones — those are where the interesting bugs live.</p>
+
+      <h3>Pairwise / all-pairs</h3>
+      <p>When many parameters interact, exhaustive testing is impossible. Pairwise generates a small set of tests that covers every pair of parameter values. Studies show most defects surface from single-parameter or pair-wise interactions, not higher-order combinations.</p>
+
+      <h3>Error guessing</h3>
+      <p>Experience talking. Empty inputs, whitespace-only, extremely long strings, Unicode, negative numbers, dates in leap years, timezone boundaries. Keep a checklist and add to it every time a bug bites you.</p>
+    </section>
+
+    <section id="exploratory" class="panel">
+      <h2 style="margin-top:0;">Exploratory testing — done professionally</h2>
+      <p>Exploratory testing is not "no plan." It's session-based, charter-driven, and produces artifacts.</p>
+      <p><strong>Structure a session:</strong></p>
+      <ol>
+        <li><strong>Charter</strong> — a one-sentence mission. "Explore the login flow with a focus on account lockout and rate limiting."</li>
+        <li><strong>Time-box</strong> — 60 or 90 minutes. Longer sessions lose sharpness.</li>
+        <li><strong>Notes</strong> — capture as you go: what you tested, what you observed, questions raised, bugs filed.</li>
+        <li><strong>Debrief</strong> — five minutes at the end to summarize findings, gaps, and what's worth automating.</li>
+      </ol>
+      <p>Reference: <em>Explore It!</em> by Elisabeth Hendrickson is the canonical text. Keep charters, heuristics, and a running "cheat sheet of nasty inputs" in a notes file you carry between projects.</p>
+    </section>
+
+    <section id="bug-reports" class="panel">
+      <h2 style="margin-top:0;">Bug reports that survive triage</h2>
+      <p>A bad bug report burns cycles for you AND the developer. A good one gets fixed. The difference is a checklist:</p>
+      <ul>
+        <li><strong>Title</strong> — what + where + observed. "500 error on Save when Notes field &gt; 500 chars (Profile page)".</li>
+        <li><strong>Environment</strong> — browser, OS, build number/commit hash.</li>
+        <li><strong>Steps to reproduce</strong> — numbered, minimal, deterministic. Someone else on a fresh machine should reproduce it blindly.</li>
+        <li><strong>Expected result</strong> — separately from actual.</li>
+        <li><strong>Actual result</strong> — what happened, including error messages verbatim.</li>
+        <li><strong>Evidence</strong> — screenshot minimum; HAR file, console log, or screen recording for anything harder.</li>
+        <li><strong>Severity</strong> (technical impact) and <strong>priority</strong> (business urgency) — separate judgments, each with a one-line reason.</li>
+        <li><strong>Frequency</strong> — quantified. "Reproduces 5/5 times" beats "sometimes."</li>
+        <li><strong>Regression?</strong> — if you can identify the last build it worked, name it. Saves hours in triage.</li>
+      </ul>
+    </section>
+
+    <section id="practice" class="panel" style="border-color: var(--accent);">
+      <h2 style="margin-top:0;">Practice — earn Star-Dust</h2>
+      <ol>
+        <li>Take the <a href="../practice-tests.html">Manual Testing quiz</a> — aim for ≥ 80%.</li>
+        <li>Run a 30-minute exploratory session on the <a href="../../practice-apps/login-broken.html">Login (buggy)</a> app. Charter: find every validation and info-leak defect.</li>
+        <li>Draft 3 bug reports from that session in the <a href="../bug-report-builder.html">Bug Report Builder</a> — mixed severities.</li>
+        <li>Log your finds in the <a href="../bug-bounty.html">Bug Bounty scorer</a> and compare to the answer key.</li>
+        <li>Draft one full test case for the <a href="../../practice-apps/register.html">clean Registration form</a> in the <a href="../test-case-builder.html">Test Case Builder</a>.</li>
+      </ol>
+    </section>
+
+    <p class="mt-16"><a href="../learn.html">← Back to Learn</a></p>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p>QA Prep Hub — a local study companion. Themed on <em>The Convergence Chronicles: The Resonance Lattice</em>.</p>
+      <p style="margin-top:12px;">Found it useful?
+        <a class="donation-cta" href="https://buymeacoffee.com/kyoshiuriza" target="_blank" rel="noopener noreferrer" data-testid="donate-link">☕ Buy me a coffee</a>
+      </p>
+    </div>
+  </footer>
+
+  <script src="../../js/data/defects.js"></script>
+  <script src="../../js/progress.js"></script>
+  <script src="../../js/rpg.js"></script>
+</body>
+</html>

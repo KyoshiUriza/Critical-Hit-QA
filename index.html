@@ -12,14 +12,14 @@
       <a href="index.html" class="brand">QA Prep Hub</a>
       <nav class="nav">
         <a href="index.html" class="active">Home</a>
+        <a href="pages/learn.html">Learn</a>
         <a href="pages/practice-tests.html">Practice Tests</a>
-        <a href="pages/interview-questions.html">Interview Questions</a>
         <a href="pages/practice-apps.html">Practice Apps</a>
         <a href="pages/bug-bounty.html">Bug Bounty</a>
         <a href="pages/automation-lab.html">Automation Lab</a>
         <a href="pages/progress.html">Progress</a>
+        <a href="pages/tester-lattice.html">Lattice</a>
         <a href="pages/study-plan.html">Study Plan</a>
-        <a href="pages/resources.html">Resources</a>
       </nav>
     </div>
   </header>
@@ -28,17 +28,31 @@
     <section class="hero">
       <h1>Land your next QA role.</h1>
       <p class="lede">
-        A hands-on prep hub for Software QA interviews — study questions,
-        practice quizzes, real interactive apps to test, and ready-to-run
-        automation examples in Playwright, Cypress, and Selenium.
+        A hands-on prep hub for Software QA interviews — structured learning tracks,
+        practice quizzes, real interactive apps to test, seeded-bug hunts,
+        and ready-to-run automation examples in Playwright, Cypress, and Selenium.
+      </p>
+      <p class="lede" style="font-size:0.92rem; font-style:italic; color:var(--text-dim);">
+        Progress builds your rank on <a href="pages/tester-lattice.html">The Tester's Lattice</a> — a lightweight RPG layer over your study, themed on <em>The Convergence Chronicles: The Resonance Lattice</em>.
       </p>
       <div class="hero-cta">
-        <a class="btn btn-primary" href="pages/practice-tests.html">Take a Practice Quiz</a>
+        <a class="btn btn-primary" href="pages/learn.html">Start Learning</a>
+        <a class="btn btn-primary" href="pages/practice-tests.html">Take a Quiz</a>
         <a class="btn btn-ghost" href="pages/practice-apps.html">Try a Practice App</a>
       </div>
     </section>
 
     <section class="feature-grid">
+      <a class="feature-card" href="pages/learn.html">
+        <div class="feature-icon">L</div>
+        <h3>Learn</h3>
+        <p>Structured tracks: QA basics, manual, automation, codeless (AccelQ), and code-based frameworks (Playwright, Selenium).</p>
+      </a>
+      <a class="feature-card" href="pages/tester-lattice.html">
+        <div class="feature-icon">◈</div>
+        <h3>The Tester's Lattice</h3>
+        <p>Your RPG character sheet. Earn Star-Dust, bind Catalysts, unlock Signature Abilities as you study.</p>
+      </a>
       <a class="feature-card" href="pages/practice-tests.html">
         <div class="feature-icon">?</div>
         <h3>Practice Tests</h3>
@@ -101,12 +115,22 @@
 
   <footer class="site-footer">
     <div class="container">
-      <p>QA Prep Hub — a local study companion. Built as a self-contained static site.</p>
+      <p>
+        QA Prep Hub — a local study companion. Built as a self-contained static site.
+        Themed on <em>The Convergence Chronicles: The Resonance Lattice</em>.
+      </p>
+      <p style="margin-top:12px;">
+        Found it useful?
+        <a class="donation-cta" href="https://buymeacoffee.com/kyoshiuriza" target="_blank" rel="noopener noreferrer" data-testid="donate-link">☕ Buy me a coffee</a>
+      </p>
     </div>
   </footer>
 
   <script src="js/data/quiz-questions.js"></script>
   <script src="js/data/interview-questions.js"></script>
+  <script src="js/data/defects.js"></script>
+  <script src="js/progress.js"></script>
+  <script src="js/rpg.js"></script>
   <script src="js/home.js"></script>
 </body>
 </html>

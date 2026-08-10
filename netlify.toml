@@ -8,3 +8,7 @@
     X-Frame-Options = "SAMEORIGIN"
     Referrer-Policy = "strict-origin-when-cross-origin"
     Permissions-Policy = "geolocation=(), microphone=(), camera=()"
+    # CSP: no external assets are ever loaded; a Buy-Me-a-Coffee link opens in a new tab
+    # but does not embed anything. 'unsafe-inline' on script-src remains because many pages
+    # ship inline <script> blocks — a future pass can extract them and drop 'unsafe-inline'.
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; frame-ancestors 'self'; base-uri 'self'; form-action 'self'; object-src 'none'; upgrade-insecure-requests"

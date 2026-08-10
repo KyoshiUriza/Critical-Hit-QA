@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Codeless Testing (AccelQ) — Learn — QA Prep Hub</title>
+  <link rel="stylesheet" href="../../css/styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="../../index.html" class="brand">QA Prep Hub</a>
+      <nav class="nav">
+        <a href="../../index.html">Home</a>
+        <a href="../learn.html" class="active">Learn</a>
+        <a href="../practice-tests.html">Practice Tests</a>
+        <a href="../automation-lab.html">Automation Lab</a>
+        <a href="../tester-lattice.html">Lattice</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="page-header">
+      <h1>Codeless Testing (AccelQ)</h1>
+      <p>Low-code / no-code test automation platforms. When they fit, and when reaching for one is the wrong call.</p>
+    </div>
+
+    <div class="section-toc">
+      <h4>◈ On this page</h4>
+      <ul>
+        <li><a href="#what">What "codeless" actually means</a></li>
+        <li><a href="#accelq">AccelQ — the pitch and the reality</a></li>
+        <li><a href="#action-based">Action-based modeling</a></li>
+        <li><a href="#fits">When codeless fits</a></li>
+        <li><a href="#doesnt">When it doesn't</a></li>
+        <li><a href="#others">The rest of the codeless landscape</a></li>
+        <li><a href="#practice">Practice</a></li>
+      </ul>
+    </div>
+
+    <section id="what" class="panel">
+      <h2 style="margin-top:0;">What "codeless" actually means</h2>
+      <p>"Codeless" is a spectrum, not a binary. Nearly every "no-code" tool lets you drop into script for the hard cases; nearly every code framework has recorders and generators for the easy ones. What differs is the <em>default author experience</em>:</p>
+      <ul>
+        <li><strong>True codeless</strong> — you build tests by selecting elements, choosing actions from a menu, and typing data. No syntax. The tool generates and runs the underlying automation.</li>
+        <li><strong>Low-code</strong> — visual authoring backed by a scripting escape hatch (usually JS or Python).</li>
+        <li><strong>Record-and-playback</strong> — you perform the flow once, the tool records selectors and actions, you edit and parameterize afterward.</li>
+      </ul>
+      <p>The value proposition is the same across the category: <strong>lower the floor</strong> so people who aren't full-time automation engineers can contribute meaningful test coverage.</p>
+    </section>
+
+    <section id="accelq" class="panel">
+      <h2 style="margin-top:0;">AccelQ — the pitch and the reality</h2>
+      <p><strong>AccelQ</strong> is an AI-powered, cloud-hosted codeless automation platform aimed at enterprise QA teams. Its differentiators, in order:</p>
+      <ol>
+        <li><strong>Action-based modeling.</strong> You describe application logic as reusable Actions ("Log in as admin", "Add product to cart") — the framework encapsulates locators and steps. Tests become sequences of Actions plus data. See below.</li>
+        <li><strong>Cross-technology coverage.</strong> One project can automate web, mobile, desktop, API, and mainframe under a shared model. Uncommon for a single tool.</li>
+        <li><strong>Self-healing locators.</strong> When the underlying UI changes, the tool proposes a new selector. Reduces the "one CSS refactor breaks 400 tests" pain.</li>
+        <li><strong>Built-in test design.</strong> Data tables, decision tables, and parameterization are first-class — you're not gluing together spreadsheet files.</li>
+        <li><strong>Traceability.</strong> Tests map to requirements; the platform tracks coverage against them explicitly.</li>
+      </ol>
+      <p><strong>The reality:</strong> AccelQ genuinely reduces the ramp for less technical testers, and self-healing is real when your UI has decent structure. But codeless does not eliminate the underlying discipline — poorly designed action libraries turn into unreadable spaghetti just like poorly designed code. The platform is also SaaS and priced per user; total cost of ownership is very different from "install open-source Playwright."</p>
+    </section>
+
+    <section id="action-based" class="panel">
+      <h2 style="margin-top:0;">Action-based modeling — the concept that matters</h2>
+      <p>Even if you never use AccelQ, understanding action-based modeling makes you a better automation engineer:</p>
+      <ul>
+        <li>An <strong>Action</strong> encapsulates a piece of business logic — its inputs, outputs, steps, and preconditions. "Place order" is an Action. So is "log in as admin."</li>
+        <li>Actions compose. "Complete a purchase" = "Log in" → "Add to cart" → "Checkout" → "Verify order confirmation." Each of those is itself a callable Action.</li>
+        <li>Tests are thin sequences of Actions plus test data. The messy details (locators, waits, retries) live inside the Actions.</li>
+      </ul>
+      <p>This is essentially the <strong>Page Object Model</strong> generalized to business logic — a step up in abstraction. You can build the same discipline in Playwright or Selenium code by writing your own "Action" layer above your Page Objects.</p>
+    </section>
+
+    <section id="fits" class="panel">
+      <h2 style="margin-top:0;">When codeless fits</h2>
+      <ul>
+        <li>You have <strong>subject-matter experts</strong> (business analysts, manual testers) who understand what to test but don't program. Codeless lets them author.</li>
+        <li>Your app is a <strong>stable enterprise product</strong> — banking, ERP, healthcare — where the UI doesn't change every sprint and coverage requirements are massive.</li>
+        <li>You need <strong>traceability to requirements</strong> for audit / compliance reasons and want it maintained automatically.</li>
+        <li>You need <strong>cross-technology automation</strong> under one roof and don't want to stitch three frameworks together.</li>
+        <li>You have <strong>budget</strong> for a commercial tool and want vendor support / SLAs.</li>
+      </ul>
+    </section>
+
+    <section id="doesnt" class="panel">
+      <h2 style="margin-top:0;">When codeless doesn't fit</h2>
+      <ul>
+        <li><strong>Fast-moving product</strong> with heavy UI churn — self-healing helps but doesn't erase maintenance; the visual authoring loop can be slower than a strong Playwright suite.</li>
+        <li><strong>Team is already skilled in code.</strong> Adding a codeless layer buys you nothing and adds a licensing bill.</li>
+        <li><strong>Deeply custom flows</strong> — canvas apps, WebGL, drag-drop with complex state — where the platform's abstractions don't fit and you spend most of your time in the escape hatch.</li>
+        <li><strong>Highly branched pipelines</strong> — needing tight integration with a bespoke CI stack (custom containers, GPU jobs, complex secrets management). SaaS platforms often make this harder than it should be.</li>
+        <li><strong>Startup / early-stage teams</strong> — the total cost per year is meaningful; that money often buys more coverage as engineer time on open source.</li>
+      </ul>
+    </section>
+
+    <section id="others" class="panel">
+      <h2 style="margin-top:0;">The rest of the codeless landscape</h2>
+      <p>Know that these exist and roughly what each is best at:</p>
+      <ul>
+        <li><strong>Testsigma</strong> — natural-language-first authoring (write "Enter admin@x.com in the Email field"). Cloud-hosted; strong for teams standardizing on plain-English steps.</li>
+        <li><strong>Katalon Studio</strong> — Groovy-scripted under the hood but exposes recording and low-code for beginners. Long-standing product; large community.</li>
+        <li><strong>TestRigor</strong> — natural-language authoring; heavy emphasis on generative-AI-assisted test authoring.</li>
+        <li><strong>Ranorex</strong> — desktop-focused with strong Windows / native support; used heavily in industrial and desktop-app QA.</li>
+        <li><strong>Tricentis Tosca</strong> — enterprise favorite; model-based testing with heavy governance features. Steepest learning curve.</li>
+        <li><strong>Selenium IDE</strong> — the classic free record-and-playback browser extension. Best treated as a bootstrapping tool, not a production framework.</li>
+      </ul>
+    </section>
+
+    <section id="practice" class="panel" style="border-color: var(--accent);">
+      <h2 style="margin-top:0;">Practice — earn Star-Dust</h2>
+      <ol>
+        <li>Sign up for the <a href="https://www.accelq.com/" target="_blank" rel="noopener noreferrer">AccelQ free trial</a> (or a Testsigma free tier) and complete their guided quickstart against a sample app.</li>
+        <li>Model the clean login flow on our <a href="../../practice-apps/login.html">practice login</a> as an Action: <em>login(email, password)</em>. Then write 3 tests that reuse it (valid, wrong password, empty).</li>
+        <li>Write down: what took 30 seconds that would have taken 5 minutes in raw Playwright? What took 5 minutes that would have taken 30 seconds?</li>
+        <li>Interview readiness: be able to explain <em>action-based modeling</em>, <em>self-healing locators</em>, and <em>when NOT to reach for a codeless tool</em>.</li>
+      </ol>
+    </section>
+
+    <p class="mt-16"><a href="../learn.html">← Back to Learn</a></p>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p>QA Prep Hub — a local study companion. Themed on <em>The Convergence Chronicles: The Resonance Lattice</em>.</p>
+      <p style="margin-top:12px;">Found it useful?
+        <a class="donation-cta" href="https://buymeacoffee.com/kyoshiuriza" target="_blank" rel="noopener noreferrer" data-testid="donate-link">☕ Buy me a coffee</a>
+      </p>
+    </div>
+  </footer>
+
+  <script src="../../js/data/defects.js"></script>
+  <script src="../../js/progress.js"></script>
+  <script src="../../js/rpg.js"></script>
+</body>
+</html>

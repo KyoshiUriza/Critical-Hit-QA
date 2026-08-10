@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Automation Testing — Learn — QA Prep Hub</title>
+  <link rel="stylesheet" href="../../css/styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="../../index.html" class="brand">QA Prep Hub</a>
+      <nav class="nav">
+        <a href="../../index.html">Home</a>
+        <a href="../learn.html" class="active">Learn</a>
+        <a href="../practice-tests.html">Practice Tests</a>
+        <a href="../automation-lab.html">Automation Lab</a>
+        <a href="../tester-lattice.html">Lattice</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="page-header">
+      <h1>Automation Testing</h1>
+      <p>The mindset shift: from "test the change" to "prove no regressions across every previous change, continuously."</p>
+    </div>
+
+    <div class="section-toc">
+      <h4>◈ On this page</h4>
+      <ul>
+        <li><a href="#why">Why automate at all</a></li>
+        <li><a href="#pyramid">The test pyramid</a></li>
+        <li><a href="#what-not">What NOT to automate</a></li>
+        <li><a href="#pom">The Page Object Model</a></li>
+        <li><a href="#flake">Flaky tests — real causes and real fixes</a></li>
+        <li><a href="#ci">CI integration</a></li>
+        <li><a href="#practice">Practice</a></li>
+      </ul>
+    </div>
+
+    <section id="why" class="panel">
+      <h2 style="margin-top:0;">Why automate at all</h2>
+      <p>Automation is not about speed. It's about <em>trust in a changing codebase</em>. Every new feature risks breaking every old one. Manual regression at any real scale is impossibly expensive; automated regression is the only way to keep the safety net proportional to the code you own.</p>
+      <p>The economics are simple: the test costs once to write, then near-zero to run. If it runs 50 times over the life of the feature, the automation cost is 2% per run compared to a manual re-execution.</p>
+    </section>
+
+    <section id="pyramid" class="panel">
+      <h2 style="margin-top:0;">The test pyramid</h2>
+      <p>Coined by Mike Cohn. A healthy suite is pyramid-shaped:</p>
+      <ul>
+        <li><strong>Base — many unit tests.</strong> Fast (ms), cheap, deterministic, isolated. Written alongside code by developers. Runs on every save.</li>
+        <li><strong>Middle — integration / service / API tests.</strong> Slower (10s ms – seconds), more realistic. Verifies components talking to each other.</li>
+        <li><strong>Top — end-to-end / UI tests.</strong> Slow (seconds – minutes), brittle, expensive to maintain. Cover the critical user journeys only.</li>
+      </ul>
+      <p>The anti-pattern is the <strong>ice cream cone</strong> — most tests at the UI level, few at the unit level. Slow feedback, high maintenance, developers avoid running the suite locally.</p>
+      <p><strong>Rule of thumb:</strong> if a lower level of the pyramid can prove the same behavior, prove it there.</p>
+    </section>
+
+    <section id="what-not" class="panel">
+      <h2 style="margin-top:0;">What NOT to automate</h2>
+      <ul>
+        <li><strong>Features still in churn.</strong> Cost of maintaining the test exceeds the cost of running it manually. Wait until the design stabilizes.</li>
+        <li><strong>Exploratory testing.</strong> The value is human judgment. Automation removes exactly what makes it work.</li>
+        <li><strong>Subjective checks.</strong> "Does this feel laggy?" "Is the copy on-brand?" — humans, not scripts.</li>
+        <li><strong>One-off tests</strong> that will not run again.</li>
+        <li><strong>Environments you can't control</strong> — real payment gateways, live third-party APIs without sandboxes.</li>
+      </ul>
+      <p>Automate the boring, repetitive, high-value regressions. Keep humans for the interesting parts.</p>
+    </section>
+
+    <section id="pom" class="panel">
+      <h2 style="margin-top:0;">The Page Object Model</h2>
+      <p>Wrap each page (or major component) in a class exposing element locators and high-level actions. Tests become readable and maintenance concentrates in one place.</p>
+      <pre class="code">// LoginPage.js
+class LoginPage {
+  constructor(page) {
+    this.page = page;
+    this.email = page.getByLabel('Email');
+    this.password = page.getByLabel('Password');
+    this.submit = page.getByRole('button', { name: 'Sign in' });
+    this.error = page.getByRole('alert');
+  }
+  async login(email, pw) {
+    await this.email.fill(email);
+    await this.password.fill(pw);
+    await this.submit.click();
+  }
+}
+
+// login.spec.js
+test('bad password shows error', async ({ page }) => {
+  const login = new LoginPage(page);
+  await page.goto('/login');
+  await login.login('u@x.com', 'wrong');
+  await expect(login.error).toHaveText('Invalid credentials');
+});</pre>
+      <p>When the UI changes, you update <em>one</em> file. Tests stay readable.</p>
+    </section>
+
+    <section id="flake" class="panel">
+      <h2 style="margin-top:0;">Flaky tests — real causes and real fixes</h2>
+      <p>Flake is not "the test framework is unreliable." Flake is almost always a real bug in either the test or the app. Do NOT default to retry.</p>
+      <p><strong>Root causes and fixes:</strong></p>
+      <ul>
+        <li><strong>Timing / no wait for state.</strong> Fix with an explicit wait for the specific condition (element visible, network idle, text present) — never <code class="inline">sleep(3)</code>.</li>
+        <li><strong>Test order dependency.</strong> Tests leak state between each other. Fix with fresh fixtures per test — reset DB, clear storage, delete created users.</li>
+        <li><strong>Non-deterministic data.</strong> Timestamps, random IDs, current-date logic. Fix by mocking the clock or seeding random.</li>
+        <li><strong>External dependencies.</strong> Third-party API returned different data. Fix with mocks or a stable stub.</li>
+        <li><strong>Animation / debounce.</strong> Click landed mid-animation. Fix by waiting for a stable signal (an ARIA attribute, a class change, network idle).</li>
+      </ul>
+      <p>Only quarantine + retry as a temporary measure with an owner and a due date. Never permanent.</p>
+    </section>
+
+    <section id="ci" class="panel">
+      <h2 style="margin-top:0;">CI integration</h2>
+      <p>Tests you don't run don't protect you. Automated tests must run:</p>
+      <ul>
+        <li>On every pull request (block merge if red).</li>
+        <li>On every merge to main (catches integration issues from concurrent PRs).</li>
+        <li>On a schedule against production-like environments (catches slow drift).</li>
+      </ul>
+      <p><strong>Guardrails for a CI suite:</strong></p>
+      <ul>
+        <li>Fail fast. Kill the run at the first failure if debugging, run to completion if reporting.</li>
+        <li>Parallelize. Shard the suite across workers; keep total wall time under ~10 minutes.</li>
+        <li>Track flake rate. Any test with &gt; 1% flake gets fixed or quarantined that week.</li>
+        <li>Artifacts on failure. Screenshot, video, trace, browser console log, network log. Debugging without them is guessing.</li>
+      </ul>
+    </section>
+
+    <section id="practice" class="panel" style="border-color: var(--accent);">
+      <h2 style="margin-top:0;">Practice — earn Star-Dust</h2>
+      <ol>
+        <li>Take the <a href="../practice-tests.html">Automation quiz</a> — aim ≥ 80%.</li>
+        <li>Open the <a href="../automation-lab.html">Automation Lab</a>. Copy the Playwright login spec, install Playwright locally, point it at the clean login app.</li>
+        <li>Refactor the spec into a Page Object.</li>
+        <li>Extend it with tests for the buggy login — every test should FAIL, surfacing a real defect.</li>
+        <li>Add a GitHub Actions workflow that runs the suite on push.</li>
+      </ol>
+    </section>
+
+    <p class="mt-16"><a href="../learn.html">← Back to Learn</a></p>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p>QA Prep Hub — a local study companion. Themed on <em>The Convergence Chronicles: The Resonance Lattice</em>.</p>
+      <p style="margin-top:12px;">Found it useful?
+        <a class="donation-cta" href="https://buymeacoffee.com/kyoshiuriza" target="_blank" rel="noopener noreferrer" data-testid="donate-link">☕ Buy me a coffee</a>
+      </p>
+    </div>
+  </footer>
+
+  <script src="../../js/data/defects.js"></script>
+  <script src="../../js/progress.js"></script>
+  <script src="../../js/rpg.js"></script>
+</body>
+</html>

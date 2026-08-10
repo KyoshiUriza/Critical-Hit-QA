@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Tester's Lattice — QA Prep Hub</title>
+  <link rel="stylesheet" href="../css/styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="../index.html" class="brand">QA Prep Hub</a>
+      <nav class="nav">
+        <a href="../index.html">Home</a>
+        <a href="learn.html">Learn</a>
+        <a href="practice-tests.html">Practice Tests</a>
+        <a href="interview-questions.html">Interview Questions</a>
+        <a href="practice-apps.html">Practice Apps</a>
+        <a href="bug-bounty.html">Bug Bounty</a>
+        <a href="automation-lab.html">Automation Lab</a>
+        <a href="progress.html">Progress</a>
+        <a href="tester-lattice.html" class="active">Lattice</a>
+        <a href="study-plan.html">Study Plan</a>
+        <a href="resources.html">Resources</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="page-header">
+      <h1>The Tester's Lattice</h1>
+      <p>Your character sheet. Rank, Star-Dust, bound Catalysts, and Signature Abilities. Everything you do on this site feeds it.</p>
+    </div>
+
+    <div class="rpg-hero" id="rank-hero"></div>
+
+    <div class="two-col">
+      <div class="panel">
+        <h2 style="margin-top:0;">Bound Catalysts</h2>
+        <p class="text-dim" style="font-size:0.88rem;">Each Catalyst binds once. The System does not need much consent.</p>
+        <div id="catalysts-list"></div>
+      </div>
+      <div class="panel">
+        <h2 style="margin-top:0;">Signature Abilities</h2>
+        <p class="text-dim" style="font-size:0.88rem;">Latent until practice awakens them.</p>
+        <div id="achievements-list"></div>
+      </div>
+    </div>
+
+    <div class="panel mt-16">
+      <h2 style="margin-top:0;">The Ranks</h2>
+      <p class="text-dim">The System does not hand out titles. It logs the total and lets the number decide.</p>
+      <table style="width:100%; border-collapse:collapse; margin-top:12px;">
+        <thead>
+          <tr style="border-bottom:1px solid var(--border); text-align:left;">
+            <th style="padding:8px;">Lv.</th>
+            <th style="padding:8px;">Rank</th>
+            <th style="padding:8px;">Star-Dust</th>
+            <th style="padding:8px;">Lore</th>
+          </tr>
+        </thead>
+        <tbody id="ranks-tbody"></tbody>
+      </table>
+    </div>
+
+    <div class="panel mt-16">
+      <h2 style="margin-top:0;">How to earn Star-Dust</h2>
+      <ul>
+        <li><strong>+8</strong> per correct quiz answer · <strong>+2</strong> per incorrect (participation).</li>
+        <li><strong>+10 × severity</strong> per defect caught in Bug Bounty (critical = 5, high = 3, medium = 2, low = 1).</li>
+        <li><strong>+25</strong> per test case drafted in the <a href="test-case-builder.html">Test Case Builder</a>.</li>
+        <li><strong>+25</strong> per bug report drafted in the <a href="bug-report-builder.html">Bug Report Builder</a>.</li>
+        <li><strong>+40</strong> per study plan day marked complete.</li>
+        <li><strong>+5</strong> per day of your current streak (bonus caps at 30 days).</li>
+      </ul>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p>QA Prep Hub — a local study companion. Themed on <em>The Convergence Chronicles: The Resonance Lattice</em>.</p>
+      <p style="margin-top:12px;">Found it useful?
+        <a class="donation-cta" href="https://buymeacoffee.com/kyoshiuriza" target="_blank" rel="noopener noreferrer" data-testid="donate-link">☕ Buy me a coffee</a>
+      </p>
+    </div>
+  </footer>
+
+  <script src="../js/data/defects.js"></script>
+  <script src="../js/progress.js"></script>
+  <script src="../js/rpg.js"></script>
+  <script>
+    function render() {
+      const p = window.Progress.get();
+      const dust = window.RPG.computeStarDust(p);
+      const { current, next } = window.RPG.computeRank(dust);
+      const unlockedAch = new Set(window.RPG.unlockedAchievements(p));
+      const unlockedCat = new Set(window.RPG.unlockedCatalysts(p));
+
+      const pct = next ? Math.min(100, Math.round((dust - current.starDust) / (next.starDust - current.starDust) * 100)) : 100;
+      document.getElementById("rank-hero").innerHTML = `
+        <div class="rpg-rank-label">◈ Rank · Level ${current.level}</div>
+        <h2 class="rpg-rank-name">${current.name}</h2>
+        <p class="rpg-rank-flavor">"${current.blurb}"</p>
+        <div class="rpg-dust-line">✦ ${dust.toLocaleString()} Star-Dust</div>
+        <div class="rpg-progress-bar"><span style="width:${pct}%"></span></div>
+        <p class="text-dim" style="font-size:0.85rem; margin-top:6px;">
+          ${next
+            ? `${(next.starDust - dust).toLocaleString()} to <strong style="color:var(--text)">${next.name}</strong>`
+            : "Maximum rank reached. The Tester Absolute."}
+        </p>
+      `;
+
+      document.getElementById("catalysts-list").innerHTML = window.RPG.CATALYSTS.map((c) => `
+        <div class="rpg-catalyst ${unlockedCat.has(c.id) ? "unlocked" : ""}">
+          <div class="rpg-sigil">${c.name.split(" ").pop()[0]}</div>
+          <div style="flex:1;">
+            <div class="rpg-name">${unlockedCat.has(c.id) ? c.name : "??? Catalyst"}</div>
+            <div class="rpg-lore">${unlockedCat.has(c.id) ? "Ability: " + c.ability : c.grantedAt}</div>
+            ${unlockedCat.has(c.id) ? "" : `<div class="rpg-locked-label">LOCKED</div>`}
+          </div>
+        </div>
+      `).join("");
+
+      document.getElementById("achievements-list").innerHTML = window.RPG.ACHIEVEMENTS.map((a) => `
+        <div class="rpg-achievement ${unlockedAch.has(a.id) ? "unlocked" : ""}">
+          <div class="rpg-sigil">${unlockedAch.has(a.id) ? "✦" : "◦"}</div>
+          <div style="flex:1;">
+            <div class="rpg-name">${a.name}</div>
+            <div class="rpg-lore">${a.lore}</div>
+            <div class="rpg-hint">${unlockedAch.has(a.id) ? "Unlocked." : "To unlock: " + a.hint}</div>
+          </div>
+        </div>
+      `).join("");
+
+      document.getElementById("ranks-tbody").innerHTML = window.RPG.RANKS.map((r) => `
+        <tr style="border-bottom:1px solid var(--border); ${r.level === current.level ? "background:rgba(79,157,255,0.08);" : ""}">
+          <td style="padding:8px; font-family:var(--font-mono);">${r.level}</td>
+          <td style="padding:8px; font-weight:600;">${r.name}</td>
+          <td style="padding:8px; font-family:var(--font-mono); color:var(--accent-2);">${r.starDust.toLocaleString()}</td>
+          <td style="padding:8px; color:var(--text-dim); font-style:italic; font-size:0.88rem;">${r.blurb}</td>
+        </tr>
+      `).join("");
+    }
+
+    render();
+  </script>
+</body>
+</html>

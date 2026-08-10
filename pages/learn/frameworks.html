@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Code-based Frameworks — Learn — QA Prep Hub</title>
+  <link rel="stylesheet" href="../../css/styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="../../index.html" class="brand">QA Prep Hub</a>
+      <nav class="nav">
+        <a href="../../index.html">Home</a>
+        <a href="../learn.html" class="active">Learn</a>
+        <a href="../practice-tests.html">Practice Tests</a>
+        <a href="../automation-lab.html">Automation Lab</a>
+        <a href="../tester-lattice.html">Lattice</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="page-header">
+      <h1>Code-based Framework Testing</h1>
+      <p>Playwright and Selenium — the two tools every serious QA engineer should be able to speak to in an interview.</p>
+    </div>
+
+    <div class="section-toc">
+      <h4>◈ On this page</h4>
+      <ul>
+        <li><a href="#compare">Playwright vs. Selenium — the actual comparison</a></li>
+        <li><a href="#playwright">Playwright deep dive</a></li>
+        <li><a href="#selenium">Selenium deep dive</a></li>
+        <li><a href="#locators">Locator strategies that survive</a></li>
+        <li><a href="#waits">Waits, done right</a></li>
+        <li><a href="#choosing">Choosing between them (2026 view)</a></li>
+        <li><a href="#practice">Practice</a></li>
+      </ul>
+    </div>
+
+    <section id="compare" class="panel">
+      <h2 style="margin-top:0;">Playwright vs. Selenium — the actual comparison</h2>
+      <table style="width:100%; border-collapse:collapse;">
+        <thead>
+          <tr style="border-bottom:1px solid var(--border); text-align:left;">
+            <th style="padding:8px;"></th>
+            <th style="padding:8px;">Playwright</th>
+            <th style="padding:8px;">Selenium</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="border-bottom:1px solid var(--border);"><td style="padding:8px;"><strong>First release</strong></td><td style="padding:8px;">2020 (Microsoft)</td><td style="padding:8px;">2004 (open-source, W3C-standard)</td></tr>
+          <tr style="border-bottom:1px solid var(--border);"><td style="padding:8px;"><strong>Language bindings</strong></td><td style="padding:8px;">JavaScript/TypeScript (primary), Python, .NET, Java</td><td style="padding:8px;">Java, Python, C#, JavaScript, Ruby, Kotlin, and more</td></tr>
+          <tr style="border-bottom:1px solid var(--border);"><td style="padding:8px;"><strong>Protocol</strong></td><td style="padding:8px;">Chrome DevTools Protocol + WebDriver BiDi</td><td style="padding:8px;">W3C WebDriver</td></tr>
+          <tr style="border-bottom:1px solid var(--border);"><td style="padding:8px;"><strong>Browsers</strong></td><td style="padding:8px;">Chromium, Firefox, WebKit — bundled</td><td style="padding:8px;">Any browser with a WebDriver — bring your own</td></tr>
+          <tr style="border-bottom:1px solid var(--border);"><td style="padding:8px;"><strong>Auto-wait</strong></td><td style="padding:8px;">Yes, built-in — most actions await actionability</td><td style="padding:8px;">No — you write explicit waits</td></tr>
+          <tr style="border-bottom:1px solid var(--border);"><td style="padding:8px;"><strong>Parallelism</strong></td><td style="padding:8px;">Native, first-class — isolated contexts per test</td><td style="padding:8px;">Via Selenium Grid or test-runner-specific tooling</td></tr>
+          <tr style="border-bottom:1px solid var(--border);"><td style="padding:8px;"><strong>Multi-tab / multi-origin</strong></td><td style="padding:8px;">Yes, single API</td><td style="padding:8px;">Yes, but more setup</td></tr>
+          <tr style="border-bottom:1px solid var(--border);"><td style="padding:8px;"><strong>Network interception</strong></td><td style="padding:8px;">Yes, first-class — mock/stub any request</td><td style="padding:8px;">Limited natively; needs extensions</td></tr>
+          <tr style="border-bottom:1px solid var(--border);"><td style="padding:8px;"><strong>Trace viewer</strong></td><td style="padding:8px;">Yes — DOM snapshots, network, console per action</td><td style="padding:8px;">Not built-in</td></tr>
+          <tr style="border-bottom:1px solid var(--border);"><td style="padding:8px;"><strong>Ecosystem age</strong></td><td style="padding:8px;">Growing fast</td><td style="padding:8px;">20+ years — enormous integrations, huge community</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="playwright" class="panel">
+      <h2 style="margin-top:0;">Playwright deep dive</h2>
+      <p>Microsoft-backed, released 2020, written by the team that previously built Puppeteer at Google. Designed from the start around the pain points a decade of Selenium exposed.</p>
+
+      <h3>Install and run</h3>
+      <pre class="code">npm init playwright@latest
+npx playwright test
+npx playwright test --ui         # interactive mode
+npx playwright show-trace tr.zip # inspect a failed run</pre>
+
+      <h3>The core primitives</h3>
+      <ul>
+        <li><strong>Browser</strong> — a browser process (chromium, firefox, webkit).</li>
+        <li><strong>Context</strong> — an isolated browser session, its own cookies and storage. Each test gets a fresh one by default.</li>
+        <li><strong>Page</strong> — a tab within a context. You do most of your work through this.</li>
+        <li><strong>Locator</strong> — a lazy, re-resolving reference to an element. Never a "stale element" exception.</li>
+      </ul>
+
+      <h3>Recommended locators (in order)</h3>
+      <pre class="code">page.getByRole('button', { name: 'Sign in' })   // best — semantic
+page.getByLabel('Email')
+page.getByPlaceholder('you@example.com')
+page.getByText('Welcome back')
+page.getByTestId('login-submit')                 // stable data-testid
+page.locator('css=.some-class')                  // last resort</pre>
+
+      <h3>Auto-wait — what actually happens</h3>
+      <p>When you call <code class="inline">await locator.click()</code>, Playwright waits until the element is:</p>
+      <ul>
+        <li>Attached to the DOM</li>
+        <li>Visible (not <code class="inline">display:none</code>, not zero-size)</li>
+        <li>Stable (not in transit due to animation)</li>
+        <li>Enabled</li>
+        <li>Receiving events (not covered by another element)</li>
+      </ul>
+      <p>All within a default 30-second timeout. This eliminates a huge class of flake without a single explicit <code class="inline">wait</code>.</p>
+
+      <h3>Trace viewer — the killer feature</h3>
+      <p>Add <code class="inline">trace: 'on-first-retry'</code> to your Playwright config. On failure, run <code class="inline">npx playwright show-trace</code> and get a full timeline: DOM snapshot before/after every action, network calls, console logs, screenshots, source. Diagnosing a flaky failure goes from hours to minutes.</p>
+    </section>
+
+    <section id="selenium" class="panel">
+      <h2 style="margin-top:0;">Selenium deep dive</h2>
+      <p>The granddaddy. WebDriver became a W3C standard in 2018 largely because of Selenium's ubiquity. Selenium 4+ ships true W3C WebDriver, relative locators, and a modernized Grid.</p>
+
+      <h3>Install (Python)</h3>
+      <pre class="code">pip install selenium
+# WebDriver Manager handles the driver binary in Selenium 4+
+python -c "from selenium import webdriver; d = webdriver.Chrome(); d.get('https://example.com'); d.quit()"</pre>
+
+      <h3>The core primitives</h3>
+      <ul>
+        <li><strong>WebDriver</strong> — the browser session.</li>
+        <li><strong>WebElement</strong> — a reference to a DOM element. <em>Stale-element-reference</em> exceptions happen when the DOM re-renders.</li>
+        <li><strong>By</strong> — locator strategies: <code class="inline">By.ID</code>, <code class="inline">By.CSS_SELECTOR</code>, <code class="inline">By.XPATH</code>, and (Selenium 4+) relative locators like <code class="inline">above</code>, <code class="inline">below</code>, <code class="inline">near</code>.</li>
+        <li><strong>WebDriverWait</strong> + <strong>ExpectedConditions</strong> — the explicit-wait mechanism.</li>
+      </ul>
+
+      <h3>Explicit wait pattern</h3>
+      <pre class="code">from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.by import By
+
+el = WebDriverWait(driver, 10).until(
+    EC.element_to_be_clickable((By.CSS_SELECTOR, '[data-testid="login-submit"]'))
+)
+el.click()</pre>
+      <p>Selenium does <em>not</em> auto-wait. If you skip explicit waits you get flake. Never sleep.</p>
+
+      <h3>Selenium Grid</h3>
+      <p>For scale: run tests distributed across many browsers/OSes. Grid 4 supports Docker containers per session, native browser sandboxing, and cloud providers like Sauce Labs, BrowserStack, LambdaTest slot in seamlessly.</p>
+
+      <h3>Where Selenium still wins</h3>
+      <ul>
+        <li>Language coverage — need Java, Ruby, C#, Kotlin? Selenium has first-class bindings; Playwright doesn't for all of them.</li>
+        <li>Any browser with a WebDriver — including embedded browsers, older builds, exotic platforms.</li>
+        <li>Massive existing test suites — migrating a decade of Selenium tests to Playwright is a project, not a decision.</li>
+        <li>Corporate policy or standards mandating W3C WebDriver.</li>
+      </ul>
+    </section>
+
+    <section id="locators" class="panel">
+      <h2 style="margin-top:0;">Locator strategies that survive UI change</h2>
+      <p>Locator brittleness is the single largest maintenance cost in UI automation. Rank your locator choices from best to worst:</p>
+      <ol>
+        <li><strong>Semantic queries.</strong> <code class="inline">getByRole('button', { name: 'Sign in' })</code> — what a screen reader sees. Cheapest to maintain; also tests accessibility as a side effect.</li>
+        <li><strong>Test-specific attributes.</strong> <code class="inline">data-testid="login-submit"</code>. Add these deliberately to the app; they survive style refactors.</li>
+        <li><strong>Stable IDs.</strong> Not auto-generated ones like <code class="inline">id="mui-generated-42"</code>.</li>
+        <li><strong>Text content.</strong> Fine if the text is stable and unique enough.</li>
+        <li><strong>CSS class of a specific-looking class.</strong> Only if you own the class name and won't refactor styles.</li>
+        <li><strong>Absolute XPath.</strong> Almost always wrong. Breaks the moment a wrapper div gets added.</li>
+        <li><strong>Positional / nth-child.</strong> Guaranteed to break within the year.</li>
+      </ol>
+      <p>The practice apps on this site all expose <code class="inline">data-testid</code> attributes for exactly this reason.</p>
+    </section>
+
+    <section id="waits" class="panel">
+      <h2 style="margin-top:0;">Waits, done right</h2>
+      <ul>
+        <li><strong>Never sleep.</strong> A fixed <code class="inline">sleep(2)</code> is both too slow (when things are fast) and still flaky (when things are slow). Zero justifications.</li>
+        <li><strong>Wait for a specific condition</strong> — element visible, network request done, ARIA attribute changed, text present.</li>
+        <li><strong>Framework-level auto-wait &gt; manual wait</strong> where available (Playwright). Skip the ceremony.</li>
+        <li><strong>Waiting for network idle</strong> is a heuristic — brittle if your app polls. Prefer waiting for the specific request whose result matters.</li>
+        <li><strong>Long timeouts hide bugs.</strong> A 60-second wait that always succeeds in 200ms is fine. One that regularly takes 30 seconds is telling you something.</li>
+      </ul>
+    </section>
+
+    <section id="choosing" class="panel">
+      <h2 style="margin-top:0;">Choosing between them (2026 view)</h2>
+      <ul>
+        <li><strong>Greenfield project, JS/TS-native team, modern web app</strong> → Playwright. Lower ceremony, faster feedback, trace viewer alone is worth it.</li>
+        <li><strong>Team is Java/Python/C# by default</strong> and you want first-class language support → Playwright works in all of these too. Playwright is the safer pick for greenfield across the board today.</li>
+        <li><strong>Existing large Selenium investment</strong> → don't rewrite. Migrate incrementally by writing new tests in Playwright and letting the Selenium suite age out.</li>
+        <li><strong>Need Ruby / Kotlin / a niche browser / an on-prem Grid</strong> → Selenium is still the answer.</li>
+        <li><strong>Team-of-one or hobby project</strong> → Playwright. Setup is a single command.</li>
+      </ul>
+      <p>Playwright is the safer default pick for greenfield projects in 2026. Selenium remains the right call when your constraints — language, browser, existing suite, standard — require it.</p>
+    </section>
+
+    <section id="practice" class="panel" style="border-color: var(--accent);">
+      <h2 style="margin-top:0;">Practice — earn Star-Dust</h2>
+      <ol>
+        <li>Take the <a href="../practice-tests.html">Automation quiz</a> — aim ≥ 85%.</li>
+        <li>Install Playwright locally. Serve this project (<code class="inline">python -m http.server 8080</code>) and run the login spec from the <a href="../automation-lab.html">Automation Lab</a>.</li>
+        <li>Rewrite the same spec using Selenium (Python) — get it green.</li>
+        <li>Diff the two: which took more code? Which was harder to debug? Which failure output would you rather read at 4am?</li>
+        <li>Point the Playwright suite at the <a href="../../practice-apps/login-broken.html">buggy login</a> and confirm the "expected behavior" assertions fail — that's a real regression suite catching real bugs.</li>
+      </ol>
+    </section>
+
+    <p class="mt-16"><a href="../learn.html">← Back to Learn</a></p>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p>QA Prep Hub — a local study companion. Themed on <em>The Convergence Chronicles: The Resonance Lattice</em>.</p>
+      <p style="margin-top:12px;">Found it useful?
+        <a class="donation-cta" href="https://buymeacoffee.com/kyoshiuriza" target="_blank" rel="noopener noreferrer" data-testid="donate-link">☕ Buy me a coffee</a>
+      </p>
+    </div>
+  </footer>
+
+  <script src="../../js/data/defects.js"></script>
+  <script src="../../js/progress.js"></script>
+  <script src="../../js/rpg.js"></script>
+</body>
+</html>
