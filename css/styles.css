@@ -213,6 +213,12 @@ html, body {
   min-height: 60px;
   gap: 16px;
   flex-wrap: nowrap;
+  /* The header is chrome, not content — it may use the full viewport. Capping
+     it at .container's 1120px left the brand + 10 nav items + RPG chip needing
+     ~1177px, so the chip overflowed the container at EVERY width and the page
+     picked up a horizontal scrollbar around 1200px. Content stays constrained;
+     only the header bar widens. */
+  max-width: 1400px;
 }
 .brand {
   font-weight: 700;
@@ -279,9 +285,11 @@ html, body {
 .nav-toggle-bars::before { top: -6px; }
 .nav-toggle-bars::after { top: 6px; }
 
-/* Below this width the 10 items cannot fit on one row without shrinking past
-   a comfortable tap target, so they move into a disclosure panel. */
-@media (max-width: 1180px) {
+/* Measured: brand + 10 nav items + RPG chip need ~1177px, plus 40px of
+   container padding. Below ~1220px they cannot share a row, so they move into
+   a disclosure panel. This number is derived, not guessed — see
+   tests/header.spec.js, which fails if the content stops fitting. */
+@media (max-width: 1220px) {
   .nav-toggle { display: flex; }
   .header-inner { flex-wrap: wrap; }
   .nav {

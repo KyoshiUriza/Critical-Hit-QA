@@ -27,9 +27,40 @@ for (const width of WIDTHS) {
 
     expect(escaped, `nav items rendered outside the header at ${width}px`).toEqual([]);
   });
+
+  test(`no horizontal overflow at ${width}px`, async ({ page }) => {
+    // Setting flex-shrink:0 to stop the chip wrapping converted the problem
+    // into sideways overflow — invisible to the vertical-escape check above.
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto('/index.html?reset');
+    // Seed progress so the RPG chip renders at a realistic width.
+    await page.evaluate(() => {
+      for (let i = 0; i < 6; i++) {
+        window.Progress.recordQuizRun({ category: 'manual', correct: 9, total: 10, elapsedMs: 1000 });
+      }
+    });
+    await page.reload();
+
+    const overflow = await page.evaluate(() => {
+      const doc = document.documentElement;
+      const inner = document.querySelector('.header-inner');
+      const right = inner.getBoundingClientRect().right;
+      const strays = [...inner.children]
+        .filter((el) => el.getClientRects().length && el.getBoundingClientRect().right > right + 1)
+        .map((el) => el.className || el.tagName);
+      return {
+        pageScrolls: doc.scrollWidth > doc.clientWidth,
+        strays,
+      };
+    });
+
+    expect(overflow.pageScrolls, `page scrolls horizontally at ${width}px`).toBe(false);
+    expect(overflow.strays, `header children overflow the bar at ${width}px`).toEqual([]);
+  });
 }
 
 test('wide viewports show the full nav and hide the toggle', async ({ page }) => {
+  // Above the measured 1220px breakpoint.
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto('/index.html?reset');
 
@@ -97,9 +128,23 @@ test('a long rank name does not wrap the chip or the brand', async ({ page }) =>
   const brandBox = await page.locator('.brand').boundingBox();
   const headerBox = await page.locator('.site-header').boundingBox();
 
-  // Single-line heights: anything taller means it wrapped.
-  expect(chipBox.height, 'chip wrapped to multiple lines').toBeLessThan(40);
-  expect(brandBox.height, 'brand wrapped to two lines').toBeLessThan(36);
+  // Compare against each element's own line-height rather than a hardcoded
+  // pixel count — absolute thresholds encode Windows font metrics and would
+  // be flaky on the Linux CI runner.
+  const wrapped = await page.evaluate(() => {
+    const check = (sel) => {
+      const el = document.querySelector(sel);
+      if (!el) return null;
+      const cs = getComputedStyle(el);
+      let lh = parseFloat(cs.lineHeight);
+      if (Number.isNaN(lh)) lh = parseFloat(cs.fontSize) * 1.2;
+      // More than ~1.6 line-boxes tall means it wrapped.
+      return el.getBoundingClientRect().height > lh * 1.6;
+    };
+    return { chip: check('.rpg-chip'), brand: check('.brand') };
+  });
+  expect(wrapped.chip, 'chip wrapped to multiple lines').toBe(false);
+  expect(wrapped.brand, 'brand wrapped to two lines').toBe(false);
   // And nothing spills out of the bar.
   expect(chipBox.y + chipBox.height).toBeLessThanOrEqual(headerBox.y + headerBox.height + 1);
 });
