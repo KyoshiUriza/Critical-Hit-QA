@@ -29,6 +29,7 @@ const PAGES = [
   '/pages/resources.html',             // the most outbound links of any page
   '/pages/account.html',               // profiles + sync codes
   '/pages/tester-lattice.html',        // character sheet
+  '/practice-apps/cart-broken.html',   // buggy app + bounty side panel
   '/practice-apps/locator-lab.html',
   '/practice-apps/sql-sandbox.html',
   '/practice-apps/login.html',
@@ -153,6 +154,17 @@ function check(ok, label, detail) {
   await page.goto(BASE + '/pages/portfolio.html', { waitUntil: 'networkidle' });
   const saved = await page.getByTestId('artifact-bug-report').count();
   check(saved === 1, 'a draft autosaves and appears in the portfolio', saved + ' found');
+
+  // The bounty drawer ships as its own file; if bounty-panel.js failed to
+  // deploy, the buggy apps would render fine with the feature silently gone.
+  await page.goto(BASE + '/practice-apps/cart-broken.html?reset', { waitUntil: 'networkidle' });
+  const toggleCount = await page.getByTestId('bounty-toggle').count();
+  check(toggleCount === 1, 'the Bug Bounty side panel mounts on buggy apps', toggleCount + ' toggle(s)');
+  if (toggleCount === 1) {
+    await page.getByTestId('bounty-toggle').click();
+    const panelShown = await page.getByTestId('bounty-panel').isVisible();
+    check(panelShown, 'the panel opens and lists the checklist', panelShown ? 'open' : 'did not open');
+  }
 
   // The font is the one asset the deploy workflow could silently omit — it
   // copies an explicit file list, and a missing woff2 degrades to the system

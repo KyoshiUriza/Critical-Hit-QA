@@ -24,7 +24,7 @@
     "practice_todos",
     "practice_todos_broken"
   ];
-  var OWNED_SESSION_KEYS = ["login_fails", "login_locked"];
+  var OWNED_SESSION_KEYS = ["login_fails", "login_locked", "bounty_panel_open"];
 
   function reset() {
     OWNED_KEYS.forEach(function (k) {

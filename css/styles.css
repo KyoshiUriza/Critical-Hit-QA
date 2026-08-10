@@ -1249,6 +1249,107 @@ code.inline {
    rather than a hardcoded rgba of a colour that no longer exists. */
 .rank-current { background: color-mix(in srgb, var(--accent) 10%, transparent); }
 
+/* ── Bug Bounty side panel ───────────────────────────────────────────────
+   A non-modal drawer on the buggy practice apps, so a find gets ticked at
+   the moment it happens instead of in another tab. Mounted by
+   js/bounty-panel.js only on pages whose defects are in the catalogue. */
+.bounty-toggle {
+  position: fixed;
+  right: 0;
+  top: 40%;
+  z-index: 95;                    /* above content, below toasts */
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  background: var(--accent);
+  color: var(--on-accent);
+  border: 1px solid transparent;
+  border-right: none;
+  border-radius: var(--rad-md) 0 0 var(--rad-md);
+  padding: var(--sp-3) var(--sp-3);
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: var(--shadow-md);
+  /* NOT `all` — the focus ring is box-shadow and must be instant. */
+  transition: transform var(--dur-fast) var(--ease-out);
+}
+.bounty-toggle:hover { transform: translateX(-2px); }
+.bounty-toggle:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+.bounty-toggle-count {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  background: color-mix(in srgb, var(--on-accent) 18%, transparent);
+  padding: 1px 7px;
+  border-radius: var(--rad-full);
+}
+/* When the drawer is open the toggle tucks behind it — the drawer has its
+   own close button, and two controls for one action confuses focus order. */
+.bounty-open .bounty-toggle { transform: translateX(100%); visibility: hidden; }
+
+.bounty-panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: min(380px, 92vw);
+  z-index: 96;
+  background: var(--bg-elev);
+  border-left: 1px solid var(--border-strong);
+  box-shadow: var(--shadow-lg);
+  padding: var(--sp-4) var(--sp-4) var(--sp-6);
+  overflow-y: auto;
+  transform: translateX(100%);
+  visibility: hidden;
+  transition: transform var(--dur-med) var(--ease-out), visibility var(--dur-med);
+}
+.bounty-open .bounty-panel { transform: translateX(0); visibility: visible; }
+
+.bounty-panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-2);
+  margin-bottom: var(--sp-2);
+}
+.bounty-panel-title { font-size: var(--text-lg); margin: 0; }
+.bounty-panel-title:focus-visible { outline: none; box-shadow: var(--focus-ring); border-radius: var(--rad-sm); }
+.bounty-panel-close {
+  background: transparent;
+  border: 1px solid var(--border-control);
+  border-radius: var(--rad-md);
+  color: var(--text);
+  font-size: var(--text-lg);
+  line-height: 1;
+  width: 32px;
+  height: 32px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.bounty-panel-close:hover { background: var(--bg-elev-2); }
+
+.bounty-score { font-size: var(--text-sm); margin: 0 0 var(--sp-2); }
+
+.bounty-list { list-style: none; padding: 0; margin: var(--sp-3) 0 0; }
+.bounty-item { border: 1px solid var(--border); border-radius: var(--rad-md); margin-bottom: var(--sp-2); }
+.bounty-item.found { border-color: var(--accent-2); }
+.bounty-item-label {
+  display: flex;
+  gap: var(--sp-2);
+  align-items: flex-start;
+  padding: var(--sp-3);
+  cursor: pointer;
+}
+.bounty-item-label input { margin-top: 3px; }
+.bounty-item-title { font-size: var(--text-sm); }
+.bounty-writeup-link {
+  display: inline-block;
+  margin-top: var(--sp-2);
+  font-size: var(--text-xs);
+}
+.bounty-panel-footer { margin-top: var(--sp-4); }
+
 .donation-cta {
   display: inline-flex; align-items: center; gap: 6px;
   background: var(--brand-donate); color: var(--brand-donate-fg);
