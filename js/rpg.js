@@ -286,8 +286,14 @@
     chip.href = pageHrefTo("tester-lattice.html");
     chip.className = "rpg-chip";
     chip.setAttribute("title", `${current.name} · ${s} Star-Dust${next ? ` · ${next.starDust - s} to ${next.name}` : ""}`);
+    // Level and rank name are separate spans so CSS can drop the NAME on
+    // narrower viewports while keeping the level. Combined in one span, the
+    // chip claimed ~110px it could not afford between 1251 and 1306px, which
+    // overflowed the page horizontally on Linux (see the breakpoint note in
+    // styles.css). The title attribute keeps the full text available.
     chip.innerHTML = `
-      <span class="rpg-chip-rank">Lv.${current.level} ${current.name}</span>
+      <span class="rpg-chip-lv">Lv.${current.level}</span>
+      <span class="rpg-chip-rank">${current.name}</span>
       <span class="rpg-chip-dust">✦ ${s}</span>
       <span class="rpg-chip-bar"><span style="width:${pctToNext}%"></span></span>
     `;

@@ -157,6 +157,50 @@ test('a long rank name does not wrap the chip or the brand', async ({ page }) =>
   expect(chipBox.y + chipBox.height).toBeLessThanOrEqual(headerBox.y + headerBox.height + 1);
 });
 
+test('the header fits inside its own breakpoint, with slack', async ({ page }) => {
+  // The invariant the sampled widths above only test by luck of sampling.
+  //
+  // The header collapses to a hamburger at <=1250px, which means at 1251px the
+  // full row — brand + 11 nav items + RPG chip — must FIT. It did not: it
+  // needed 1307px, so 1251-1306 was over-subscribed. Windows compressed the
+  // nav and stayed silent; Linux pushed the page sideways, so this only ever
+  // failed on CI.
+  //
+  // Measuring the requirement directly catches that on any platform and any
+  // font, instead of hoping a sampled width lands inside the broken band.
+  const BREAKPOINT = 1250;
+  const SLACK = 20; // room for font-metric differences between platforms
+
+  await page.setViewportSize({ width: BREAKPOINT + 1, height: 900 });
+  await page.goto('/index.html?reset');
+  // Seed so the chip renders at a realistic width, not its empty state.
+  await page.evaluate(() => {
+    for (let i = 0; i < 6; i++) {
+      window.Progress.recordQuizRun({ category: 'manual', correct: 9, total: 10, elapsedMs: 1000 });
+    }
+  });
+  await page.goto('/index.html');
+  await page.locator('.rpg-chip').waitFor();
+
+  const required = await page.evaluate(() => {
+    const inner = document.querySelector('.header-inner');
+    const cs = getComputedStyle(inner);
+    const gap = parseFloat(cs.gap) || 0;
+    const pad = (parseFloat(cs.paddingLeft) || 0) + (parseFloat(cs.paddingRight) || 0);
+    const kids = [...inner.children].filter((el) => el.getClientRects().length);
+    // scrollWidth, not getBoundingClientRect: a flex item that has been
+    // squeezed reports its squeezed size, which would hide the overflow.
+    const content = kids.reduce((sum, el) => sum + Math.ceil(el.scrollWidth), 0);
+    return content + gap * Math.max(0, kids.length - 1) + pad;
+  });
+
+  expect(
+    required,
+    `header needs ${required}px but collapses only at ${BREAKPOINT}px — ` +
+    `widths ${BREAKPOINT + 1}-${required - 1} overflow`
+  ).toBeLessThanOrEqual(BREAKPOINT - SLACK);
+});
+
 test('the nav does not shift horizontally between pages', async ({ page }) => {
   // The symptom as reported: navigating from Home to Quizzes (and five other
   // pages) made the header options jump right. Cause: those pages did not

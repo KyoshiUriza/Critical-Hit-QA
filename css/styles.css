@@ -359,7 +359,7 @@ html, body {
   /* min-height, never a fixed height: a fixed 60px let the nav's second row
      render outside the header box entirely. */
   min-height: 60px;
-  gap: 16px;
+  gap: 12px;
   flex-wrap: nowrap;
   /* The header is chrome, not content — it may use the full viewport. Capping
      it at .container's 1120px left the brand + 10 nav items + RPG chip needing
@@ -396,7 +396,7 @@ html, body {
      sizes there is, would have seen a hamburger. Reclaiming 4px per item
      across 11 items brings it back under. A tighter nav also suits the
      dense, utilitarian aesthetic this redesign is going for. */
-  padding: 8px 8px;
+  padding: 8px 7px;
   border-radius: var(--rad-md);
   font-size: var(--fs-md);
   white-space: nowrap;
@@ -1076,10 +1076,26 @@ code.inline {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+.rpg-chip-lv {
+  color: var(--accent);
+  font-weight: 700;
+  white-space: nowrap;
+}
 .rpg-chip-dust { color: var(--accent-2); white-space: nowrap; }
 
-/* Below the nav breakpoint the header is tight — drop the rank name and keep
-   the level and score, which is the part that changes. */
+/* The rank name is the chip's most expensive and least useful part: it can be
+   ~110px of a header that, with 11 nav items, has none to spare. Above 1400px
+   there is room; below it the level and score carry the information and the
+   name is available via the chip's title attribute.
+
+   This is not cosmetic. With the name always on, the header needed 1307px
+   while the nav breakpoint sat at 1250 — so between 1251 and 1306 the content
+   did not fit. On Windows the nav compressed silently; on Linux it pushed the
+   page sideways, which is how CI caught it and local runs did not. */
+@media (max-width: 1400px) {
+  .rpg-chip-rank { display: none; }
+}
+
 @media (max-width: 640px) {
   .rpg-chip-rank { max-width: 5ch; }
   .rpg-chip-bar { display: none; }
