@@ -127,9 +127,14 @@
       const pw = document.getElementById("password");
       const strength = document.getElementById("pw-strength");
 
+      var submitCount = 0;
       // BUG 6: strength meter always says "Strong".
       pw.addEventListener("input", () => {
         strength.textContent = pw.value ? "Strength: Strong" : "";
+        // A demonstrably weak password still labelled Strong.
+        if (window.Detector && pw.value && pw.value.length < 8) {
+          window.Detector.trigger("strength-lie");
+        }
       });
 
       document.getElementById("reg-form").addEventListener("submit", (e) => {
@@ -181,6 +186,22 @@
         result.className = "form-success";
         result.style.display = "block";
         result.textContent = `Account created for ${name || "(unnamed)"} (${email}). (Simulated.)`;
+
+        if (window.Detector) {
+          var D = window.Detector;
+          if (name.trim().length === 1) D.trigger("name-length");
+          if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) D.trigger("email-regex");
+          if (age === 12) D.trigger("age-boundary");
+          if (!country) D.trigger("country-missing");
+          if (!/[A-Z]/.test(password) || !/[a-z]/.test(password) ||
+              !/[0-9]/.test(password) || !/[^A-Za-z0-9]/.test(password)) {
+            D.trigger("pw-complexity");
+          }
+          if (confirm !== password && confirm.trim() === password.trim()) D.trigger("confirm-trim");
+          if (!tos) D.trigger("tos-missing");
+          submitCount += 1;
+          if (submitCount >= 2) D.trigger("double-submit");
+        }
         // BUG 9: form NOT disabled — rapid double-submit allowed.
       });
 
@@ -207,6 +228,7 @@
   <script src="../js/profiles.js"></script>
   <script src="../js/progress.js"></script>
   <script src="../js/rpg.js"></script>
+  <script src="../js/defect-detector.js"></script>
   <script src="../js/bounty-panel.js"></script>
   <div id="site-footer"></div>
 </body>

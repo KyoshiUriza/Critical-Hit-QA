@@ -30,7 +30,15 @@
           <form id="login-form" novalidate>
             <div class="form-field">
               <label for="email">Email</label>
-              <input type="email" id="email" name="email" data-testid="login-email" autocomplete="username" />
+              <!-- type="text", deliberately, and ONLY in the broken build.
+                   The catalogue seeds an "email is not trimmed" defect, but
+                   the HTML value-sanitisation algorithm strips leading and
+                   trailing whitespace from type="email" before script ever
+                   sees it — so that defect was unreachable through the UI and
+                   nobody could have found it. Building the detector is what
+                   surfaced this. The clean build keeps type="email", which is
+                   the correct choice when validation actually works. -->
+              <input type="text" id="email" name="email" data-testid="login-email" autocomplete="username" />
               <div class="form-error" id="email-error" data-testid="login-email-error"></div>
             </div>
             <div class="form-field">
@@ -122,10 +130,15 @@
       }
 
       // BUG 7: "Show" toggle is one-way.
+      var toggleClicks = 0;
       document.getElementById("toggle-pw").addEventListener("click", () => {
         const pw = document.getElementById("password");
         pw.type = "text";
         // (never sets back to "password" and never updates the label)
+        // Detected on the SECOND click: one click is correct behaviour, and
+        // only the second proves the toggle does not toggle.
+        toggleClicks += 1;
+        if (toggleClicks >= 2 && window.Detector) window.Detector.trigger("toggle-oneway");
       });
 
       document.getElementById("reset-btn").addEventListener("click", () => {
@@ -150,6 +163,26 @@
         const email = document.getElementById("email").value;
         const pw = document.getElementById("password").value;
 
+        // ── Detection ──────────────────────────────────────────────────
+        // Only fires when the defective behaviour genuinely happens, not on
+        // any interaction. Untrimmed email counts only when the trimmed form
+        // WOULD have been accepted — otherwise it is just a typo.
+        var D = window.Detector;
+        if (D) {
+          if (email !== email.trim() && email.trim().toLowerCase() === VALID_EMAIL.toLowerCase()) {
+            D.trigger("email-trim");
+          }
+          if (email && /^[^\s@]+@[^\s@]+$/.test(email) && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            D.trigger("email-regex");   // accepted an address with no TLD
+          }
+          if (email && !pw) {
+            D.trigger("empty-password"); // reached submit with an empty password
+          }
+          if (pw && pw.length > 0 && pw.length < 8 && pw === VALID_PW) {
+            D.trigger("pw-length");
+          }
+        }
+
         let hasError = false;
         if (!email) { setError("email-error", "Email is required."); hasError = true; }
         else if (!/^[^\s@]+@[^\s@]+$/.test(email)) { // BUG 1: missing "\.[^\s@]+" tail
@@ -159,12 +192,19 @@
         if (hasError) return;
 
         // BUG 2: case-sensitive comparison (no toLowerCase).
+        if (window.Detector && email !== VALID_EMAIL &&
+            email.trim().toLowerCase() === VALID_EMAIL.toLowerCase() && pw === VALID_PW) {
+          // Right credentials, rejected purely because of letter case.
+          window.Detector.trigger("email-case");
+        }
         if (email === VALID_EMAIL && pw === VALID_PW) {
           // BUG 6: fails counter NOT cleared on success.
+          if (window.Detector && state.fails > 0) window.Detector.trigger("lockout-reset");
           if (document.getElementById("remember").checked) {
             localStorage.setItem("remembered_email", email);
             // BUG 9: also stores password in plaintext.
             localStorage.setItem("remembered_pw", pw);
+            if (window.Detector) window.Detector.trigger("password-persisted");
           } else {
             localStorage.removeItem("remembered_email");
           }
@@ -178,6 +218,7 @@
             showResult(`Too many failed attempts. Locked for 30s.`, "danger");
           } else {
             // BUG 8: reveals that the email is valid.
+            if (window.Detector) window.Detector.trigger("user-enumeration");
             showResult(`Wrong password. ${MAX_FAILS - state.fails} attempt(s) remaining.`, "danger");
           }
         } else {
@@ -226,6 +267,7 @@
   <script src="../js/profiles.js"></script>
   <script src="../js/progress.js"></script>
   <script src="../js/rpg.js"></script>
+  <script src="../js/defect-detector.js"></script>
   <script src="../js/bounty-panel.js"></script>
   <div id="site-footer"></div>
 </body>

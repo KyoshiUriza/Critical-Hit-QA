@@ -25,6 +25,9 @@
     "practice_todos_broken"
   ];
   var OWNED_SESSION_KEYS = ["login_fails", "login_locked", "bounty_panel_open"];
+  // Auto-detection markers are per app and created at runtime, so they are
+  // swept by prefix in reset() alongside the profile data keys.
+  var SESSION_PREFIXES = ["qaprep_auto_"];
 
   function reset() {
     OWNED_KEYS.forEach(function (k) {
@@ -44,6 +47,14 @@
     OWNED_SESSION_KEYS.forEach(function (k) {
       try { sessionStorage.removeItem(k); } catch (_) {}
     });
+    try {
+      var gone = [];
+      for (var j = 0; j < sessionStorage.length; j++) {
+        var sk = sessionStorage.key(j);
+        SESSION_PREFIXES.forEach(function (p) { if (sk.indexOf(p) === 0) gone.push(sk); });
+      }
+      gone.forEach(function (sk) { sessionStorage.removeItem(sk); });
+    } catch (_) {}
   }
 
   function seed(progress) {

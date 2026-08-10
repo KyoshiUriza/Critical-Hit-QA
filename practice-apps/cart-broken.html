@@ -156,6 +156,20 @@
         const tax = subtotal * TAX_RATE;
         const total = afterDiscount + shipping + tax;
 
+        if (window.Detector) {
+          // Tax on the raw subtotal only differs once a discount exists.
+          if (discount > 0) window.Detector.trigger("tax-basis");
+          // Free shipping earned on the pre-discount figure: the order does
+          // not actually qualify, but shipping was waived anyway.
+          if (subtotal >= FREE_SHIP_MIN && afterDiscount < FREE_SHIP_MIN) {
+            window.Detector.trigger("shipping-basis");
+          }
+          // Floating-point residue reaching the rendered figure.
+          if (Math.abs(total * 100 - Math.round(total * 100)) > 0.000001) {
+            window.Detector.trigger("money-rounding");
+          }
+        }
+
         box.innerHTML = `
           ${lines}
           <div class="cart-line"><span>Subtotal</span><span data-testid="subtotal">${money(subtotal)}</span></div>
@@ -183,6 +197,7 @@
           else if (qty === "dec") {
             // BUG 6: decrement can push qty to 0 or below; item is not removed.
             cart[id].qty -= 1;
+            if (window.Detector && cart[id].qty < 1) window.Detector.trigger("negative-qty");
           }
           renderCart();
         }
@@ -199,6 +214,12 @@
         } else if (raw === "EXPIRED") {
           coupon = null;
           msg.textContent = "This coupon has expired.";
+          msg.className = "form-error visible";
+        } else if (window.Detector && !COUPONS[raw] && COUPONS[raw.toUpperCase()]) {
+          // A valid code rejected purely because of letter case.
+          window.Detector.trigger("coupon-case");
+          coupon = null;
+          msg.textContent = "Invalid coupon code.";
           msg.className = "form-error visible";
         } else if (COUPONS[raw]) {
           coupon = raw;
@@ -217,6 +238,8 @@
         const result = document.getElementById("checkout-result");
         result.setAttribute("data-testid", "checkout-result");
         // BUG 5: no empty-cart guard.
+        var wasEmpty = Object.keys(cart).length === 0;
+        var hadCoupon = !!coupon;
         result.className = "form-success";
         result.style.display = "block";
         result.textContent = "Order placed (simulated). Thank you!";
@@ -224,6 +247,12 @@
         // BUG 7: coupon deliberately NOT cleared here.
         document.getElementById("coupon").value = "";
         renderCart();
+        if (window.Detector) {
+          if (wasEmpty) window.Detector.trigger("empty-checkout");
+          // The input was cleared but the discount is still applied to the
+          // next order — the state and the UI disagree.
+          if (hadCoupon && coupon) window.Detector.trigger("coupon-persists");
+        }
       });
 
       document.getElementById("reveal-btn").addEventListener("click", () => {
@@ -240,6 +269,7 @@
   <script src="../js/profiles.js"></script>
   <script src="../js/progress.js"></script>
   <script src="../js/rpg.js"></script>
+  <script src="../js/defect-detector.js"></script>
   <script src="../js/bounty-panel.js"></script>
   <div id="site-footer"></div>
 </body>

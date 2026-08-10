@@ -99,6 +99,7 @@
     // ---- rendering ---------------------------------------------------------
     function render() {
       var found = new Set(window.Progress.getBugBountyFinds(key));
+      var auto = window.Detector ? window.Detector.autoDetected(key) : [];
       var totalW = 0, foundW = 0;
       app.defects.forEach(function (d) {
         var w = SEVERITY_WEIGHT[d.severity];
@@ -131,6 +132,16 @@
           isFound ? d.title : "Hidden — tick when you find it");
         var topLine = el("div", "");
         topLine.append(sev, document.createTextNode(" "), titleText);
+
+        // Auto-detected finds are labelled, not hidden among the rest. You
+        // still get the credit; the panel is just honest about whether you
+        // claimed it or the app handed it to you.
+        if (isFound && auto.indexOf(d.id) !== -1) {
+          var badge = el("span", "bounty-auto-badge", "AUTO-DETECTED");
+          badge.setAttribute("data-testid", "auto-badge");
+          badge.title = "You triggered this behaviour in the app, so it was revealed for you.";
+          topLine.append(document.createTextNode(" "), badge);
+        }
         body.appendChild(topLine);
 
         if (isFound) {
@@ -188,6 +199,54 @@
         setOpen(false, true);
       }
     });
+
+    // A defect detected in the app updates the panel immediately, whether it
+    // is open or shut — the count on the toggle changes either way, which is
+    // the signal that something just happened.
+    document.addEventListener("qa:defect-detected", function (e) {
+      render();
+      announce(e.detail);
+    });
+
+    // Announced politely rather than as an alert: it must reach a screen
+    // reader without stealing focus from whatever the tester was doing.
+    function announce(detail) {
+      var live = byIdOrCreate();
+      live.textContent = "Defect detected: " + detail.title + " (" + detail.severity + ")";
+      toast(detail);
+    }
+
+    function byIdOrCreate() {
+      var n = document.getElementById("bounty-live");
+      if (!n) {
+        n = el("div", "sr-only");
+        n.id = "bounty-live";
+        n.setAttribute("role", "status");
+        n.setAttribute("aria-live", "polite");
+        document.body.appendChild(n);
+      }
+      return n;
+    }
+
+    function toast(detail) {
+      var t = el("div", "bounty-toast");
+      t.setAttribute("data-testid", "defect-toast");
+      t.appendChild(el("div", "bounty-toast-title", "🐛 Defect detected"));
+      t.appendChild(el("div", "bounty-toast-body", detail.title));
+      var open = el("button", "btn btn-ghost btn-sm mt-2", "Open Bug Bounty");
+      open.type = "button";
+      open.addEventListener("click", function () {
+        setOpen(true, true);
+        t.remove();
+      });
+      t.appendChild(open);
+      document.body.appendChild(t);
+      requestAnimationFrame(function () { t.classList.add("visible"); });
+      setTimeout(function () {
+        t.classList.remove("visible");
+        setTimeout(function () { t.remove(); }, 400);
+      }, 6000);
+    }
 
     document.body.append(toggle, panel);
     render();

@@ -112,10 +112,20 @@
             </li>
           `).join("");
         // BUG 2: template above uses ${t.text} directly inside innerHTML → XSS.
+        // Detected when injected markup actually became elements, not merely
+        // when it was typed — the defect is the rendering, not the input.
+        if (window.Detector && list.querySelector("[data-testid='todo-text'] *")) {
+          window.Detector.trigger("xss");
+        }
 
         // BUG 3: counts TOTAL, not incomplete.
         const total = todos.length;
         document.getElementById("count-label").textContent = `${total} item${total === 1 ? "" : "s"} left`;
+        // Only wrong once at least one item is complete: with none done, the
+        // total and the incomplete count agree and nothing is observable.
+        if (window.Detector && todos.some((t) => t.done)) {
+          window.Detector.trigger("wrong-counter");
+        }
       }
 
       document.getElementById("add-btn").addEventListener("click", addTodo);
@@ -128,6 +138,8 @@
         // BUG 1: no .trim() before the empty check — whitespace-only passes through.
         const val = input.value;
         if (val === "") return;
+        // Whitespace-only got through the empty check.
+        if (window.Detector && val.trim() === "") window.Detector.trigger("whitespace-todo");
         todos.push({ id: Date.now() + "-" + Math.random().toString(36).slice(2, 6), text: val, done: false });
         input.value = "";
         save(); render();
@@ -154,14 +166,23 @@
           btn.classList.add("active");
           filter = btn.dataset.filter;
           render();
+          // The Active filter is inverted. Observable only when there is a
+          // completed item for it to wrongly show.
+          if (window.Detector && filter === "active" && todos.some((t) => t.done)) {
+            window.Detector.trigger("filter-inverted");
+          }
         });
       });
 
       // BUG 5: "Clear completed" wipes everything.
       document.getElementById("clear-completed").addEventListener("click", (e) => {
         e.preventDefault();
+        // Detected only if something incomplete was destroyed — clearing a
+        // list where everything was already done is correct behaviour.
+        var hadIncomplete = todos.some((t) => !t.done);
         todos = [];
         save(); render();
+        if (window.Detector && hadIncomplete) window.Detector.trigger("clear-all");
       });
 
       document.getElementById("reveal-btn").addEventListener("click", () => {
@@ -177,6 +198,7 @@
   <script src="../js/profiles.js"></script>
   <script src="../js/progress.js"></script>
   <script src="../js/rpg.js"></script>
+  <script src="../js/defect-detector.js"></script>
   <script src="../js/bounty-panel.js"></script>
   <div id="site-footer"></div>
 </body>
