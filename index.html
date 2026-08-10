@@ -12,83 +12,115 @@
 
   <main id="main" class="container">
     <section class="hero">
-      <h1>Land your next QA role.</h1>
+      <h1>Hunt real bugs. Write the report. Get hired.</h1>
       <p class="lede">
-        A hands-on prep hub for Software QA interviews — structured learning tracks,
-        practice quizzes, real interactive apps to test, seeded-bug hunts,
-        and ready-to-run automation examples in Playwright, Cypress, and Selenium.
+        Most QA prep gives you flashcards. This gives you <strong>broken apps with
+        seeded defects</strong> — find them, score yourself against the catalog, then
+        write the bug report and export it straight into your portfolio.
       </p>
-      <p class="lede" style="font-size:0.92rem; font-style:italic; color:var(--text-dim);">
-        Progress builds your rank on <a href="pages/tester-lattice.html">The Tester's Lattice</a> — a lightweight RPG layer over your study, themed on <em>The Convergence Chronicles: The Resonance Lattice</em>.
+      <p class="lede lede-sub">
+        Free, no signup, works offline. Plus quizzes, interview questions, and
+        runnable Playwright / Cypress / Selenium examples.
       </p>
       <div class="hero-cta">
-        <a class="btn btn-primary" href="pages/learn.html">Start Learning</a>
-        <a class="btn btn-primary" href="pages/practice-tests.html">Take a Quiz</a>
-        <a class="btn btn-ghost" href="pages/practice-apps.html">Try a Practice App</a>
+        <a class="btn btn-primary btn-lg" href="pages/practice-apps.html#buggy" data-testid="hero-primary-cta">
+          Start a bug hunt →
+        </a>
+        <a class="btn btn-ghost" href="pages/learn.html">Or start with the basics</a>
       </div>
     </section>
 
-    <section class="feature-grid">
-      <a class="feature-card" href="pages/learn.html">
-        <div class="feature-icon">L</div>
-        <h3>Learn</h3>
-        <p>Structured tracks: QA basics, manual, automation, codeless (AccelQ), and code-based frameworks (Playwright, Selenium).</p>
-      </a>
-      <a class="feature-card" href="pages/tester-lattice.html">
-        <div class="feature-icon">◈</div>
-        <h3>The Tester's Lattice</h3>
-        <p>Your RPG character sheet. Earn Star-Dust, bind Catalysts, unlock Signature Abilities as you study.</p>
-      </a>
-      <a class="feature-card" href="pages/practice-tests.html">
-        <div class="feature-icon">?</div>
-        <h3>Practice Tests</h3>
-        <p>Timed multiple-choice quizzes across manual, automation, API, and Agile topics with instant explanations.</p>
-      </a>
-      <a class="feature-card" href="pages/interview-questions.html">
-        <div class="feature-icon">Q</div>
-        <h3>Interview Questions</h3>
-        <p>Curated, categorized Q&A — from "what is regression testing" to "design a test plan for X."</p>
-      </a>
-      <a class="feature-card" href="pages/practice-apps.html">
-        <div class="feature-icon">&#x25A2;</div>
-        <h3>Practice Apps</h3>
-        <p>Interactive front-end apps (login, todo, cart, form) — clean AND buggy variants. Write test cases, then hunt seeded defects.</p>
-      </a>
-      <a class="feature-card" href="pages/automation-lab.html">
-        <div class="feature-icon">&lt;/&gt;</div>
-        <h3>Automation Lab</h3>
-        <p>Copy-paste Playwright, Cypress, and Selenium examples targeting our practice apps.</p>
-      </a>
-      <a class="feature-card" href="pages/test-case-builder.html">
-        <div class="feature-icon">&#10003;</div>
-        <h3>Test Case Builder</h3>
-        <p>Template-driven test case authoring — export as Markdown or JSON for your portfolio.</p>
-      </a>
-      <a class="feature-card" href="pages/bug-report-builder.html">
-        <div class="feature-icon">!</div>
-        <h3>Bug Report Builder</h3>
-        <p>Structured bug report authoring. Export to Markdown, GitHub Issue, or Jira format.</p>
-      </a>
-      <a class="feature-card" href="pages/bug-bounty.html">
-        <div class="feature-icon">&#x1F41B;</div>
-        <h3>Bug Bounty</h3>
-        <p>Score your buggy-app hunts against the seeded defect catalog. Weighted by severity.</p>
-      </a>
-      <a class="feature-card" href="pages/study-plan.html">
-        <div class="feature-icon">&#128197;</div>
-        <h3>Study Plan</h3>
-        <p>3-day, 1-week, or 1-month structured prep plans linking into every tool on the site.</p>
-      </a>
-      <a class="feature-card" href="pages/progress.html">
-        <div class="feature-icon">&#128200;</div>
-        <h3>Progress Dashboard</h3>
-        <p>Track quiz accuracy by category, bug bounty score, streaks, and drafted artifacts.</p>
-      </a>
-      <a class="feature-card" href="pages/resources.html">
-        <div class="feature-icon">i</div>
-        <h3>Resources</h3>
-        <p>Cheat sheets, glossary, and links to ISTQB, testing books, and free tools.</p>
-      </a>
+    <!-- Returning users get a resume card here instead of scanning the grid. -->
+    <section id="resume-strip" class="hidden" aria-live="polite"></section>
+
+    <section class="home-section">
+      <h2 class="home-section-title">The core loop</h2>
+      <p class="home-section-sub">Find a defect, document it, prove you can automate it. This is what interviewers actually probe.</p>
+      <div class="feature-grid">
+        <a class="feature-card" href="pages/practice-apps.html">
+          <div class="feature-icon">&#x1F50E;</div>
+          <h3>1 · Practice Apps</h3>
+          <p>12 working apps — 8 clean, 4 with seeded defects. Run an exploratory session against real UI.</p>
+        </a>
+        <a class="feature-card" href="pages/bug-bounty.html">
+          <div class="feature-icon">&#x1F41B;</div>
+          <h3>2 · Bug Bounty</h3>
+          <p>Tick off what you found. Score against the seeded catalog, weighted by severity.</p>
+        </a>
+        <a class="feature-card" href="pages/bug-report-builder.html">
+          <div class="feature-icon">!</div>
+          <h3>3 · Bug Report Builder</h3>
+          <p>Turn a find into a proper report. Export as Markdown, GitHub Issue, or Jira.</p>
+        </a>
+      </div>
+    </section>
+
+    <section class="home-section">
+      <h2 class="home-section-title">Learn &amp; drill</h2>
+      <div class="feature-grid">
+        <a class="feature-card" href="pages/learn.html">
+          <div class="feature-icon">L</div>
+          <h3>Learn</h3>
+          <p>Tracks for manual, automation, codeless (AccelQ), and code-based frameworks (Playwright, Selenium).</p>
+        </a>
+        <a class="feature-card" href="pages/practice-tests.html">
+          <div class="feature-icon">?</div>
+          <h3>Quizzes</h3>
+          <p>Timed multiple-choice across manual, automation, API, and Agile — with instant explanations.</p>
+        </a>
+        <a class="feature-card" href="pages/interview-questions.html">
+          <div class="feature-icon">Q</div>
+          <h3>Interview Questions</h3>
+          <p>Curated Q&amp;A with model answers — from "what is regression testing" to "design a test plan for X."</p>
+        </a>
+        <a class="feature-card" href="pages/automation-lab.html">
+          <div class="feature-icon">&lt;/&gt;</div>
+          <h3>Automation Lab</h3>
+          <p>Copy-paste Playwright, Cypress, and Selenium specs that run against the practice apps.</p>
+        </a>
+      </div>
+    </section>
+
+    <section class="home-section">
+      <h2 class="home-section-title">Build your portfolio</h2>
+      <div class="feature-grid">
+        <a class="feature-card" href="pages/test-case-builder.html">
+          <div class="feature-icon">&#10003;</div>
+          <h3>Test Case Builder</h3>
+          <p>Structured test case authoring — export as Markdown or JSON.</p>
+        </a>
+        <a class="feature-card" href="pages/study-plan.html">
+          <div class="feature-icon">&#128197;</div>
+          <h3>Study Plan</h3>
+          <p>3-day, 1-week, or 1-month plans that link into every tool here.</p>
+        </a>
+        <a class="feature-card" href="pages/progress.html">
+          <div class="feature-icon">&#128200;</div>
+          <h3>Progress</h3>
+          <p>Quiz accuracy by category, bug-hunt score, streaks, and drafted artifacts.</p>
+        </a>
+        <a class="feature-card" href="pages/resources.html">
+          <div class="feature-icon">i</div>
+          <h3>Resources</h3>
+          <p>Cheat sheets, glossary, reading list, and an interview-prep checklist.</p>
+        </a>
+      </div>
+    </section>
+
+    <!-- Gamification is opt-in, not the headline. PO review flagged the RPG lore
+         as a differentiator for some users and a bounce risk for others. -->
+    <section class="home-section">
+      <div class="panel lattice-teaser">
+        <div>
+          <h3>Optional: The Tester's Lattice</h3>
+          <p class="text-dim">
+            Everything you do here earns Star-Dust and ranks you up — a light RPG layer
+            themed on <em>The Convergence Chronicles</em>. Purely cosmetic; ignore it and
+            nothing changes.
+          </p>
+        </div>
+        <a class="btn btn-ghost btn-sm" href="pages/tester-lattice.html">View your Lattice →</a>
+      </div>
     </section>
 
     <section class="stats-strip">

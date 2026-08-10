@@ -135,14 +135,20 @@
       }
     };
 
-    let activePlan = "1-week";
+    // Restore the user's last-viewed plan instead of resetting to 1-week.
+    let activePlan = (window.Progress.getActivePlan && window.Progress.getActivePlan()) || "1-week";
+    if (!PLANS[activePlan]) activePlan = "1-week";
     const tabs = document.getElementById("plan-tabs");
     Object.entries(PLANS).forEach(([key, p]) => {
       const btn = document.createElement("button");
       btn.className = "category-tab";
       btn.dataset.key = key;
       btn.textContent = p.title;
-      btn.addEventListener("click", () => { activePlan = key; render(); });
+      btn.addEventListener("click", () => {
+        activePlan = key;
+        window.Progress.setActivePlan(key);
+        render();
+      });
       tabs.appendChild(btn);
     });
 

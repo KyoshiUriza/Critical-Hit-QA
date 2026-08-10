@@ -16,9 +16,25 @@
       <p>Personal dashboard — quiz history, bug bounty catch rate, and artifacts you've drafted. Stored locally in this browser.</p>
     </div>
 
+    <!-- Shown only when the user has no activity. A dashboard of zeros reads
+         as "you're failing", not "you haven't started". -->
+    <div class="next-action hidden" id="empty-state" data-testid="progress-empty-state">
+      <h2>Nothing tracked yet — that's the right place to start.</h2>
+      <p>
+        Take a quiz or run a bug hunt and this page fills in with your accuracy by
+        category, your defect catch-rate, and a study streak.
+      </p>
+      <div style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
+        <a class="btn btn-primary" href="practice-apps.html#buggy" data-testid="empty-cta-hunt">Start a bug hunt →</a>
+        <a class="btn btn-ghost" href="practice-tests.html">Take a quiz</a>
+      </div>
+    </div>
+
+    <div id="plan-continue"></div>
+
     <div class="stats-strip" id="top-stats"></div>
 
-    <div class="two-col">
+    <div class="two-col" id="detail-panels">
       <div class="panel">
         <h2 style="margin-top:0;">Quiz performance by category</h2>
         <div id="quiz-by-cat"></div>
@@ -29,7 +45,7 @@
       </div>
     </div>
 
-    <div class="panel mt-16">
+    <div class="panel mt-16" id="recent-runs-panel">
       <h2 style="margin-top:0;">Recent quiz runs</h2>
       <div id="recent-runs"></div>
     </div>
@@ -56,6 +72,59 @@
     const SEVERITY_WEIGHT = { low: 1, medium: 2, high: 3, critical: 5 };
     function render() {
       const data = window.Progress.get();
+
+      // Has the user done anything at all?
+      const hasActivity =
+        data.quiz.runs.length > 0 ||
+        data.testCases > 0 ||
+        data.bugReports > 0 ||
+        Object.values(data.bugBounty || {}).some((a) => a && a.length) ||
+        Object.values(data.studyPlan || {}).some((pl) => Object.values(pl).some(Boolean));
+
+      const emptyEl = document.getElementById("empty-state");
+      const statsEl = document.getElementById("top-stats");
+      const detailEl = document.getElementById("detail-panels");
+      const runsEl = document.getElementById("recent-runs-panel");
+
+      emptyEl.classList.toggle("hidden", hasActivity);
+      statsEl.classList.toggle("hidden", !hasActivity);
+      detailEl.classList.toggle("hidden", !hasActivity);
+      if (runsEl) runsEl.classList.toggle("hidden", !hasActivity);
+      if (!hasActivity) return;
+
+      // Continue-your-plan chip. Previously the user had to remember which plan
+      // they were on and which day they'd reached.
+      const planEl = document.getElementById("plan-continue");
+      planEl.textContent = "";
+      const activePlan = window.Progress.getActivePlan && window.Progress.getActivePlan();
+      if (activePlan && data.studyPlan[activePlan]) {
+        const PLAN_LEN = { "3-day": 3, "1-week": 7, "1-month": 4 };
+        const total = PLAN_LEN[activePlan] || 7;
+        const days = data.studyPlan[activePlan];
+        const doneCount = Object.values(days).filter(Boolean).length;
+        let nextDay = -1;
+        for (let d = 0; d < total; d++) { if (!days[d]) { nextDay = d; break; } }
+
+        const card = document.createElement("div");
+        card.className = "resume-card";
+        card.setAttribute("data-testid", "plan-continue");
+        const left = document.createElement("div");
+        const h = document.createElement("h2");
+        h.textContent = nextDay < 0
+          ? "You finished the " + activePlan + " plan"
+          : "Study Plan: " + activePlan;
+        const sub = document.createElement("p");
+        sub.textContent = nextDay < 0
+          ? "All " + total + " days complete. Try a longer plan or run a bug hunt."
+          : doneCount + " of " + total + " days done — day " + (nextDay + 1) + " is next.";
+        left.append(h, sub);
+        const cta = document.createElement("a");
+        cta.className = "btn btn-primary";
+        cta.href = "study-plan.html";
+        cta.textContent = nextDay < 0 ? "Pick a new plan →" : "Continue day " + (nextDay + 1) + " →";
+        card.append(left, cta);
+        planEl.appendChild(card);
+      }
 
       // Top stats
       const totalQuizAttempted = Object.values(data.quiz.byCategory).reduce((s, c) => s + c.attempted, 0);

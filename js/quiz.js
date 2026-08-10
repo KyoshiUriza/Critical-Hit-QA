@@ -213,7 +213,16 @@
     el("setup-screen").classList.remove("hidden");
   }
 
+  // Deep link support: practice-tests.html?category=manual preselects the drill.
+  function applyCategoryFromUrl() {
+    const want = new URLSearchParams(location.search).get("category");
+    if (!want) return;
+    const sel = el("category-select");
+    if (sel && [...sel.options].some((o) => o.value === want)) sel.value = want;
+  }
+
   document.addEventListener("DOMContentLoaded", () => {
+    applyCategoryFromUrl();
     el("start-btn").addEventListener("click", startQuiz);
     el("check-btn").addEventListener("click", checkAnswer);
     el("next-btn").addEventListener("click", nextQuestion);

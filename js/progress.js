@@ -91,7 +91,21 @@
       const data = ensure(load());
       if (!data.studyPlan[planKey]) data.studyPlan[planKey] = {};
       data.studyPlan[planKey][dayIndex] = !!done;
+      data.activePlan = planKey;
       if (done) updateStreak(data);
+      save(data);
+    },
+
+    // Which plan tab the user last looked at. Previously the Study Plan page
+    // hardcoded "1-week" on every load, discarding the user's choice.
+    getActivePlan() {
+      const data = ensure(load());
+      return data.activePlan || null;
+    },
+
+    setActivePlan(planKey) {
+      const data = ensure(load());
+      data.activePlan = planKey;
       save(data);
     }
   };

@@ -869,3 +869,74 @@ code.inline {
 /* Sortable table headers need to look interactive and take focus. */
 th[data-sort] { cursor: pointer; user-select: none; }
 th[data-sort]:focus-visible { box-shadow: var(--focus-ring); }
+
+/* ─── Sprint 2: home page grouping + resume strip ─── */
+
+.btn-lg { padding: 14px 28px; font-size: 1.05rem; }
+
+.lede-sub { font-size: 0.92rem; margin-top: -8px; }
+
+.home-section { margin: 40px 0; }
+.home-section-title {
+  font-size: 1.15rem;
+  margin: 0 0 4px;
+  letter-spacing: 0.01em;
+}
+.home-section-title::before {
+  content: "◈ ";
+  color: var(--accent);
+}
+.home-section-sub {
+  color: var(--text-dim);
+  margin: 0 0 16px;
+  font-size: 0.92rem;
+  max-width: 68ch;
+}
+.home-section .feature-grid { margin: 0; }
+
+.lattice-teaser {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin: 0;
+}
+.lattice-teaser h3 { margin: 0 0 4px; font-size: 1rem; }
+.lattice-teaser p { margin: 0; font-size: 0.9rem; max-width: 60ch; }
+
+/* Returning-user resume card. */
+.resume-card {
+  background: linear-gradient(135deg, rgba(79,157,255,0.12), transparent);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius);
+  padding: 20px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin: 24px 0;
+}
+.resume-card h2 { margin: 0 0 4px; font-size: 1.05rem; }
+.resume-card p { margin: 0; color: var(--text-dim); font-size: 0.9rem; }
+.resume-meta {
+  display: flex;
+  gap: 18px;
+  flex-wrap: wrap;
+  margin-top: 8px;
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  color: var(--text-dim);
+}
+.resume-meta strong { color: var(--accent-2); }
+
+/* Next-step bar on practice apps — they used to be navigation dead-ends. */
+.app-next-steps {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 8px;
+}
+.app-next-steps .text-dim { margin-right: 4px; font-weight: 600; }
