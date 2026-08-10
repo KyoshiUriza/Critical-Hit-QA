@@ -49,7 +49,7 @@ jobs:
                    _site/favicon.svg _site/apple-touch-icon.png; do
             test -f "$f" || { echo "MISSING: $f"; exit 1; }
           done
-          # A stray absolute path breaks the site under the /QAHub/ subpath and
+          # A stray absolute path breaks the site under the /critical-hit-qa/ subpath and
           # would only show up after deploy.
           if grep -rnE '(href|src)="/[^/]' _site --include=*.html --include=*.js; then
             echo "Found root-relative paths — these break under a project subpath."

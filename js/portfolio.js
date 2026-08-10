@@ -93,7 +93,7 @@
       "",
       "_" + bugs.length + " bug report" + (bugs.length === 1 ? "" : "s") +
       " and " + cases.length + " test case" + (cases.length === 1 ? "" : "s") +
-      ", written against the practice applications at QA Prep Hub._",
+      ", written against the practice applications at Critical Hit QA._",
       ""
     ];
     if (bugs.length) {

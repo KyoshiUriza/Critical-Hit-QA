@@ -24,7 +24,7 @@ Pick one:
 
 ## 2. Short bio (~2–3 sentences — the About box)
 
-> I build **QA Prep Hub**, a free set of practice tools for people trying to
+> I build **Critical Hit QA**, a free set of practice tools for people trying to
 > land their first software QA role. It has deliberately broken web apps to
 > hunt bugs in, a lab that grades your test locators and tells you which ones
 > will break in six months, and an in-browser SQL sandbox — plus quizzes,
@@ -36,13 +36,13 @@ Pick one:
 
 ## 3. Longer version (the main profile page)
 
-> ### QA Prep Hub — free practice tools for aspiring QA engineers
+> ### Critical Hit QA — free practice tools for aspiring QA engineers
 >
 > Most QA interview prep hands you flashcards. That teaches you to recite what
 > regression testing *is*, which is exactly the answer hiring managers say they
 > are tired of hearing.
 >
-> So I built the other thing. **QA Prep Hub** gives you deliberately broken web
+> So I built the other thing. **Critical Hit QA** gives you deliberately broken web
 > applications with real, catalogued defects seeded into them. You run an
 > exploratory session, find what you can, and score yourself against the answer
 > key — weighted by severity, so a critical find counts for more than a
@@ -96,9 +96,9 @@ Pick one:
 
 BMC has a website/link field. Once the site is live, use:
 
-    https://kyoshiuriza.github.io/QAHub/
+    https://kyoshiuriza.github.io/critical-hit-qa/
 
-Add the repo as a second link if BMC allows it — `https://github.com/KyoshiUriza/QAHub`.
+Add the repo as a second link if BMC allows it — `https://github.com/KyoshiUriza/critical-hit-qa`.
 An open-source project with a test suite reads more credibly than a bare site,
 and it is the thing that separates this from a landing page.
 

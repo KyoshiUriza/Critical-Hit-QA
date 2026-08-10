@@ -1,9 +1,9 @@
-# Hosting the QA Prep Hub
+# Hosting the Critical Hit QA
 
 The site is 100% static — no build step, no server, no database.
 
-**Live at:** https://kyoshiuriza.github.io/QAHub/
-**Repo:** https://github.com/KyoshiUriza/QAHub
+**Live at:** https://kyoshiuriza.github.io/critical-hit-qa/
+**Repo:** https://github.com/KyoshiUriza/critical-hit-qa
 
 ---
 
@@ -35,7 +35,7 @@ rather than going live:
 - no root-relative paths (`href="/js/..."`) exist
 
 That second one matters more than it looks. GitHub Pages serves a project site
-from a **subpath** — `/QAHub/`, not `/`. Any root-relative path silently 404s
+from a **subpath** — `/critical-hit-qa/`, not `/`. Any root-relative path silently 404s
 in production while working perfectly on `localhost`. Every path in this
 project is relative, and `js/site-chrome.js` derives its own prefix from each
 page's `data-depth`, so the whole site is subpath-safe. The check keeps it that
@@ -55,7 +55,7 @@ break in production:
 
 - all 11 key pages return 200, render the injected chrome, load CSS, and
   produce zero console errors and zero failed requests
-- no nav link escapes the `/QAHub/` subpath
+- no nav link escapes the `/critical-hit-qa/` subpath
 - repo internals (`tests/`, `package.json`, `README.md`) are **not** served —
   catching a regression in the workflow's assemble step
 - the quiz, Locator Lab, and SQL Sandbox actually execute

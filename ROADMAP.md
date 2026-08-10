@@ -1,4 +1,4 @@
-# QA Prep Hub — MVP Roadmap & Feature Research
+# Critical Hit QA — MVP Roadmap & Feature Research
 
 > **STATUS — updated 2026-08-10.** Everything in "Tier 1" below has **shipped**,
 > plus three sprints of follow-up work from a full-team review (see

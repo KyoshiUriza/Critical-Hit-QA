@@ -1,4 +1,4 @@
-# Gemini prompt — modernize the QA Prep Hub UI
+# Gemini prompt — modernize the Critical Hit QA UI
 
 Paste the block below into Google Gemini (2.5 Pro or newer recommended — it holds long context and returns better CSS).
 
@@ -26,7 +26,7 @@ You are a senior product designer who specializes in developer tools and technic
 
 ### The product
 
-**QA Prep Hub** — a free, static web app that helps Software QA candidates prepare for job interviews. The core loop is: hunt seeded bugs in deliberately broken practice apps → score your findings → write a proper bug report → export it to your portfolio. It also has learning tracks, quizzes, an interactive locator-grading lab, and an in-browser SQL sandbox.
+**Critical Hit QA** — a free, static web app that helps Software QA candidates prepare for job interviews. The core loop is: hunt seeded bugs in deliberately broken practice apps → score your findings → write a proper bug report → export it to your portfolio. It also has learning tracks, quizzes, an interactive locator-grading lab, and an in-browser SQL sandbox.
 
 **Who uses it:** QA engineers and QA candidates, mostly 22–40, often studying at night before an interview. Many will send the link to a recruiter or hiring manager as evidence of what they've been practicing.
 

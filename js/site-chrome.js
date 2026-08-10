@@ -48,7 +48,7 @@
   };
 
   var DONATE_URL = "https://buymeacoffee.com/kyoshiuriza";
-  var REPO_URL = "https://github.com/KyoshiUriza/QAHub";
+  var REPO_URL = "https://github.com/KyoshiUriza/critical-hit-qa";
   // Feedback goes to GitHub Issues rather than a mailto. On a public project
   // that is strictly better: reports are visible and trackable instead of
   // landing in one inbox, and there is no address for scrapers to harvest.
@@ -90,7 +90,7 @@
     var brand = document.createElement("a");
     brand.className = "brand";
     brand.href = p + "index.html";
-    brand.textContent = "QA Prep Hub";
+    brand.textContent = "Critical Hit QA";
 
     // Ten nav items cannot fit on a narrow viewport. Rather than let them wrap
     // out of a fixed-height bar, collapse them behind a toggle.
@@ -147,7 +147,7 @@
     container.className = "container";
 
     var line1 = document.createElement("p");
-    line1.appendChild(document.createTextNode("QA Prep Hub — a local study companion. Themed on "));
+    line1.appendChild(document.createTextNode("Critical Hit QA — a local study companion. Themed on "));
     var em = document.createElement("em");
     em.textContent = "The Convergence Chronicles: The Resonance Lattice";
     line1.appendChild(em);
@@ -197,7 +197,7 @@
   // same reason the header does: duplicated markup drifts. Injecting from JS
   // costs a few ms before the tab icon appears, which is a fair trade for one
   // source of truth. Paths are depth-derived, so they resolve on a project
-  // subpath like /QAHub/ too.
+  // subpath like /critical-hit-qa/ too.
   function mountFavicons() {
     if (document.querySelector('link[rel="icon"]')) return;
     var p = prefix();

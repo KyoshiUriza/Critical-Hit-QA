@@ -1,4 +1,4 @@
-# QA Prep Hub — Sub-agent team
+# Critical Hit QA — Sub-agent team
 
 A standard agile team, one Claude Code sub-agent per role. Each agent is an expert in their domain, follows current best practices, and knows this project's specific context and constraints.
 
