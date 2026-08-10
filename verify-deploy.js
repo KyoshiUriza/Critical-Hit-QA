@@ -162,7 +162,15 @@ function check(ok, label, detail) {
   check(toggleCount === 1, 'the Bug Bounty side panel mounts on buggy apps', toggleCount + ' toggle(s)');
   if (toggleCount === 1) {
     await page.getByTestId('bounty-toggle').click();
-    const panelShown = await page.getByTestId('bounty-panel').isVisible();
+    // waitFor, not isVisible(): the drawer animates in over 250ms and a
+    // no-retry snapshot races the transition — it failed here while the
+    // feature worked fine.
+    let panelShown = true;
+    try {
+      await page.getByTestId('bounty-panel').waitFor({ state: 'visible', timeout: 5000 });
+    } catch (_) {
+      panelShown = false;
+    }
     check(panelShown, 'the panel opens and lists the checklist', panelShown ? 'open' : 'did not open');
   }
 
