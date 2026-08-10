@@ -6,24 +6,11 @@
   <title>Learn — QA Prep Hub</title>
   <link rel="stylesheet" href="../css/styles.css" />
 </head>
-<body>
-  <header class="site-header">
-    <div class="container header-inner">
-      <a href="../index.html" class="brand">QA Prep Hub</a>
-      <nav class="nav">
-        <a href="../index.html">Home</a>
-        <a href="learn.html" class="active">Learn</a>
-        <a href="practice-tests.html">Practice Tests</a>
-        <a href="practice-apps.html">Practice Apps</a>
-        <a href="bug-bounty.html">Bug Bounty</a>
-        <a href="progress.html">Progress</a>
-        <a href="tester-lattice.html">Lattice</a>
-        <a href="study-plan.html">Study Plan</a>
-      </nav>
-    </div>
-  </header>
+<body data-page="learn" data-depth="1">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div id="site-header"></div>
 
-  <main class="container">
+  <main id="main" class="container">
     <div class="page-header">
       <h1>Learn</h1>
       <p>Structured tracks through QA fundamentals. Read, then practice — every section links out to a quiz, a practice app, or an automation exercise.</p>
@@ -68,15 +55,9 @@
     </div>
   </main>
 
-  <footer class="site-footer">
-    <div class="container">
-      <p>QA Prep Hub — a local study companion. Themed on <em>The Convergence Chronicles: The Resonance Lattice</em>.</p>
-      <p style="margin-top:12px;">Found it useful?
-        <a class="donation-cta" href="https://buymeacoffee.com/kyoshiuriza" target="_blank" rel="noopener noreferrer" data-testid="donate-link">☕ Buy me a coffee</a>
-      </p>
-    </div>
-  </footer>
+  <div id="site-footer"></div>
 
+  <script src="../js/site-chrome.js"></script>
   <script src="../js/data/defects.js"></script>
   <script src="../js/progress.js"></script>
   <script src="../js/rpg.js"></script>

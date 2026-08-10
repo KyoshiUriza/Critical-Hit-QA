@@ -27,18 +27,11 @@
     .error-red { color:#c62828; } /* error only conveyed via color */
   </style>
 </head>
-<body>
-  <header class="site-header">
-    <div class="container header-inner">
-      <a href="../index.html" class="brand">QA Prep Hub</a>
-      <nav class="nav">
-        <a href="../index.html">Home</a>
-        <a href="../pages/practice-apps.html">← Back to Practice Apps</a>
-      </nav>
-    </div>
-  </header>
+<body data-page="practice-app-detail" data-depth="1">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div id="site-header"></div>
 
-  <main class="container">
+  <main id="main" class="container">
     <div class="page-header">
       <h1>Accessibility Challenge</h1>
       <p>This page intentionally fails multiple WCAG 2.1 AA criteria. Your job: find them all.</p>
@@ -154,8 +147,10 @@
       document.getElementById("answer-key").classList.toggle("hidden");
     });
   </script>
+  <script src="../js/site-chrome.js"></script>
   <script src="../js/data/defects.js"></script>
   <script src="../js/progress.js"></script>
   <script src="../js/rpg.js"></script>
+  <div id="site-footer"></div>
 </body>
 </html>

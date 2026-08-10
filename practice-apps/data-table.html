@@ -17,18 +17,11 @@
     .pager button[disabled] { opacity:0.4; cursor:not-allowed; }
   </style>
 </head>
-<body>
-  <header class="site-header">
-    <div class="container header-inner">
-      <a href="../index.html" class="brand">QA Prep Hub</a>
-      <nav class="nav">
-        <a href="../index.html">Home</a>
-        <a href="../pages/practice-apps.html">← Back to Practice Apps</a>
-      </nav>
-    </div>
-  </header>
+<body data-page="practice-app-detail" data-depth="1">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div id="site-header"></div>
 
-  <main class="container">
+  <main id="main" class="container">
     <div class="page-header">
       <h1>Data Table</h1>
       <p>Sortable, filterable, paginated employee table with row selection.</p>
@@ -53,11 +46,11 @@
               <thead>
                 <tr>
                   <th data-testid="th-select"><input type="checkbox" id="select-all" data-testid="select-all" aria-label="Select all" /></th>
-                  <th data-sort="id" data-testid="th-id">ID</th>
-                  <th data-sort="name" data-testid="th-name">Name</th>
-                  <th data-sort="department" data-testid="th-dept">Department</th>
-                  <th data-sort="salary" data-testid="th-salary">Salary</th>
-                  <th data-sort="hired" data-testid="th-hired">Hired</th>
+                  <th data-sort="id" data-testid="th-id" tabindex="0" role="button">ID</th>
+                  <th data-sort="name" data-testid="th-name" tabindex="0" role="button">Name</th>
+                  <th data-sort="department" data-testid="th-dept" tabindex="0" role="button">Department</th>
+                  <th data-sort="salary" data-testid="th-salary" tabindex="0" role="button">Salary</th>
+                  <th data-sort="hired" data-testid="th-hired" tabindex="0" role="button">Hired</th>
                 </tr>
               </thead>
               <tbody id="tbody"></tbody>
@@ -198,13 +191,22 @@
       document.getElementById("selection-count").textContent = `${state.selected.size} selected`;
     }
 
+    function toggleSort(th) {
+      const col = th.dataset.sort;
+      if (state.sortCol !== col) { state.sortCol = col; state.sortDir = "ascending"; }
+      else if (state.sortDir === "ascending") state.sortDir = "descending";
+      else { state.sortCol = null; state.sortDir = null; }
+      state.page = 1; render();
+    }
+
     document.querySelectorAll("th[data-sort]").forEach((th) => {
-      th.addEventListener("click", () => {
-        const col = th.dataset.sort;
-        if (state.sortCol !== col) { state.sortCol = col; state.sortDir = "ascending"; }
-        else if (state.sortDir === "ascending") state.sortDir = "descending";
-        else { state.sortCol = null; state.sortDir = null; }
-        state.page = 1; render();
+      th.addEventListener("click", () => toggleSort(th));
+      // WCAG 2.1.1 — a header that sorts on click must sort on keyboard too.
+      th.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          toggleSort(th);
+        }
       });
     });
 
@@ -230,8 +232,10 @@
 
     render();
   </script>
+  <script src="../js/site-chrome.js"></script>
   <script src="../js/data/defects.js"></script>
   <script src="../js/progress.js"></script>
   <script src="../js/rpg.js"></script>
+  <div id="site-footer"></div>
 </body>
 </html>

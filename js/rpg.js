@@ -152,7 +152,13 @@
     if (!window.Progress || !document.body) return;
     const p = window.Progress.get();
     const now = new Set(unlockedAchievements(p));
-    const seen = new Set(JSON.parse(localStorage.getItem("qaprep_rpg_seen") || "[]"));
+    // Tampered or malformed storage must not break the toast pipeline.
+    let seenList = [];
+    try {
+      const parsed = JSON.parse(localStorage.getItem("qaprep_rpg_seen") || "[]");
+      if (Array.isArray(parsed)) seenList = parsed.filter((x) => typeof x === "string");
+    } catch (_) { /* fall through to empty */ }
+    const seen = new Set(seenList);
     const newly = [...now].filter((id) => !seen.has(id));
     if (newly.length === 0) return;
     newly.forEach((id, i) => {
@@ -196,11 +202,14 @@
     nav.appendChild(chip);
   }
 
-  // Guess whether we're at root or a subpage to link the tester-lattice page correctly.
+  // Resolve a pages/ URL from anywhere in the site.
+  // Depth comes from <body data-depth>, the same source site-chrome.js uses —
+  // no path sniffing, so adding a directory level can't silently break links.
   function pageHrefTo(page) {
-    const path = location.pathname;
-    if (path.includes("/pages/") || path.includes("/practice-apps/")) return page.includes("/") ? "../" + page : (path.includes("/practice-apps/") ? "../pages/" + page : page);
-    return "pages/" + page;
+    const prefix = (window.SiteChrome && window.SiteChrome.prefix)
+      ? window.SiteChrome.prefix()
+      : "";
+    return prefix + "pages/" + page;
   }
 
   window.RPG = {

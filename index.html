@@ -6,25 +6,11 @@
   <title>QA Prep Hub — Interview & Testing Resources</title>
   <link rel="stylesheet" href="css/styles.css" />
 </head>
-<body>
-  <header class="site-header">
-    <div class="container header-inner">
-      <a href="index.html" class="brand">QA Prep Hub</a>
-      <nav class="nav">
-        <a href="index.html" class="active">Home</a>
-        <a href="pages/learn.html">Learn</a>
-        <a href="pages/practice-tests.html">Practice Tests</a>
-        <a href="pages/practice-apps.html">Practice Apps</a>
-        <a href="pages/bug-bounty.html">Bug Bounty</a>
-        <a href="pages/automation-lab.html">Automation Lab</a>
-        <a href="pages/progress.html">Progress</a>
-        <a href="pages/tester-lattice.html">Lattice</a>
-        <a href="pages/study-plan.html">Study Plan</a>
-      </nav>
-    </div>
-  </header>
+<body data-page="home" data-depth="0">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div id="site-header"></div>
 
-  <main class="container">
+  <main id="main" class="container">
     <section class="hero">
       <h1>Land your next QA role.</h1>
       <p class="lede">
@@ -113,19 +99,9 @@
     </section>
   </main>
 
-  <footer class="site-footer">
-    <div class="container">
-      <p>
-        QA Prep Hub — a local study companion. Built as a self-contained static site.
-        Themed on <em>The Convergence Chronicles: The Resonance Lattice</em>.
-      </p>
-      <p style="margin-top:12px;">
-        Found it useful?
-        <a class="donation-cta" href="https://buymeacoffee.com/kyoshiuriza" target="_blank" rel="noopener noreferrer" data-testid="donate-link">☕ Buy me a coffee</a>
-      </p>
-    </div>
-  </footer>
+  <div id="site-footer"></div>
 
+  <script src="js/site-chrome.js"></script>
   <script src="js/data/quiz-questions.js"></script>
   <script src="js/data/interview-questions.js"></script>
   <script src="js/data/defects.js"></script>
