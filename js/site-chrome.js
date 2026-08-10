@@ -45,6 +45,14 @@
   };
 
   var DONATE_URL = "https://buymeacoffee.com/kyoshiuriza";
+  // No backend, so feedback is a mailto. Subject is prefilled so replies are
+  // filterable; body seeds the three things that make feedback actionable.
+  var FEEDBACK_URL =
+    "mailto:kyoushiuriza@gmail.com" +
+    "?subject=" + encodeURIComponent("QA Prep Hub feedback") +
+    "&body=" + encodeURIComponent(
+      "What page were you on?\n\nWhat did you expect?\n\nWhat happened instead?\n"
+    );
 
   function depth() {
     var d = document.body.getAttribute("data-depth");
@@ -124,8 +132,17 @@
     donate.textContent = "☕ Buy me a coffee";
     line2.appendChild(donate);
 
+    var line3 = document.createElement("p");
+    line3.style.marginTop = "8px";
+    var feedback = document.createElement("a");
+    feedback.href = FEEDBACK_URL;
+    feedback.textContent = "Found a bug here or have an idea? Tell me →";
+    feedback.setAttribute("data-testid", "feedback-link");
+    line3.appendChild(feedback);
+
     container.appendChild(line1);
     container.appendChild(line2);
+    container.appendChild(line3);
     footer.appendChild(container);
     return footer;
   }

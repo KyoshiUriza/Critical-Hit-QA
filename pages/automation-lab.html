@@ -62,8 +62,8 @@ test.describe('Login form', () =&gt; {
 
   test('shows validation errors on empty submit', async ({ page }) =&gt; {
     await page.getByTestId('login-submit').click();
-    await expect(page.getByTestId('email-error')).toHaveText(/required/i);
-    await expect(page.getByTestId('password-error')).toHaveText(/required/i);
+    await expect(page.getByTestId('login-email-error')).toHaveText(/required/i);
+    await expect(page.getByTestId('login-password-error')).toHaveText(/required/i);
   });
 
   test('locks account after 3 failed attempts', async ({ page }) =&gt; {
@@ -341,7 +341,7 @@ test('BUG: email regex must require a TLD', async ({ page }) =&gt; {
   await page.getByTestId('login-email').fill('a@b');
   await page.getByTestId('login-password').fill('Passw0rd!');
   await page.getByTestId('login-submit').click();
-  await expect(page.getByTestId('email-error')).toBeVisible();
+  await expect(page.getByTestId('login-email-error')).toBeVisible();
 });
 
 test('BUG: email compare must be case-insensitive', async ({ page }) =&gt; {
@@ -354,7 +354,7 @@ test('BUG: email compare must be case-insensitive', async ({ page }) =&gt; {
 test('BUG: empty password must be rejected', async ({ page }) =&gt; {
   await page.getByTestId('login-email').fill('demo@qa.test');
   await page.getByTestId('login-submit').click();
-  await expect(page.getByTestId('password-error')).toBeVisible();
+  await expect(page.getByTestId('login-password-error')).toBeVisible();
 });
 
 test('BUG: error must not distinguish "wrong password" from "no account"', async ({ page }) =&gt; {
@@ -481,6 +481,7 @@ test('BUG: user input must not execute as HTML (XSS)', async ({ page }) =&gt; {
       });
     });
   </script>
+  <script src="../js/test-hooks.js"></script>
   <script src="../js/site-chrome.js"></script>
 </body>
 </html>

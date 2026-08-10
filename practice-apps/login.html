@@ -24,7 +24,7 @@
             <div class="form-field">
               <label for="email">Email</label>
               <input type="email" id="email" name="email" data-testid="login-email" autocomplete="username" />
-              <div class="form-error" id="email-error" data-testid="email-error"></div>
+              <div class="form-error" id="email-error" data-testid="login-email-error"></div>
             </div>
             <div class="form-field">
               <label for="password">Password</label>
@@ -32,7 +32,7 @@
                 <input type="password" id="password" name="password" data-testid="login-password" autocomplete="current-password" style="flex:1;" />
                 <button type="button" class="btn btn-ghost btn-sm" id="toggle-pw" data-testid="toggle-password">Show</button>
               </div>
-              <div class="form-error" id="password-error" data-testid="password-error"></div>
+              <div class="form-error" id="password-error" data-testid="login-password-error"></div>
             </div>
             <div class="form-field">
               <label><input type="checkbox" id="remember" data-testid="remember-me" /> Remember me</label>
@@ -60,8 +60,8 @@
           Every interactive element has a stable <code class="inline">data-testid</code>:
           <code class="inline">login-email</code>, <code class="inline">login-password</code>,
           <code class="inline">login-submit</code>, <code class="inline">toggle-password</code>,
-          <code class="inline">remember-me</code>, <code class="inline">email-error</code>,
-          <code class="inline">password-error</code>, <code class="inline">login-result</code>.
+          <code class="inline">remember-me</code>, <code class="inline">login-email-error</code>,
+          <code class="inline">login-password-error</code>, <code class="inline">login-result</code>.
         </p>
       </div>
     </div>
@@ -185,6 +185,7 @@
       }
     })();
   </script>
+  <script src="../js/test-hooks.js"></script>
   <script src="../js/site-chrome.js"></script>
   <script src="../js/data/defects.js"></script>
   <script src="../js/progress.js"></script>

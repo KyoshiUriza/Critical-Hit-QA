@@ -1,5 +1,12 @@
 # QA Prep Hub — MVP Roadmap & Feature Research
 
+> **STATUS — updated 2026-08-10.** Everything in "Tier 1" below has **shipped**,
+> plus three sprints of follow-up work from a full-team review (see
+> `.claude/agents/`). This document is retained as the research record that
+> justified those bets. For what exists today, see [README.md](README.md).
+> For what's next, see the "Next sprint candidates" section at the bottom.
+
+
 *Research date: 2026-08-10*
 
 ## Executive summary
@@ -62,7 +69,7 @@ Mapped against the ISTQB Foundation syllabus + realistic 2026 interview loops:
 
 ## Proposed features — tiered by ROI
 
-### Tier 1 — MVP additions (recommend for next iteration)
+### Tier 1 — MVP additions  ✅ ALL SHIPPED
 
 Each ships as a static-site feature using localStorage; no backend required.
 
@@ -104,7 +111,7 @@ Each ships as a static-site feature using localStorage; no backend required.
 
 ---
 
-### Tier 2 — Post-MVP (higher effort or requires services)
+### Tier 2 — Post-MVP (higher effort or requires services)  ⏳ NOT STARTED
 
 #### 6. Flashcards / spaced repetition
 - Repurpose interview Q&A into a Leitner-box or SM-2 flashcard mode. Answer "knew it / almost / didn't"; deck reshuffles on decay curve.

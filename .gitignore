@@ -1,9 +1,32 @@
+# OS
 .DS_Store
+.DS_Store?
 Thumbs.db
-*.log
+
+# Editors
 .vscode/
 .idea/
+*.swp
+
+# Node / tooling
 node_modules/
+npm-debug.log*
+# package-lock.json is committed on purpose: `npm ci` in CI requires it.
+
+# Playwright
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+
+# Secrets — never commit
 .env
-.env.local
+.env.*
+*.pem
+*.key
+credentials.json
+
+# Deploy platform caches
 .netlify/
+.vercel/
+coverage/

@@ -24,17 +24,17 @@
             <div class="form-field">
               <label for="fullname">Full name</label>
               <input type="text" id="fullname" data-testid="reg-fullname" />
-              <div class="form-error" id="fullname-error" data-testid="fullname-error"></div>
+              <div class="form-error" id="fullname-error" data-testid="reg-fullname-error"></div>
             </div>
             <div class="form-field">
               <label for="email">Email</label>
               <input type="email" id="email" data-testid="reg-email" />
-              <div class="form-error" id="email-error" data-testid="email-error"></div>
+              <div class="form-error" id="email-error" data-testid="reg-email-error"></div>
             </div>
             <div class="form-field">
               <label for="age">Age</label>
               <input type="number" id="age" min="0" max="130" data-testid="reg-age" />
-              <div class="form-error" id="age-error" data-testid="age-error"></div>
+              <div class="form-error" id="age-error" data-testid="reg-age-error"></div>
             </div>
             <div class="form-field">
               <label for="country">Country</label>
@@ -47,22 +47,22 @@
                 <option value="JP">Japan</option>
                 <option value="OTHER">Other</option>
               </select>
-              <div class="form-error" id="country-error" data-testid="country-error"></div>
+              <div class="form-error" id="country-error" data-testid="reg-country-error"></div>
             </div>
             <div class="form-field">
               <label for="password">Password</label>
               <input type="password" id="password" data-testid="reg-password" />
               <div id="pw-strength" class="text-dim" style="font-size:0.8rem; margin-top:4px;" data-testid="pw-strength"></div>
-              <div class="form-error" id="password-error" data-testid="password-error"></div>
+              <div class="form-error" id="password-error" data-testid="reg-password-error"></div>
             </div>
             <div class="form-field">
               <label for="confirm">Confirm password</label>
               <input type="password" id="confirm" data-testid="reg-confirm" />
-              <div class="form-error" id="confirm-error" data-testid="confirm-error"></div>
+              <div class="form-error" id="confirm-error" data-testid="reg-confirm-error"></div>
             </div>
             <div class="form-field">
               <label><input type="checkbox" id="tos" data-testid="reg-tos" /> I agree to the Terms of Service</label>
-              <div class="form-error" id="tos-error" data-testid="tos-error"></div>
+              <div class="form-error" id="tos-error" data-testid="reg-tos-error"></div>
             </div>
             <button type="submit" class="btn btn-primary" data-testid="reg-submit">Create account</button>
           </form>
@@ -184,6 +184,7 @@
       }
     })();
   </script>
+  <script src="../js/test-hooks.js"></script>
   <script src="../js/site-chrome.js"></script>
   <script src="../js/data/defects.js"></script>
   <script src="../js/progress.js"></script>

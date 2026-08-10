@@ -1,95 +1,125 @@
 # QA Prep Hub
 
-A self-contained, static web app for Software QA interview prep. No build step, no backend, no signup.
+<!-- Replace USER/REPO once the remote exists. -->
+[![E2E tests](https://github.com/USER/REPO/actions/workflows/e2e.yml/badge.svg)](https://github.com/USER/REPO/actions/workflows/e2e.yml)
+[![Deploy](https://github.com/USER/REPO/actions/workflows/deploy-pages.yml/badge.svg)](https://github.com/USER/REPO/actions/workflows/deploy-pages.yml)
+
+A self-contained static web app for Software QA interview prep. No build step, no backend, no signup, works offline.
+
+**The pitch:** most QA prep gives you flashcards. This gives you broken apps with seeded defects — find them, score yourself against the catalog, then write the bug report and export it into your portfolio.
 
 ## What's inside
 
-- **Home** — landing overview with feature grid and live stats.
-- **Practice Tests** — timed multiple-choice quizzes with instant explanations, filterable by category. Scores recorded to your progress dashboard.
-- **Interview Questions** — categorized Q&A bank with model answers, searchable and filterable by difficulty.
-- **Practice Apps** — 12 interactive front-end apps:
-  - **Clean builds (8):** Login, Todo, Cart, Register, Data Table, File Upload, Modal Dialog, Accessibility Challenge
-  - **Buggy builds (4):** Login, Todo, Cart, Register — each seeded with real defects
-- **Bug Bounty** — score your exploratory sessions against the seeded defect catalog, weighted by severity.
-- **Automation Lab** — copy-paste Playwright / Cypress / Selenium examples targeting the practice apps, including a "bug-hunt regression suite" that fails against the buggy builds.
-- **Test Case Builder** — form-driven test case authoring, exports as Markdown or JSON.
-- **Bug Report Builder** — structured bug report authoring, exports as Markdown, GitHub Issue, or Jira format.
-- **Progress Dashboard** — per-category quiz accuracy, bug bounty catch rate, streaks, drafted-artifact counts. Import/export JSON.
-- **Study Plan** — 3-day, 1-week, and 1-month structured prep plans linking into every tool.
+**The core loop**
+- **Practice Apps** — 12 working mini-apps: 8 clean, 4 with intentionally seeded defects (31 total).
+- **Bug Bounty** — tick off the defects you found; scored against the seeded catalog, weighted by severity.
+- **Bug Report Builder** — turn a find into a real report. Exports Markdown / GitHub Issue / Jira / JSON.
+
+**Learn & drill**
+- **Learn tracks** — manual testing, automation testing, codeless (AccelQ), and code-based frameworks (Playwright, Selenium).
+- **Quizzes** — timed multiple-choice with instant explanations, filterable by category, deep-linkable via `?category=`.
+- **Interview Questions** — curated Q&A with model answers, searchable and filterable by difficulty.
+- **Automation Lab** — copy-paste Playwright / Cypress / Selenium specs that run against the practice apps, including a "bug-hunt regression suite" that fails against the buggy builds.
+
+**Build your portfolio**
+- **Test Case Builder** — structured test case authoring, exports Markdown or JSON.
+- **Study Plan** — 3-day, 1-week, and 1-month plans; your active plan and progress persist.
+- **Progress Dashboard** — quiz accuracy by category, bug-hunt catch rate, streaks, drafted artifacts. Import/export JSON.
 - **Resources** — HTTP cheat sheet, glossary, test techniques, reading list, interview checklist.
+
+**Optional**
+- **The Tester's Lattice** — a light RPG layer (ranks, Star-Dust, Catalysts, Signature Abilities) themed on *The Convergence Chronicles: The Resonance Lattice*. Purely cosmetic; ignoring it changes nothing.
 
 ## Running it
 
-No build step. Open [index.html](index.html) directly, or serve locally:
+No build step for the site itself:
 
 ```bash
 python -m http.server 8080
 ```
 
-Then visit `http://localhost:8080`. Serving locally is required to run the Automation Lab examples against the practice apps (many test runners refuse `file://` URLs).
+Then open http://localhost:8080. Serving locally is required to run the Automation Lab examples (test runners refuse `file://` URLs).
 
-## Hosting online
+## Running the tests
 
-See [HOSTING.md](HOSTING.md) for step-by-step guides on:
+The site has zero runtime dependencies. Playwright is a devDependency used only for the E2E suite.
 
-- **Netlify Drop** — drag the folder to a browser, 60 seconds, done.
-- **Netlify + GitHub** — automatic redeploys on push.
-- **GitHub Pages** — free, GitHub-native, workflow included at [.github/workflows/deploy-pages.yml](.github/workflows/deploy-pages.yml).
-- **Cloudflare Pages** / **Vercel** — same shape as Netlify.
+```bash
+npm install && npx playwright install chromium && npm test
+```
+
+The suite (`tests/`) has two halves:
+- **`smoke.spec.js`** — every page renders the shared chrome, exposes a skip link, and produces **zero console errors**.
+- **`regression.spec.js`** — one test per bug found in review, each asserting the *correct* behaviour so a reverted fix goes red.
+
+CI runs both on every push and PR via [`.github/workflows/e2e.yml`](.github/workflows/e2e.yml).
+
+### Test hooks
+
+Every page loads [`js/test-hooks.js`](js/test-hooks.js), which exposes:
+
+```js
+window.__qa.reset()      // clear all site-owned storage
+window.__qa.seed({...})  // write a progress snapshot directly
+window.__qa.snapshot()   // read current site-owned storage
+```
+
+Append `?reset` to any URL to clear state before the page initialises:
+
+```js
+await page.goto('/practice-apps/login.html?reset');
+```
+
+## Hosting
+
+See [HOSTING.md](HOSTING.md). Netlify Drop is the 60-second path; Netlify-via-git and GitHub Pages both auto-deploy (workflow included).
 
 ## Project structure
 
 ```
 QA Website Project/
 ├── index.html
-├── README.md
-├── ROADMAP.md               # feature research & prioritization
-├── HOSTING.md               # deployment guides
-├── netlify.toml             # Netlify config
-├── .github/workflows/deploy-pages.yml
-├── css/styles.css
+├── README.md  ROADMAP.md  HOSTING.md
+├── netlify.toml                    # publish dir, security + cache headers
+├── package.json  playwright.config.js
+├── .github/workflows/
+│   ├── deploy-pages.yml            # GitHub Pages deploy
+│   └── e2e.yml                     # Playwright suite on push + PR
+├── .claude/agents/                 # 9-role agile team (see its README)
+├── css/styles.css                  # tokens + all component styles
 ├── js/
-│   ├── home.js
-│   ├── quiz.js
-│   ├── interview.js
-│   ├── progress.js          # shared localStorage progress store
-│   └── data/
-│       ├── quiz-questions.js
-│       ├── interview-questions.js
-│       └── defects.js       # seeded-bug catalog for the buggy apps
+│   ├── site-chrome.js              # single source of truth for header/footer
+│   ├── test-hooks.js               # ?reset and window.__qa
+│   ├── progress.js                 # localStorage state (qaprep_progress_v1)
+│   ├── rpg.js                      # derived RPG layer (ranks, XP, unlocks)
+│   ├── quiz.js  interview.js  home.js
+│   └── data/                       # quiz-questions, interview-questions, defects
 ├── pages/
-│   ├── practice-tests.html
-│   ├── interview-questions.html
-│   ├── practice-apps.html
-│   ├── bug-bounty.html
-│   ├── automation-lab.html
-│   ├── test-case-builder.html
-│   ├── bug-report-builder.html
-│   ├── progress.html
-│   ├── study-plan.html
-│   └── resources.html
-└── practice-apps/
-    ├── login.html            login-broken.html      (9 seeded defects)
-    ├── todo.html             todo-broken.html       (6 seeded defects)
-    ├── cart.html             cart-broken.html       (7 seeded defects)
-    ├── register.html         register-broken.html   (9 seeded defects)
-    ├── data-table.html
-    ├── file-upload.html
-    ├── modal.html
-    └── a11y-challenge.html   (13 seeded WCAG issues)
+│   ├── learn.html + learn/{manual,automation,codeless,frameworks}.html
+│   ├── practice-tests.html  interview-questions.html  practice-apps.html
+│   ├── bug-bounty.html  automation-lab.html  resources.html
+│   ├── test-case-builder.html  bug-report-builder.html
+│   └── progress.html  tester-lattice.html  study-plan.html
+├── practice-apps/                  # 8 clean + 4 buggy
+└── tests/                          # smoke.spec.js  regression.spec.js
 ```
 
-## Design notes
+## Design constraints
 
-- **Automation-first.** Every interactive element in the practice apps has a stable `data-testid` attribute so your selectors are stable across UI changes.
-- **Theme-aware.** Dark by default, follows `prefers-color-scheme` for light mode.
-- **No frameworks, no build tools, no external dependencies.** One folder, works offline, deploys anywhere.
-- **Progress is per-browser** and stored under the `qaprep_progress_v1` localStorage key. Export/import JSON from the Progress Dashboard to move it between browsers or devices.
+These are deliberate. Breaking one requires an explicit trade-off, not a silent addition.
+
+- **Zero runtime dependencies.** No framework, no bundler, no CDN scripts, no external fonts or stylesheets. The site works offline and satisfies a strict CSP.
+- **Static only.** No backend, no accounts. State lives in `localStorage` per browser under `qaprep_progress_v1`.
+- **`data-testid` on every interactive element** in the practice apps — automation-first by design.
+- **One header, one footer.** [`js/site-chrome.js`](js/site-chrome.js) renders both; pages declare only `data-page` and `data-depth`. Never hand-write a nav.
+- **User input never touches `innerHTML`.** Use `textContent` or `createElement` + `append`.
+- **Both themes are first-class.** Every color is a token with a light-mode override that meets WCAG AA.
 
 ## Extending it
 
-- Add quiz questions → `js/data/quiz-questions.js` (categories auto-appear in filters).
-- Add interview questions → `js/data/interview-questions.js` (new categories auto-tab).
-- Add practice apps → drop a new HTML file in `practice-apps/`, link it from `pages/practice-apps.html`.
-- Add seeded defects → `js/data/defects.js`; they'll appear in the Bug Bounty scorer automatically.
-- Add a study plan → append to the `PLANS` object in `pages/study-plan.html`.
+- Quiz questions → append to [`js/data/quiz-questions.js`](js/data/quiz-questions.js).
+- Interview questions → append to [`js/data/interview-questions.js`](js/data/interview-questions.js) (new categories auto-tab).
+- Practice apps → new file in `practice-apps/`, link it from `pages/practice-apps.html`, give it `data-page="practice-app-detail" data-depth="1"` and the chrome slots.
+- Seeded defects → [`js/data/defects.js`](js/data/defects.js); they appear in Bug Bounty and the RPG scoring automatically.
+- Nav items → [`js/site-chrome.js`](js/site-chrome.js) `NAV` array, one place.
+- Study plans → the `PLANS` object in `pages/study-plan.html`.

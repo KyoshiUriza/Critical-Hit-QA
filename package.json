@@ -1,0 +1,15 @@
+{
+  "name": "qa-prep-hub",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Static QA interview prep site. The app itself has zero runtime dependencies; devDependencies exist only to run the E2E suite.",
+  "scripts": {
+    "serve": "python -m http.server 8080",
+    "test": "playwright test",
+    "test:ui": "playwright test --ui",
+    "test:report": "playwright show-report"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.49.0"
+  }
+}
