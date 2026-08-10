@@ -1,4 +1,13 @@
-# OS
+# OS / cloud-sync artifacts
+# This project lives in a Google Drive synced folder. Drive stages uploads —
+# including compressed .git objects — in .tmp.driveupload/, which churns
+# constantly and must never be committed.
+.tmp.driveupload/
+desktop.ini
+*.gdoc
+*.gsheet
+*.gslides
+
 .DS_Store
 .DS_Store?
 Thumbs.db
