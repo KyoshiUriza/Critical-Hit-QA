@@ -33,6 +33,7 @@ jobs:
         run: |
           mkdir -p _site
           cp -r index.html css js pages practice-apps _site/
+          cp favicon.svg favicon-16.png favicon-32.png apple-touch-icon.png _site/
           # GitHub Pages runs Jekyll by default, which ignores files and
           # directories beginning with an underscore. Nothing here starts with
           # one today, but .nojekyll makes that a guarantee rather than luck.
@@ -44,7 +45,8 @@ jobs:
         run: |
           set -e
           for f in _site/index.html _site/css/styles.css _site/js/site-chrome.js \
-                   _site/pages/portfolio.html _site/practice-apps/locator-lab.html; do
+                   _site/pages/portfolio.html _site/practice-apps/locator-lab.html \
+                   _site/favicon.svg _site/apple-touch-icon.png; do
             test -f "$f" || { echo "MISSING: $f"; exit 1; }
           done
           # A stray absolute path breaks the site under the /QAHub/ subpath and

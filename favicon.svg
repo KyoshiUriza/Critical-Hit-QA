@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="QA Prep Hub">
+  <!--
+    Built on the ◈ mark the site already uses in .brand::before and its section
+    headings — a lattice node, which also ties to the Resonance Lattice theme.
+
+    A filled tile rather than a bare glyph: at 16px a stroke-only icon vanishes
+    against a matching tab background, and browser tab strips are light in one
+    theme and dark in the other. A solid rounded square reads on both.
+  -->
+  <rect width="32" height="32" rx="7" fill="#2f7fe6"/>
+  <!-- Outer diamond: the node's boundary. Thick enough to survive 16px. -->
+  <path d="M16 5 L27 16 L16 27 L5 16 Z"
+        fill="none" stroke="#ffffff" stroke-width="2.75" stroke-linejoin="round"/>
+  <!-- Inner diamond: the node itself. Solid, so it never disappears. -->
+  <path d="M16 11.5 L20.5 16 L16 20.5 L11.5 16 Z" fill="#ffffff"/>
+</svg>

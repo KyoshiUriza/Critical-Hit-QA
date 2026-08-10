@@ -122,3 +122,30 @@ test.describe('public-repo hygiene', () => {
     await expect(src).toHaveAttribute('rel', 'noopener noreferrer');
   });
 });
+
+test.describe('favicon', () => {
+  // Icons are injected by site-chrome.js with depth-derived paths, so a
+  // subpath deploy or a new directory level is exactly what would break them.
+  for (const path of ['index.html', 'pages/portfolio.html', 'pages/learn/locators.html', 'practice-apps/locator-lab.html']) {
+    test(`icons resolve on ${path}`, async ({ page }) => {
+      await page.goto(`/${path}?reset`);
+
+      const links = await page.evaluate(() =>
+        [...document.querySelectorAll('link[rel*="icon"]')].map((l) => ({
+          rel: l.rel,
+          href: l.href,           // resolved absolute URL
+        }))
+      );
+
+      // svg + 32 + 16 + apple-touch
+      expect(links, `no icon links on ${path}`).toHaveLength(4);
+      expect(links.some((l) => l.href.endsWith('favicon.svg')), 'SVG icon missing').toBe(true);
+      expect(links.some((l) => l.rel === 'apple-touch-icon'), 'apple-touch-icon missing').toBe(true);
+
+      for (const l of links) {
+        const resp = await page.request.get(l.href);
+        expect(resp.status(), `${l.href} did not resolve`).toBe(200);
+      }
+    });
+  }
+});

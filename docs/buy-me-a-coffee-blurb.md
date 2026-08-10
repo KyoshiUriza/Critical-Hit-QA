@@ -92,6 +92,19 @@ Pick one:
 
 ---
 
+## Website field
+
+BMC has a website/link field. Once the site is live, use:
+
+    https://kyoshiuriza.github.io/QAHub/
+
+Add the repo as a second link if BMC allows it — `https://github.com/KyoshiUriza/QAHub`.
+An open-source project with a test suite reads more credibly than a bare site,
+and it is the thing that separates this from a landing page.
+
+The site's own footer already links back to BMC, so once both exist the loop is
+closed in both directions.
+
 ## Notes on the copy
 
 - **It stays concrete.** Everything above is checkable against the live site —

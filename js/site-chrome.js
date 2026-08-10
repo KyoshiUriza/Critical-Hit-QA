@@ -193,7 +193,36 @@
     return footer;
   }
 
+  // Favicons live here rather than in 35 hand-written <head> blocks, for the
+  // same reason the header does: duplicated markup drifts. Injecting from JS
+  // costs a few ms before the tab icon appears, which is a fair trade for one
+  // source of truth. Paths are depth-derived, so they resolve on a project
+  // subpath like /QAHub/ too.
+  function mountFavicons() {
+    if (document.querySelector('link[rel="icon"]')) return;
+    var p = prefix();
+    var head = document.head;
+
+    function link(rel, href, type, sizes) {
+      var l = document.createElement("link");
+      l.rel = rel;
+      l.href = p + href;
+      if (type) l.type = type;
+      if (sizes) l.setAttribute("sizes", sizes);
+      head.appendChild(l);
+    }
+
+    // SVG first — modern browsers prefer it and it stays sharp at any density.
+    link("icon", "favicon.svg", "image/svg+xml");
+    // Raster fallbacks for browsers that ignore SVG icons.
+    link("icon", "favicon-32.png", "image/png", "32x32");
+    link("icon", "favicon-16.png", "image/png", "16x16");
+    link("apple-touch-icon", "apple-touch-icon.png", null, "180x180");
+  }
+
   function mount() {
+    mountFavicons();
+
     var headerSlot = document.getElementById("site-header");
     if (headerSlot) headerSlot.replaceWith(buildHeader());
 
