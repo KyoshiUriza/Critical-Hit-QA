@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; object-src 'none'; frame-src 'none'; base-uri 'self'; form-action 'self'" />
+  <meta name="referrer" content="no-referrer" />
+  <title>Meridian Bank — Critical Hit QA</title>
+  <link rel="stylesheet" href="../css/styles.css" />
+</head>
+<!-- A generic retail-banking app, not a copy of any real bank. The value is in
+     the interaction patterns — money arithmetic, transfers, statement
+     filtering, step-up authentication — which are the same everywhere and can
+     be practised without borrowing anyone's branding. -->
+<body data-page="practice-app-detail" data-depth="1">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div id="site-header"></div>
+
+  <main id="main" class="container">
+    <div class="page-header">
+      <h1>Meridian Bank <span class="text-dim">(clean build)</span></h1>
+      <p>Retail banking: transfers between accounts, a filterable statement, and a step-up confirmation. Money is the domain where rounding, boundaries and state all matter at once.</p>
+    </div>
+
+    <div class="panel panel-accent">
+      <strong>Testing charter —</strong> money is the highest-severity domain
+      there is, so test it like one. Try transfers at and past the balance, at
+      zero and below, to the same account, with more than two decimal places,
+      and with the daily limit already spent. Then check the statement actually
+      reflects what you did. Every figure on this page is derived from one
+      integer-pence ledger — if you can make the header total disagree with the
+      statement, that is a critical find.
+    </div>
+
+    <section class="app-frame">
+      <h2>Accounts</h2>
+      <div class="two-col" id="accounts" data-testid="accounts"></div>
+      <p class="mt-2">Total across accounts: <strong data-testid="total-balance"></strong></p>
+      <p class="text-dim text-sm">Daily transfer limit: <strong>£1,000.00</strong> · used today: <span data-testid="limit-used">£0.00</span></p>
+    </section>
+
+    <section class="app-frame">
+      <h2>Transfer</h2>
+      <div class="two-col">
+        <div class="form-field">
+          <label for="from-acct">From</label>
+          <select id="from-acct" data-testid="from-account"></select>
+        </div>
+        <div class="form-field">
+          <label for="to-acct">To</label>
+          <select id="to-acct" data-testid="to-account"></select>
+        </div>
+      </div>
+      <div class="form-field">
+        <label for="amount">Amount (£)</label>
+        <input type="text" id="amount" data-testid="amount" placeholder="0.00" autocomplete="off" inputmode="decimal" />
+      </div>
+      <div class="form-field">
+        <label for="reference">Reference (optional, max 18 chars)</label>
+        <input type="text" id="reference" data-testid="reference" maxlength="18" autocomplete="off" />
+      </div>
+      <button class="btn btn-primary" data-testid="review-transfer">Review transfer</button>
+      <p class="form-error" id="transfer-error" data-testid="transfer-error" role="alert"></p>
+
+      <!-- Step-up confirmation: transfers above £500 need a second factor.
+           A common real-world flow, and a good state-machine exercise. -->
+      <div class="panel panel-warn hidden mt-4" id="confirm-box" data-testid="confirm-box">
+        <h3 class="m-0">Confirm transfer</h3>
+        <p id="confirm-summary" data-testid="confirm-summary"></p>
+        <div class="form-field hidden" id="otp-field" data-testid="otp-field">
+          <label for="otp">Transfers over £500 need a code. Use <code class="inline">246810</code>.</label>
+          <input type="text" id="otp" data-testid="otp" maxlength="6" autocomplete="off" inputmode="numeric" />
+        </div>
+        <p class="form-error" id="otp-error" data-testid="otp-error" role="alert"></p>
+        <button class="btn btn-primary" data-testid="confirm-transfer">Confirm</button>
+        <button class="btn btn-ghost" data-testid="cancel-transfer">Cancel</button>
+      </div>
+      <p class="form-success hidden" id="transfer-ok" data-testid="transfer-ok" role="status"></p>
+    </section>
+
+    <section class="app-frame">
+      <h2>Statement</h2>
+      <div class="flex gap-3 flex-wrap items-center">
+        <div class="form-field m-0">
+          <label for="filter-acct">Account</label>
+          <select id="filter-acct" data-testid="filter-account">
+            <option value="all">All accounts</option>
+          </select>
+        </div>
+        <div class="form-field m-0">
+          <label for="filter-type">Type</label>
+          <select id="filter-type" data-testid="filter-type">
+            <option value="all">All</option>
+            <option value="in">Money in</option>
+            <option value="out">Money out</option>
+          </select>
+        </div>
+        <div class="form-field m-0">
+          <label for="filter-text">Search reference</label>
+          <input type="text" id="filter-text" data-testid="filter-text" autocomplete="off" />
+        </div>
+      </div>
+      <table class="data-table mt-3" data-testid="statement">
+        <thead><tr><th>Date</th><th>Account</th><th>Reference</th><th>Amount</th><th>Balance after</th></tr></thead>
+        <tbody id="statement-body"></tbody>
+      </table>
+      <p class="text-dim" id="statement-empty" data-testid="statement-empty" hidden>No transactions match those filters.</p>
+    </section>
+
+    <div class="panel app-next-steps">
+      <span class="text-dim">Related:</span>
+      <a class="btn btn-primary btn-sm" href="../pages/bug-report-builder.html">Write up a find →</a>
+      <a class="btn btn-ghost btn-sm" href="component-gauntlet.html">Component Gauntlet</a>
+      <a class="btn btn-ghost btn-sm" href="../pages/practice-apps.html">All practice apps</a>
+    </div>
+  </main>
+
+  <div id="site-footer"></div>
+
+  <script src="../js/test-hooks.js"></script>
+  <script src="../js/site-chrome.js"></script>
+  <script src="../js/data/defects.js"></script>
+  <script src="../js/profiles.js"></script>
+  <script src="../js/progress.js"></script>
+  <script src="../js/rpg.js"></script>
+  <script>
+    // ── Money is stored in integer pence, never floats. ───────────────────
+    // 0.1 + 0.2 !== 0.3 in binary floating point, and a bank that adds
+    // balances in pounds accumulates error. This build is the correct
+    // reference; the buggy variant is where that rule gets broken.
+    var ACCOUNTS = [
+      { id: "cur", name: "Everyday Current", number: "•••• 4417", pence: 128455 },
+      { id: "sav", name: "Rainy Day Saver",  number: "•••• 9032", pence: 542000 }
+    ];
+    var DAILY_LIMIT_PENCE = 100000;
+    var OTP_THRESHOLD_PENCE = 50000;
+    var VALID_OTP = "246810";
+
+    var TX = [
+      { date: "2026-08-04", acct: "cur", ref: "Salary",        pence:  210000, after: 338455 },
+      { date: "2026-08-05", acct: "cur", ref: "Coffee Roasters", pence: -450,  after: 338005 },
+      { date: "2026-08-06", acct: "sav", ref: "Standing order", pence:  50000, after: 542000 },
+      { date: "2026-08-07", acct: "cur", ref: "Rent",          pence: -209550, after: 128455 }
+    ];
+    var limitUsedPence = 0;
+    var pending = null;
+
+    function el(id) { return document.getElementById(id); }
+    function testid(id) { return document.querySelector('[data-testid="' + id + '"]'); }
+
+    // Formatting happens once, here, from pence. Anything that formats
+    // elsewhere is a chance for two figures to disagree.
+    function money(pence) {
+      var neg = pence < 0;
+      var abs = Math.abs(pence);
+      var s = "£" + Math.floor(abs / 100).toLocaleString("en-GB") + "." + String(abs % 100).padStart(2, "0");
+      return neg ? "-" + s : s;
+    }
+
+    function acct(id) {
+      return ACCOUNTS.filter(function (a) { return a.id === id; })[0];
+    }
+
+    function renderAccounts() {
+      var wrap = testid("accounts");
+      wrap.textContent = "";
+      ACCOUNTS.forEach(function (a) {
+        var card = document.createElement("div");
+        card.className = "panel";
+        card.setAttribute("data-testid", "account-" + a.id);
+        var h = document.createElement("h3");
+        h.className = "m-0";
+        h.textContent = a.name;
+        var num = document.createElement("div");
+        num.className = "text-dim text-sm";
+        num.textContent = a.number;
+        var bal = document.createElement("div");
+        bal.className = "quiz-score";
+        bal.setAttribute("data-testid", "balance-" + a.id);
+        bal.textContent = money(a.pence);
+        card.append(h, num, bal);
+        wrap.appendChild(card);
+      });
+      testid("total-balance").textContent = money(
+        ACCOUNTS.reduce(function (s, a) { return s + a.pence; }, 0)
+      );
+      testid("limit-used").textContent = money(limitUsedPence);
+    }
+
+    function fillSelects() {
+      [testid("from-account"), testid("to-account")].forEach(function (sel) {
+        sel.textContent = "";
+        ACCOUNTS.forEach(function (a) {
+          var o = document.createElement("option");
+          o.value = a.id;
+          o.textContent = a.name + " (" + a.number + ")";
+          sel.appendChild(o);
+        });
+      });
+      testid("to-account").selectedIndex = 1;
+
+      var filter = testid("filter-account");
+      ACCOUNTS.forEach(function (a) {
+        var o = document.createElement("option");
+        o.value = a.id;
+        o.textContent = a.name;
+        filter.appendChild(o);
+      });
+    }
+
+    // Returns pence, or null with a message. Rejecting >2dp rather than
+    // silently rounding is the deliberate choice — silent rounding is how
+    // money quietly goes missing.
+    function parseAmount(raw) {
+      var s = String(raw).trim().replace(/^£/, "").replace(/,/g, "");
+      if (!s) return { error: "Enter an amount." };
+      if (!/^\d+(\.\d{1,2})?$/.test(s)) {
+        if (/^\d+\.\d{3,}$/.test(s)) return { error: "Amounts cannot have more than 2 decimal places." };
+        return { error: "Enter a valid amount, for example 25.00" };
+      }
+      var parts = s.split(".");
+      var pence = Number(parts[0]) * 100 + (parts[1] ? Number(parts[1].padEnd(2, "0")) : 0);
+      if (pence === 0) return { error: "Amount must be greater than zero." };
+      return { pence: pence };
+    }
+
+    function validate() {
+      var from = testid("from-account").value;
+      var to = testid("to-account").value;
+      var parsed = parseAmount(testid("amount").value);
+
+      if (from === to) return { error: "Choose two different accounts." };
+      if (parsed.error) return { error: parsed.error };
+      if (parsed.pence > acct(from).pence) return { error: "Insufficient funds in " + acct(from).name + "." };
+      if (limitUsedPence + parsed.pence > DAILY_LIMIT_PENCE) {
+        return { error: "That exceeds the £1,000.00 daily limit (" + money(limitUsedPence) + " already used today)." };
+      }
+      return { from: from, to: to, pence: parsed.pence, ref: testid("reference").value.trim() };
+    }
+
+    function showError(msg) {
+      var box = testid("transfer-error");
+      box.textContent = msg;
+      box.classList.add("visible");
+    }
+    function clearMessages() {
+      testid("transfer-error").textContent = "";
+      testid("transfer-error").classList.remove("visible");
+      testid("otp-error").textContent = "";
+      testid("otp-error").classList.remove("visible");
+      testid("transfer-ok").classList.add("hidden");
+    }
+
+    testid("review-transfer").addEventListener("click", function () {
+      clearMessages();
+      testid("confirm-box").classList.add("hidden");
+      var result = validate();
+      if (result.error) { showError(result.error); return; }
+
+      pending = result;
+      testid("confirm-summary").textContent =
+        "Send " + money(result.pence) + " from " + acct(result.from).name +
+        " to " + acct(result.to).name + (result.ref ? ' with reference "' + result.ref + '"' : "") + ".";
+      var needsOtp = result.pence > OTP_THRESHOLD_PENCE;
+      testid("otp-field").classList.toggle("hidden", !needsOtp);
+      testid("otp").value = "";
+      testid("confirm-box").classList.remove("hidden");
+    });
+
+    testid("cancel-transfer").addEventListener("click", function () {
+      pending = null;
+      testid("confirm-box").classList.add("hidden");
+      clearMessages();
+    });
+
+    testid("confirm-transfer").addEventListener("click", function () {
+      if (!pending) return;
+      clearMessages();
+
+      if (pending.pence > OTP_THRESHOLD_PENCE && testid("otp").value.trim() !== VALID_OTP) {
+        var e = testid("otp-error");
+        e.textContent = "That code is not correct.";
+        e.classList.add("visible");
+        return;
+      }
+
+      // Re-validate at commit. State can change between review and confirm,
+      // and a UI that only checks on the first step is a real-world defect.
+      var recheck = validate();
+      if (recheck.error) {
+        testid("confirm-box").classList.add("hidden");
+        showError(recheck.error);
+        pending = null;
+        return;
+      }
+
+      acct(pending.from).pence -= pending.pence;
+      acct(pending.to).pence += pending.pence;
+      limitUsedPence += pending.pence;
+
+      var today = "2026-08-10";
+      var ref = pending.ref || "Transfer";
+      TX.unshift({ date: today, acct: pending.from, ref: ref, pence: -pending.pence, after: acct(pending.from).pence });
+      TX.unshift({ date: today, acct: pending.to, ref: ref, pence: pending.pence, after: acct(pending.to).pence });
+
+      var ok = testid("transfer-ok");
+      ok.textContent = "Sent " + money(pending.pence) + " to " + acct(pending.to).name + ".";
+      ok.classList.remove("hidden");
+
+      pending = null;
+      testid("confirm-box").classList.add("hidden");
+      testid("amount").value = "";
+      testid("reference").value = "";
+      renderAccounts();
+      renderStatement();
+    });
+
+    function renderStatement() {
+      var a = testid("filter-account").value;
+      var t = testid("filter-type").value;
+      var q = testid("filter-text").value.trim().toLowerCase();
+
+      var rows = TX.filter(function (tx) {
+        if (a !== "all" && tx.acct !== a) return false;
+        if (t === "in" && tx.pence <= 0) return false;
+        if (t === "out" && tx.pence >= 0) return false;
+        if (q && tx.ref.toLowerCase().indexOf(q) === -1) return false;
+        return true;
+      });
+
+      var body = el("statement-body");
+      body.textContent = "";
+      rows.forEach(function (tx) {
+        var tr = document.createElement("tr");
+        tr.setAttribute("data-testid", "tx-row");
+        [tx.date, acct(tx.acct).name, tx.ref, money(tx.pence), money(tx.after)].forEach(function (v, i) {
+          var td = document.createElement("td");
+          td.textContent = v;
+          if (i === 3) {
+            td.setAttribute("data-testid", "tx-amount");
+            td.style.color = tx.pence < 0 ? "var(--danger)" : "var(--accent-2)";
+          }
+          tr.appendChild(td);
+        });
+        body.appendChild(tr);
+      });
+      testid("statement-empty").hidden = rows.length > 0;
+    }
+
+    ["filter-account", "filter-type", "filter-text"].forEach(function (id) {
+      testid(id).addEventListener("input", renderStatement);
+      testid(id).addEventListener("change", renderStatement);
+    });
+
+    fillSelects();
+    renderAccounts();
+    renderStatement();
+  </script>
+</body>
+</html>
