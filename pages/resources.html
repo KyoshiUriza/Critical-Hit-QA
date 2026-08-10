@@ -238,6 +238,26 @@
             <li><a href="https://www.selenium.dev/documentation/" target="_blank" rel="noopener noreferrer">Selenium docs</a> — still what a large share of job postings ask for.</li>
             <li><a href="https://developer.mozilla.org/en-US/docs/Web/HTTP" target="_blank" rel="noopener noreferrer">MDN HTTP reference</a> — for anything API testing touches.</li>
           </ul>
+          <strong class="mt-4" style="display:block;">Browser extensions</strong>
+          <ul class="text-dim">
+            <li>
+              <a href="https://selectorshub.com/selectorshub/" target="_blank" rel="noopener noreferrer">SelectorsHub</a>
+              — a DevTools panel that writes and verifies XPath, CSS, and Playwright
+              locators as you type, and tells you when one is wrong instead of
+              leaving you to find out in CI. It handles the two cases that
+              usually defeat hand-written selectors: <strong>shadow DOM</strong>
+              (including closed roots) and <strong>nested iframes</strong>. Free
+              tier is enough; Chrome, Edge, Firefox, Opera, Brave.
+            </li>
+          </ul>
+          <p class="text-dim text-xs">
+            One caution, because it is the same trap as self-healing locators:
+            a generated selector is a starting point, not an answer. The
+            <a href="../practice-apps/locator-lab.html">Locator Lab</a> exists to
+            teach you to judge one — a tool that hands you
+            <code class="inline">div:nth-child(3) > span</code> has solved
+            "does it match" and not "will it still match".
+          </p>
         </div>
         <div>
           <strong>Communities &amp; writing</strong>

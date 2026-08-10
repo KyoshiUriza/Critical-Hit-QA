@@ -1265,6 +1265,42 @@ code.inline {
    rather than a hardcoded rgba of a colour that no longer exists. */
 .rank-current { background: color-mix(in srgb, var(--accent) 10%, transparent); }
 
+/* ── Code Review Gauntlet ────────────────────────────────────────────────
+   Result colours use the semantic tokens rather than raw hex so they invert
+   correctly in light mode. The left border carries the state as well as the
+   background tint, because a tint alone would be the only cue for anyone who
+   cannot distinguish the hues (1.4.1: never colour as the sole signal — the
+   prefix text in .cr-why says it too). */
+.cr-issues { list-style: none; padding: 0; margin: var(--sp-3) 0; }
+.cr-issue {
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--border);
+  border-radius: var(--rad-md);
+  margin-bottom: var(--sp-2);
+}
+.cr-issue-label {
+  display: flex; gap: var(--sp-3); align-items: flex-start;
+  padding: var(--sp-3); cursor: pointer;
+}
+.cr-issue-label input { margin-top: 4px; flex-shrink: 0; }
+.cr-issue-text { font-size: var(--text-sm); }
+.cr-why {
+  font-size: var(--text-xs);
+  color: var(--text-dim);
+  margin-top: var(--sp-2);
+  line-height: 1.5;
+}
+.cr-correct { border-left-color: var(--accent-2); background: color-mix(in srgb, var(--accent-2) 8%, transparent); }
+.cr-missed  { border-left-color: var(--danger);   background: color-mix(in srgb, var(--danger) 8%, transparent); }
+.cr-false   { border-left-color: var(--warn);     background: color-mix(in srgb, var(--warn) 8%, transparent); }
+.cr-ok      { border-left-color: var(--border-strong); }
+.cr-score {
+  font-family: var(--font-mono);
+  font-size: var(--text-lg);
+  font-weight: 700;
+  margin-bottom: var(--sp-2);
+}
+
 /* ── Bug Bounty side panel ───────────────────────────────────────────────
    A non-modal drawer on the buggy practice apps, so a find gets ticked at
    the moment it happens instead of in another tab. Mounted by

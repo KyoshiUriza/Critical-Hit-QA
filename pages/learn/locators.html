@@ -27,6 +27,7 @@
         <li><a href="#scoping">Scoping: the technique that solves most of it</a></li>
         <li><a href="#waits">Locators vs. waits — a related failure</a></li>
         <li><a href="#errors">Common Playwright errors, decoded</a></li>
+        <li><a href="#tooling">Tooling: SelectorsHub</a></li>
         <li><a href="#practice">Practice</a></li>
       </ul>
     </div>
@@ -206,12 +207,44 @@ await page.getByRole('button', { name: 'Save' }).click();</pre>
       </table>
     </section>
 
+    <section id="tooling" class="panel">
+      <h2>Tooling: SelectorsHub</h2>
+      <p>
+        Everything above is about judgement, and you should be able to write a
+        locator with nothing but DevTools. Day to day, though, verify with a
+        tool — and
+        <a href="https://selectorshub.com/selectorshub/" target="_blank" rel="noopener noreferrer">SelectorsHub</a>
+        is the one to install. It adds a DevTools panel that writes and checks
+        XPath, CSS and Playwright locators as you type, flagging an invalid or
+        multi-matching selector immediately rather than at 3am in CI.
+      </p>
+      <p>Two things it does that hand-writing struggles with:</p>
+      <ul>
+        <li><strong>Shadow DOM</strong>, including closed roots. Web components hide their internals from ordinary CSS, and a selector that ignores the shadow boundary simply never matches.</li>
+        <li><strong>Nested iframes.</strong> It reports the frame chain, which is the part people miss — the locator is fine, the frame context was wrong.</li>
+      </ul>
+      <p class="text-dim">
+        Free tier covers all of this. Chrome, Edge, Firefox, Opera and Brave.
+      </p>
+      <div class="panel panel-warn">
+        <strong>Use it as a verifier, not an author.</strong> A generator answers
+        "does this match right now". It cannot answer "will this still match
+        after the next deploy" — and if you accept
+        <code class="inline">div:nth-child(3) &gt; span</code> because a tool
+        produced it, you have imported exactly the brittleness the six smells
+        above describe. Read every suggestion against the priority order, then
+        keep or rewrite it. That habit is also what interviewers are checking
+        when they ask how you pick a locator.
+      </div>
+    </section>
+
     <section id="practice" class="panel panel-accent">
       <h2>Practice — earn Star-Dust</h2>
       <ol>
         <li>Work all six exercises in the <a href="../../practice-apps/locator-lab.html">Locator Lab</a>. Aim for "Solid" on each — "Works now, breaks later" doesn't count.</li>
         <li>Open the <a href="../../practice-apps/data-table.html">Data Table</a> app and write a locator for the Delete action on a specific employee, without using position.</li>
         <li>Open the <a href="../../practice-apps/modal.html">Modal</a> app and target the Confirm button inside the dialog while an identical one exists on the page.</li>
+        <li>Work the <a href="../code-review.html">Code Review Gauntlet</a> — the same defects, seen from the reviewer's side, which is how interviews present them.</li>
         <li>Take the <a href="../practice-tests.html?category=automation">Automation quiz</a> — the locator questions are in there.</li>
         <li>Re-read one of your own existing test files and count the smells. Most suites have several.</li>
       </ol>

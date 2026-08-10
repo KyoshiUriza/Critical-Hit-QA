@@ -45,7 +45,12 @@
     "learn-frameworks": "learn",
     "learn-locators": "learn",
     "learn-sql": "learn",
-    "playwright-errors": "automation-lab"
+    "playwright-errors": "automation-lab",
+    // Deliberately NOT a 12th nav item. The header needs 1200px for 11 items
+    // and collapses at 1250 — a new item costs ~80px and would put the row
+    // back over its own breakpoint. Reached from Automation Lab, the Learn
+    // track, and Playwright Errors instead.
+    "code-review": "automation-lab"
   };
 
   var AUTHOR = "Kyoshi Uriza";

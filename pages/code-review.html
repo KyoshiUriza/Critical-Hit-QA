@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; object-src 'none'; frame-src 'none'; base-uri 'self'; form-action 'self'" />
+  <meta name="referrer" content="no-referrer" />
+  <title>Code Review Gauntlet — Critical Hit QA</title>
+  <link rel="stylesheet" href="../css/styles.css" />
+</head>
+<body data-page="code-review" data-depth="1">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div id="site-header"></div>
+
+  <main id="main" class="container">
+    <div class="page-header">
+      <h1>Code Review Gauntlet</h1>
+      <p>The hands-on round most automation interviews actually run: here is a test, tell me what is wrong with it.</p>
+    </div>
+
+    <section class="panel panel-accent">
+      <h2>How this is scored — read this first</h2>
+      <p>
+        You get a snippet and a list of possible criticisms. Tick the ones that
+        genuinely apply. <strong>Some of them do not.</strong>
+      </p>
+      <p>
+        Both directions count. Missing a real defect costs you, and flagging
+        clean code costs you too — because in a real review that is the more
+        expensive mistake. An engineer who objects to everything gets their
+        comments discounted, and interviewers are watching for exactly that.
+        Ticking every box will score badly on purpose.
+      </p>
+      <p class="text-dim m-0">
+        Snippets are Playwright in JavaScript, but the defects — sleeps, shared
+        state, brittle locators, assertions that cannot fail — are the same in
+        Cypress, Selenium, and any framework you will be handed.
+      </p>
+    </section>
+
+    <section class="panel">
+      <div class="lab-ex-head">
+        <div>
+          <span class="text-dim text-sm" id="ex-position"></span>
+          <h2 class="m-0" id="ex-title"></h2>
+        </div>
+        <div class="lab-ex-nav">
+          <span class="tag" id="ex-difficulty"></span>
+          <button class="btn btn-ghost btn-sm" id="prev-btn" data-testid="cr-prev">← Previous</button>
+          <button class="btn btn-ghost btn-sm" id="next-btn" data-testid="cr-next">Next →</button>
+        </div>
+      </div>
+
+      <p id="ex-brief" data-testid="cr-brief"></p>
+
+      <pre class="code" id="ex-code" data-testid="cr-code"></pre>
+
+      <h3>What would you raise in review?</h3>
+      <ul class="cr-issues" id="issue-list" data-testid="cr-issues"></ul>
+
+      <button class="btn btn-primary" id="grade-btn" data-testid="cr-grade">Submit review</button>
+
+      <div class="hidden mt-4" id="cr-verdict" data-testid="cr-verdict" role="status" aria-live="polite"></div>
+
+      <div class="hidden mt-4" id="fixed-wrap" data-testid="cr-fixed">
+        <h3>How it reads after the fix</h3>
+        <pre class="code" id="fixed-code"></pre>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>What interviewers are really checking</h2>
+      <p>The snippet is a prompt. The signal they are reading is how you talk about it.</p>
+      <ul>
+        <li><strong>Do you name the failure mode, or just the rule?</strong> "Don't use sleeps" is a rule. "This is 5s slower than it needs to be and still fails on a slow runner" is understanding.</li>
+        <li><strong>Do you prioritise?</strong> A test that cannot fail matters more than an untidy screenshot call. Leading with the nit signals you cannot tell them apart.</li>
+        <li><strong>Do you separate defects from preferences?</strong> Saying "nit:" out loud is a senior habit and costs nothing.</li>
+        <li><strong>Can you say why the fix is better</strong> rather than just what to change? "Auto-retrying assertions wait exactly as long as needed" beats "use expect instead".</li>
+        <li><strong>Are you kind about it?</strong> They are imagining you reviewing their team's code. Blunt is fine; contemptuous is disqualifying.</li>
+      </ul>
+      <p class="text-dim">
+        If you are asked to review live and you spot nothing, say what you would
+        check and why — reading order, then assertions, then locators, then
+        state. A visible method beats silence.
+      </p>
+    </section>
+
+    <div class="panel app-next-steps">
+      <span class="text-dim">Related:</span>
+      <a class="btn btn-primary btn-sm" href="learn/locators.html">Locators &amp; Flaky Tests →</a>
+      <a class="btn btn-ghost btn-sm" href="playwright-errors.html">Playwright Errors</a>
+      <a class="btn btn-ghost btn-sm" href="automation-lab.html">Automation Lab</a>
+      <a class="btn btn-ghost btn-sm" href="interview-questions.html">Interview Questions</a>
+    </div>
+  </main>
+
+  <div id="site-footer"></div>
+
+  <script src="../js/test-hooks.js"></script>
+  <script src="../js/site-chrome.js"></script>
+  <script src="../js/data/defects.js"></script>
+  <script src="../js/profiles.js"></script>
+  <script src="../js/progress.js"></script>
+  <script src="../js/rpg.js"></script>
+  <script src="../js/data/code-review-exercises.js"></script>
+  <script src="../js/code-review.js"></script>
+</body>
+</html>
