@@ -64,4 +64,53 @@ test.describe('practice app catalogue', () => {
       expect(keys, `${app} has a buggy build but no defect catalogue`).toContain(app);
     }
   });
+
+  test('the seeded-defect count claimed in the docs matches the catalogue', async ({ page }) => {
+    // Same guard as the app count, for the same reason: removing "password
+    // minimum length not enforced" from the login catalogue left README and
+    // the Buy Me a Coffee copy claiming 31 when there were 30.
+    await page.goto('/pages/bug-bounty.html?reset');
+    const total = await page.evaluate(() =>
+      Object.values(window.APP_DEFECTS).reduce((n, a) => n + a.defects.length, 0)
+    );
+
+    for (const file of ['README.md', 'docs/buy-me-a-coffee-blurb.md']) {
+      const text = fs.readFileSync(path.join(ROOT, file), 'utf8');
+      const claims = [...text.matchAll(/(\d+)\s+(?:real\s+|seeded\s+|total\s+)?defects?/gi)]
+        .map((m) => Number(m[1]))
+        .filter((n) => n > 5);   // ignore per-app figures and prose numbers
+      for (const claim of claims) {
+        expect(claim, `${file} claims ${claim} defects, catalogue has ${total}`).toBe(total);
+      }
+    }
+  });
+
+  test('every seeded defect has a hint that says how to reproduce it', async ({ page }) => {
+    // A defect nobody can find is not an exercise. The one that prompted this
+    // was reachable only through DevTools and said so nowhere.
+    await page.goto('/pages/bug-bounty.html?reset');
+    const thin = await page.evaluate(() => {
+      const out = [];
+      Object.entries(window.APP_DEFECTS).forEach(([app, a]) => {
+        a.defects.forEach((d) => {
+          if (!d.hint || d.hint.trim().length < 20) out.push(app + '/' + d.id);
+        });
+      });
+      return out;
+    });
+    expect(thin, 'defects whose hint is too thin to act on').toEqual([]);
+  });
+
+  test('the clean login does not enforce password composition at sign-in', async ({ page }) => {
+    // The reference build was modelling the wrong pattern: length and
+    // composition are registration-time rules. Enforcing them at sign-in adds
+    // no security, leaks the policy, and locks out older accounts.
+    await page.goto('/practice-apps/login.html?reset');
+    await page.getByTestId('login-email').fill('demo@qa.test');
+    await page.getByTestId('login-password').fill('x');
+    await page.getByTestId('login-submit').click();
+
+    const err = (await page.getByTestId('login-password-error').textContent()) || '';
+    expect(err, 'sign-in must not complain about password length').not.toMatch(/8 characters|at least/i);
+  });
 });

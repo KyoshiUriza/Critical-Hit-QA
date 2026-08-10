@@ -64,7 +64,7 @@
         <ul class="text-dim text-sm">
           <li>Email must be present and RFC-valid (require a domain with a dot).</li>
           <li>Email comparison must be case-insensitive; leading/trailing whitespace trimmed.</li>
-          <li>Password must be present, min 8 chars.</li>
+          <li>Password must be present. <strong>No length or composition rule at sign-in</strong> — those are registration-time rules; enforcing them here leaks the policy and locks out older accounts.</li>
           <li>Valid creds: <code class="inline">demo@qa.test</code> / <code class="inline">Passw0rd!</code>.</li>
           <li>After 3 failed attempts, lock for 30 seconds. Counter resets on success.</li>
           <li>"Show" button toggles password visibility both ways; label updates.</li>
@@ -74,6 +74,14 @@
         <h3>Testable attributes</h3>
         <p class="text-dim text-sm">
           Same <code class="inline">data-testid</code>s as the clean build: <code class="inline">login-email</code>, <code class="inline">login-password</code>, <code class="inline">login-submit</code>, <code class="inline">toggle-password</code>, <code class="inline">remember-me</code>, <code class="inline">email-error</code>, <code class="inline">password-error</code>, <code class="inline">login-result</code>.
+        </p>
+        <p class="text-dim text-sm">
+          One rule above cannot be checked on screen at all. "Remember me
+          persists only the email" is a claim about <strong>storage</strong> — verify it in
+          DevTools → Application → Local Storage, not by looking at the page.
+          Getting into that habit is the point: plenty of real defects are
+          invisible in the UI and obvious the moment you look at what was
+          actually written.
         </p>
       </div>
     </div>
@@ -88,7 +96,6 @@
           <li><strong>Case-sensitive email comparison.</strong> <code class="inline">Demo@qa.test</code> with the correct password fails — email compare should be case-insensitive.</li>
           <li><strong>Email whitespace not trimmed.</strong> <code class="inline">"demo@qa.test "</code> (trailing space) fails validation.</li>
           <li><strong>Empty password bypasses validation.</strong> Submitting with the correct email and blank password shows a "Welcome" success — should require a password.</li>
-          <li><strong>Password minimum length not enforced.</strong> Any non-empty password is accepted format-wise; a 1-char password produces no error.</li>
           <li><strong>Lockout counter not reset on successful login.</strong> Two failed attempts, then a successful login, then a failed attempt → immediately locked. Counter should reset on success.</li>
           <li><strong>"Show" toggle is one-way.</strong> Clicking again does not hide the password or change the label back to "Show".</li>
           <li><strong>Info-leak in error messages.</strong> Wrong password on the valid email says "Wrong password"; any other email says "No such account" — enables user enumeration.</li>
@@ -178,9 +185,10 @@
           if (email && !pw) {
             D.trigger("empty-password"); // reached submit with an empty password
           }
-          if (pw && pw.length > 0 && pw.length < 8 && pw === VALID_PW) {
-            D.trigger("pw-length");
-          }
+          // No pw-length detector: that "defect" was removed from the
+          // catalogue. A login form should not enforce length or composition —
+          // it adds no security, leaks the policy, and locks out older
+          // accounts. Registration is where the rule belongs.
         }
 
         let hasError = false;

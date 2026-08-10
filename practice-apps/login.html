@@ -50,7 +50,7 @@
         <h3>Behavior spec (your oracle)</h3>
         <ul class="text-dim text-sm">
           <li>Email must be present, valid format.</li>
-          <li>Password must be present, min 8 chars.</li>
+          <li>Password must be present. <strong>No length or composition rule at sign-in</strong> — those are registration-time rules; enforcing them here leaks the policy and locks out older accounts.</li>
           <li>Valid creds: <code class="inline">demo@qa.test</code> / <code class="inline">Passw0rd!</code>.</li>
           <li>After 3 failed attempts, account is locked for 30 seconds.</li>
           <li>"Show" password button toggles input type; button label updates.</li>
@@ -140,7 +140,6 @@
           setError("email-error", "Enter a valid email address."); hasError = true;
         }
         if (!pw) { setError("password-error", "Password is required."); hasError = true; }
-        else if (pw.length < 8) { setError("password-error", "Password must be at least 8 characters."); hasError = true; }
         if (hasError) return;
 
         if (email.toLowerCase() === VALID_EMAIL && pw === VALID_PW) {
