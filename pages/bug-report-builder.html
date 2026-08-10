@@ -116,9 +116,16 @@
         <pre class="code" id="preview" style="min-height:400px; white-space:pre-wrap;">(Fill in the form and click Export...)</pre>
         <div style="display:flex; gap:8px;">
           <button class="btn btn-ghost btn-sm" id="copy-preview">Copy to clipboard</button>
-          <button class="btn btn-ghost btn-sm" id="save-report">Save to progress</button>
+          <button class="btn btn-primary btn-sm" id="save-report" data-testid="save-artifact">Save to portfolio</button>
+          <button class="btn btn-ghost btn-sm" id="new-draft" data-testid="new-draft">New draft</button>
         </div>
-        <p class="text-dim" style="font-size:0.85rem; margin-top:12px;" id="save-note"></p>
+        <p class="text-dim builder-status" id="save-note" role="status" aria-live="polite" data-testid="save-note"></p>
+        <p class="text-dim builder-autosave-note">Drafts autosave as you type.</p>
+      </div>
+
+      <div class="panel">
+        <h3>Your saved bug reports</h3>
+        <div id="recent-drafts" data-testid="recent-drafts"></div>
       </div>
     </div>
 
@@ -139,7 +146,9 @@
 
   <script src="../js/test-hooks.js"></script>
   <script src="../js/site-chrome.js"></script>
+  <script src="../js/data/defects.js"></script>
   <script src="../js/progress.js"></script>
+  <script src="../js/builder-core.js"></script>
   <script>
     const stepsContainer = document.getElementById("steps-container");
     function addStep(action = "", expected = "") {
@@ -292,14 +301,73 @@ ${br.notes ? "h3. Notes\n" + br.notes : ""}`;
       setTimeout(() => document.getElementById("save-note").textContent = "", 2000);
     });
 
-    document.getElementById("save-report").addEventListener("click", () => {
-      if (window.Progress) window.Progress.incrementBugReports();
-      document.getElementById("save-note").textContent = "Counted toward your progress dashboard.";
-      setTimeout(() => document.getElementById("save-note").textContent = "", 2500);
+    // ── Artifact persistence ──────────────────────────────────────────────
+    const FIELD_IDS = ["br-id","br-reporter","br-title","br-severity","br-priority",
+                       "br-env","br-freq","br-pre","br-expected","br-actual",
+                       "br-evidence","br-regression","br-notes"];
+
+    function applyFields(f) {
+      FIELD_IDS.forEach((id) => { if (f[id] !== undefined) document.getElementById(id).value = f[id]; });
+      stepsContainer.innerHTML = "";
+      (f.steps || []).forEach((st) => addStep(st.action || "", st.expected || ""));
+      if (!stepsContainer.children.length) addStep();
+    }
+
+    function collectFields() {
+      const out = {};
+      FIELD_IDS.forEach((id) => { out[id] = document.getElementById(id).value; });
+      out.steps = Array.from(stepsContainer.querySelectorAll(".step-row")).map((r) => ({
+        action: r.querySelector(".step-action").value,
+        expected: r.querySelector(".step-expected").value
+      }));
+      return out;
+    }
+
+    const core = new BuilderCore({
+      type: "bug-report",
+      collect: collectFields,
+      apply: applyFields,
+      clear: () => {
+        FIELD_IDS.forEach((id) => {
+          const el = document.getElementById(id);
+          if (el.tagName === "SELECT") el.selectedIndex = 0; else el.value = "";
+        });
+        stepsContainer.innerHTML = "";
+        addStep();
+        preview("(Fill in the form and click Export...)");
+      },
+      hasContent: (f) => !!(f["br-title"].trim() || f["br-actual"].trim() ||
+                            f.steps.some((st) => st.action.trim())),
+      titleOf: (f) => (f["br-id"] ? f["br-id"] + ": " : "") + (f["br-title"].trim() || "(untitled bug report)"),
+
+      // Closes the hunt -> log -> report loop: a defect ticked in Bug Bounty
+      // arrives here with its app, environment and title already filled.
+      prefillFromDefect: (appKey, defectId) => {
+        const app = (window.APP_DEFECTS || {})[appKey];
+        if (!app) return;
+        const d = (app.defects || []).filter((x) => x.id === defectId)[0];
+        document.getElementById("br-env").value =
+          navigator.userAgent.split(") ")[0].replace(/^Mozilla\/[\d.]+ \(/, "") +
+          " · practice-apps/" + appKey + "-broken.html";
+        if (d) {
+          document.getElementById("br-title").value = d.title + " (" + app.name + ")";
+          document.getElementById("br-severity").selectedIndex =
+            ({ critical: 0, high: 1, medium: 2, low: 3 })[d.severity] ?? 2;
+          document.getElementById("br-pre").value =
+            "Open practice-apps/" + appKey + "-broken.html with a clean state (?reset).";
+          stepsContainer.innerHTML = "";
+          addStep(d.hint, "");
+          addStep("", "");
+        }
+      }
     });
 
+    document.getElementById("save-report").addEventListener("click", () => core.saveNow());
+    document.getElementById("new-draft").addEventListener("click", () => core.startNew());
+    core.init();
+
     document.getElementById("clear-form").addEventListener("click", () => {
-      if (!confirm("Clear the form?")) return;
+      if (!confirm("Clear the form? Your saved drafts are kept — this only empties the fields.")) return;
       document.querySelectorAll("#br-id, #br-reporter, #br-title, #br-env, #br-pre, #br-expected, #br-actual, #br-evidence, #br-regression, #br-notes").forEach((el) => el.value = "");
       stepsContainer.innerHTML = "";
       preview("(Fill in the form and click Export...)");
@@ -323,6 +391,7 @@ ${br.notes ? "h3. Notes\n" + br.notes : ""}`;
       document.getElementById("br-evidence").value = "- Screenshot: [attach in tracker]\n- Repro rate: 5/5 attempts";
       document.getElementById("br-regression").value = "Present in current build; earlier clean build (login.html) does not exhibit this.";
       document.getElementById("br-notes").value = "Server-side check for empty password is likely missing. Impacts every account.";
+      core.touch();   // .value assignments emit no input event, so autosave needs telling
     });
 
     addStep();

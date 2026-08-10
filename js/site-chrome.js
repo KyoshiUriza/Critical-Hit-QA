@@ -25,7 +25,7 @@
     { key: "practice-tests",label: "Quizzes",    href: "pages/practice-tests.html" },
     { key: "practice-apps", label: "Practice Apps", href: "pages/practice-apps.html" },
     { key: "bug-bounty",    label: "Bug Bounty", href: "pages/bug-bounty.html" },
-    { key: "builders",      label: "Builders",   href: "pages/bug-report-builder.html" },
+    { key: "portfolio",     label: "Portfolio",  href: "pages/portfolio.html" },
     { key: "automation-lab",label: "Automation", href: "pages/automation-lab.html" },
     { key: "progress",      label: "Progress",   href: "pages/progress.html" },
     { key: "study-plan",    label: "Study Plan", href: "pages/study-plan.html" },
@@ -34,8 +34,8 @@
 
   // Pages that share a nav highlight with a sibling (e.g. both builders).
   var ACTIVE_ALIAS = {
-    "test-case-builder": "builders",
-    "bug-report-builder": "builders",
+    "test-case-builder": "portfolio",
+    "bug-report-builder": "portfolio",
     "interview-questions": "resources",
     "tester-lattice": "progress",
     "learn-manual": "learn",

@@ -89,9 +89,16 @@
         <pre class="code" id="preview" style="min-height:400px; white-space:pre-wrap;">(Fill in the form and click Export...)</pre>
         <div style="display:flex; gap:8px;">
           <button class="btn btn-ghost btn-sm" id="copy-preview">Copy to clipboard</button>
-          <button class="btn btn-ghost btn-sm" id="save-tc">Save to progress</button>
+          <button class="btn btn-primary btn-sm" id="save-tc" data-testid="save-artifact">Save to portfolio</button>
+          <button class="btn btn-ghost btn-sm" id="new-draft" data-testid="new-draft">New draft</button>
         </div>
-        <p class="text-dim" style="font-size:0.85rem; margin-top:8px;" id="save-note"></p>
+        <p class="text-dim builder-status" id="save-note" role="status" aria-live="polite" data-testid="save-note"></p>
+        <p class="text-dim builder-autosave-note">Drafts autosave as you type.</p>
+      </div>
+
+      <div class="panel">
+        <h3>Your saved test cases</h3>
+        <div id="recent-drafts" data-testid="recent-drafts"></div>
       </div>
     </div>
   </main>
@@ -99,6 +106,7 @@
   <script src="../js/test-hooks.js"></script>
   <script src="../js/site-chrome.js"></script>
   <script src="../js/progress.js"></script>
+  <script src="../js/builder-core.js"></script>
   <script>
     (function () {
       const stepsContainer = document.getElementById("steps-container");
@@ -183,11 +191,44 @@ ${tc.expectedResult || "-"}
         document.getElementById("save-note").textContent = "Copied to clipboard.";
         setTimeout(() => document.getElementById("save-note").textContent = "", 2000);
       });
-      document.getElementById("save-tc").addEventListener("click", () => {
-        if (window.Progress) window.Progress.incrementTestCases();
-        document.getElementById("save-note").textContent = "Counted toward your progress dashboard.";
-        setTimeout(() => document.getElementById("save-note").textContent = "", 2500);
+      // ── Artifact persistence ────────────────────────────────────────────
+      const FIELD_IDS = ["tc-id","tc-title","tc-feature","tc-priority","tc-type",
+                         "tc-pre","tc-data","tc-expected"];
+
+      const core = new BuilderCore({
+        type: "test-case",
+        collect: () => {
+          const out = {};
+          FIELD_IDS.forEach((id) => { out[id] = document.getElementById(id).value; });
+          out.steps = Array.from(stepsContainer.querySelectorAll(".step-row")).map((r) => ({
+            action: r.querySelector(".step-action").value,
+            expected: r.querySelector(".step-expected").value
+          }));
+          return out;
+        },
+        apply: (f) => {
+          FIELD_IDS.forEach((id) => { if (f[id] !== undefined) document.getElementById(id).value = f[id]; });
+          stepsContainer.innerHTML = "";
+          (f.steps || []).forEach((st) => addStep(st.action || "", st.expected || ""));
+          if (!stepsContainer.children.length) addStep();
+        },
+        clear: () => {
+          FIELD_IDS.forEach((id) => {
+            const el = document.getElementById(id);
+            if (el.tagName === "SELECT") el.selectedIndex = 0; else el.value = "";
+          });
+          stepsContainer.innerHTML = "";
+          addStep();
+          preview("(Fill in the form and click Export...)");
+        },
+        hasContent: (f) => !!(f["tc-title"].trim() || f["tc-expected"].trim() ||
+                              f.steps.some((st) => st.action.trim())),
+        titleOf: (f) => (f["tc-id"] ? f["tc-id"] + ": " : "") + (f["tc-title"].trim() || "(untitled test case)")
       });
+
+      document.getElementById("save-tc").addEventListener("click", () => core.saveNow());
+      document.getElementById("new-draft").addEventListener("click", () => core.startNew());
+      core.init();
       document.getElementById("clear-form").addEventListener("click", () => {
         if (!confirm("Clear the form?")) return;
         document.querySelectorAll("#tc-id, #tc-title, #tc-feature, #tc-pre, #tc-data, #tc-expected").forEach((el) => el.value = "");
@@ -207,6 +248,7 @@ ${tc.expectedResult || "-"}
         addStep("Enter valid password in the Password field.", "Password is masked. No error is shown.");
         addStep("Click the Sign in button.", "Loading state is shown briefly.");
         document.getElementById("tc-expected").value = "The welcome message 'Welcome, demo@qa.test' is shown. The user session is established (no login form visible).";
+      core.touch();   // .value assignments emit no input event, so autosave needs telling
       });
 
       addStep();

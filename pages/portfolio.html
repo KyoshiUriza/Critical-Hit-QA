@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Portfolio — QA Prep Hub</title>
+  <link rel="stylesheet" href="../css/styles.css" />
+</head>
+<body data-page="portfolio" data-depth="1">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div id="site-header"></div>
+
+  <main id="main" class="container">
+    <div class="page-header">
+      <h1>My Portfolio</h1>
+      <p>Every bug report and test case you've drafted, kept in this browser. Export the lot as one document to hand to an interviewer.</p>
+    </div>
+
+    <div class="next-action hidden" id="empty-state" data-testid="portfolio-empty">
+      <h2>Nothing drafted yet.</h2>
+      <p>
+        Find a defect in a practice app, write it up, and it lands here. Drafts
+        autosave as you type — you don't have to remember to save.
+      </p>
+      <div style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
+        <a class="btn btn-primary" href="practice-apps.html#buggy">Start a bug hunt →</a>
+        <a class="btn btn-ghost" href="bug-report-builder.html">Open the Bug Report Builder</a>
+      </div>
+    </div>
+
+    <div id="portfolio-body" class="hidden">
+      <div class="panel">
+        <div class="lab-ex-head">
+          <h2>Export</h2>
+          <div class="lab-ex-nav">
+            <button class="btn btn-primary btn-sm" id="export-md" data-testid="export-markdown">Export all as Markdown</button>
+            <button class="btn btn-ghost btn-sm" id="export-json" data-testid="export-json">Export as JSON</button>
+            <button class="btn btn-ghost btn-sm" id="copy-export" data-testid="copy-export">Copy</button>
+            <button class="btn btn-ghost btn-sm" id="download-export" data-testid="download-export">Download</button>
+          </div>
+        </div>
+        <p class="text-dim" id="export-hint">
+          One document containing every artifact, newest first. Paste it into a
+          portfolio repo, a Notion page, or an email.
+        </p>
+        <pre class="code hidden" id="export-out" data-testid="export-out"></pre>
+      </div>
+
+      <div class="two-col">
+        <div class="panel">
+          <h2>Bug reports <span class="text-dim" id="count-bugs"></span></h2>
+          <div id="list-bugs" data-testid="list-bug-report"></div>
+        </div>
+        <div class="panel">
+          <h2>Test cases <span class="text-dim" id="count-cases"></span></h2>
+          <div id="list-cases" data-testid="list-test-case"></div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <div id="site-footer"></div>
+
+  <script src="../js/test-hooks.js"></script>
+  <script src="../js/site-chrome.js"></script>
+  <script src="../js/data/defects.js"></script>
+  <script src="../js/progress.js"></script>
+  <script src="../js/rpg.js"></script>
+  <script src="../js/portfolio.js"></script>
+</body>
+</html>

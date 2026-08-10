@@ -1343,3 +1343,29 @@ th[data-sort]:focus-visible { outline: 3px solid var(--focus-ring-color); outlin
   font-size: var(--fs-md);
   font-family: var(--font-mono);
 }
+
+/* Builder autosave status. */
+.builder-status { font-size: var(--fs-md); margin-top: var(--sp-3); min-height: 1.2em; }
+.builder-status.is-warning { color: var(--warn); }
+.builder-autosave-note { font-size: var(--fs-sm); margin-top: var(--sp-1); opacity: 0.8; }
+
+/* Portfolio artifact rows. */
+.artifact-row {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: var(--sp-3);
+  border: 1px solid var(--border);
+  border-radius: var(--rad-md);
+  margin-bottom: var(--sp-2);
+}
+.artifact-main { flex: 1; min-width: 0; }
+.artifact-title {
+  font-weight: 600;
+  font-size: var(--fs-base);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.artifact-meta { color: var(--text-dim); font-size: var(--fs-sm); font-family: var(--font-mono); }
+.bounty-writeup { margin-top: var(--sp-2); }

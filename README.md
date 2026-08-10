@@ -12,7 +12,8 @@ A self-contained static web app for Software QA interview prep. No build step, n
 **The core loop**
 - **Practice Apps** — 14 working mini-apps: 10 clean, 4 with intentionally seeded defects (31 total).
 - **Bug Bounty** — tick off the defects you found; scored against the seeded catalog, weighted by severity.
-- **Bug Report Builder** — turn a find into a real report. Exports Markdown / GitHub Issue / Jira / JSON.
+- **Bug Report Builder** — turn a find into a real report. Exports Markdown / GitHub Issue / Jira / JSON. A defect ticked in Bug Bounty carries straight through with its app, environment and title prefilled.
+- **My Portfolio** — every draft you've written, autosaved as you type. Export the lot as one Markdown document to hand to an interviewer.
 
 **Learn & drill**
 - **Learn tracks** — manual testing, automation testing, codeless (AccelQ), code-based frameworks (Playwright, Selenium), **locators & flaky tests**, and **SQL for QA**.
@@ -60,6 +61,7 @@ The suite (`tests/`) is five specs:
 | `focus-contrast.spec.js` | WCAG 2.4.11 — tab-walks each page and measures the focus indicator against the surface behind it |
 | `header.spec.js` | No nav item escapes the header at 10 widths (375–1440px); the collapse toggle; chip and brand never wrap |
 | `labs.spec.js` | Locator Lab grading, SQL Sandbox execution, and the JS/TS code toggle |
+| `portfolio.spec.js` | Draft autosave and reload, the Bug Bounty → report loop, and Markdown export |
 
 The contrast specs exist because hand-auditing a palette does not survive a
 second pass — six WCAG failures shipped despite an earlier manual fix round.
@@ -92,6 +94,7 @@ See [HOSTING.md](HOSTING.md). Netlify Drop is the 60-second path; Netlify-via-gi
 QA Website Project/
 ├── index.html
 ├── README.md  ROADMAP.md  HOSTING.md
+├── docs/adr/                       # architecture decisions
 ├── netlify.toml                    # publish dir, security + cache headers
 ├── package.json  playwright.config.js
 ├── .github/workflows/
@@ -109,6 +112,8 @@ QA Website Project/
 │   ├── sql-sandbox.js              # SQL exercise controller
 │   ├── progress.js                 # localStorage state (qaprep_progress_v1)
 │   ├── rpg.js                      # derived RPG layer (ranks, XP, unlocks)
+│   ├── builder-core.js             # autosave + artifact persistence, both builders
+│   ├── portfolio.js                # artifact list and Markdown export
 │   ├── quiz.js  interview.js  home.js
 │   └── data/                       # quiz-questions, interview-questions, defects
 ├── pages/
@@ -117,6 +122,7 @@ QA Website Project/
 │   ├── practice-tests.html  interview-questions.html  practice-apps.html
 │   ├── bug-bounty.html  automation-lab.html  resources.html
 │   ├── test-case-builder.html  bug-report-builder.html
+│   ├── portfolio.html              # saved artifacts + export
 │   └── progress.html  tester-lattice.html  study-plan.html
 ├── practice-apps/                  # 8 clean + 4 buggy
 ├── tests/                          # smoke, regression, contrast, focus-contrast,

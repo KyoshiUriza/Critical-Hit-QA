@@ -83,7 +83,9 @@
                         <span class="tag difficulty-${d.severity === "critical" ? "hard" : d.severity === "high" ? "hard" : d.severity === "medium" ? "medium" : "easy"}">${d.severity.toUpperCase()}</span>
                         <strong>${isFound ? d.title : "(tick to reveal or use \"Reveal all\")"}</strong>
                       </div>
-                      ${isFound ? `<div class="text-dim" style="font-size:0.85rem; margin-top:4px;">Reproduces via: ${d.hint}</div>` : ""}
+                      ${isFound ? `<div class="text-dim" style="font-size:var(--fs-md); margin-top:4px;">Reproduces via: ${d.hint}</div>
+                      <a class="btn btn-ghost btn-sm bounty-writeup" data-testid="write-up"
+                         href="bug-report-builder.html?app=${key}&defect=${d.id}">Write this up →</a>` : ""}
                     </div>
                   </label>
                 </li>
@@ -114,6 +116,14 @@
       else if (pct >= 40) verdict = "Solid start — dig into the calculations and edge cases.";
       document.getElementById("overall-summary").textContent = `${foundW} of ${totalW} severity points caught. ${verdict}`;
     }
+
+    // The write-up link lives inside the defect's <label>; without this the
+    // label steals the click and toggles the checkbox instead of navigating.
+    container.addEventListener("click", (e) => {
+      if (e.target.classList && e.target.classList.contains("bounty-writeup")) {
+        e.stopPropagation();
+      }
+    });
 
     container.addEventListener("change", (e) => {
       if (!e.target.matches('input[type="checkbox"][data-defect]')) return;

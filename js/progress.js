@@ -21,7 +21,19 @@
     if (!data.bugReports) data.bugReports = 0;
     if (!data.testCases) data.testCases = 0;
     if (!data.streak) data.streak = { lastDate: null, days: 0 };
+    // The site advertises "export it into your portfolio" but only ever stored
+    // a counter — close the tab and the authoring was gone. Artifacts hold the
+    // actual drafts.
+    if (!Array.isArray(data.artifacts)) data.artifacts = [];
     return data;
+  }
+
+  // Storage is finite and a portfolio is not a database. Cap it, and tell the
+  // caller rather than silently dropping their work.
+  const MAX_ARTIFACTS = 100;
+
+  function newId() {
+    return "a" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
   }
 
   function today() {
@@ -85,6 +97,74 @@
       data.testCases += 1;
       updateStreak(data);
       save(data);
+    },
+
+    // ── Artifacts ────────────────────────────────────────────────────────
+    // type: "bug-report" | "test-case"
+    // fields: the builder's own shape, stored verbatim so it can be reloaded
+    //         into the form it came from.
+
+    listArtifacts(type) {
+      const data = ensure(load());
+      const all = data.artifacts.slice().sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0));
+      return type ? all.filter((a) => a.type === type) : all;
+    },
+
+    getArtifact(id) {
+      return ensure(load()).artifacts.filter((a) => a.id === id)[0] || null;
+    },
+
+    // Returns the id so a caller can keep editing the same record instead of
+    // creating a new one on every save.
+    saveArtifact(artifact) {
+      const data = ensure(load());
+      const now = Date.now();
+      let id = artifact.id;
+
+      if (id) {
+        const existing = data.artifacts.filter((a) => a.id === id)[0];
+        if (existing) {
+          existing.title = artifact.title || existing.title;
+          existing.fields = artifact.fields;
+          existing.updatedAt = now;
+          save(data);
+          return id;
+        }
+      }
+
+      id = newId();
+      data.artifacts.unshift({
+        id: id,
+        type: artifact.type,
+        title: artifact.title || "(untitled)",
+        fields: artifact.fields,
+        createdAt: now,
+        updatedAt: now
+      });
+
+      // Oldest first out.
+      if (data.artifacts.length > MAX_ARTIFACTS) {
+        data.artifacts.sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0));
+        data.artifacts = data.artifacts.slice(0, MAX_ARTIFACTS);
+      }
+
+      // Keep the dashboard counters consistent with what is actually stored.
+      if (artifact.type === "bug-report") data.bugReports = data.artifacts.filter((a) => a.type === "bug-report").length;
+      if (artifact.type === "test-case")  data.testCases  = data.artifacts.filter((a) => a.type === "test-case").length;
+
+      updateStreak(data);
+      save(data);
+      return id;
+    },
+
+    deleteArtifact(id) {
+      const data = ensure(load());
+      const before = data.artifacts.length;
+      data.artifacts = data.artifacts.filter((a) => a.id !== id);
+      data.bugReports = data.artifacts.filter((a) => a.type === "bug-report").length;
+      data.testCases  = data.artifacts.filter((a) => a.type === "test-case").length;
+      save(data);
+      return before !== data.artifacts.length;
     },
 
     setStudyPlanDay(planKey, dayIndex, done) {

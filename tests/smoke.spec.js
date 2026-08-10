@@ -33,6 +33,7 @@ const ALL_PAGES = [
   'pages/learn/locators.html',
   'pages/learn/sql.html',
   'pages/playwright-errors.html',
+  'pages/portfolio.html',
 ];
 
 test.describe('shared chrome', () => {
@@ -84,6 +85,7 @@ test('the core loop is reachable from the hero in three clicks', async ({ page }
   await page.locator('.site-header nav a', { hasText: 'Bug Bounty' }).click();
   await expect(page.locator('h1')).toContainText('Bug Bounty');
 
-  await page.locator('.site-header nav a', { hasText: 'Builders' }).click();
-  await expect(page.locator('h1')).toContainText('Bug Report Builder');
+  // "Builders" became "Portfolio" — the destination rather than the tool.
+  await page.locator('.site-header nav a', { hasText: 'Portfolio' }).click();
+  await expect(page.locator('h1')).toContainText('My Portfolio');
 });
