@@ -25,20 +25,61 @@
   "use strict";
 
   // ---------------------------------------------------------------------
-  // Paste the Amazon Associates tracking ID here to switch monetisation on.
-  // It looks like "yourname-20" and comes from Amazon Associates ->
-  // Account Settings -> Manage Your Tracking IDs. Nothing else needs editing.
+  // Amazon Associates tracking ID. Empty string switches monetisation off.
+  // From Associates -> Account Settings -> Manage Your Tracking IDs.
   // ---------------------------------------------------------------------
-  var ASSOCIATE_TAG = "";
+  var ASSOCIATE_TAG = "kyoshiuriza-20";
+
+  // SiteStripe stamps a linkId onto each link it generates. It is per-link and
+  // exists for Amazon's own reporting — it groups clicks by which link they
+  // came from. It does NOT carry the commission; `tag` does that alone.
+  //
+  // So a book with no entry here still earns normally. What it loses is the
+  // ability to tell that click apart from the others in the Associates
+  // dashboard. Reusing one book's linkId on another would be worse than
+  // omitting it: the earnings would still be right, but the reporting would
+  // quietly attribute them to the wrong title.
+  //
+  // To fill one in: open the product on Amazon while signed in to Associates,
+  // use SiteStripe -> Text, and copy the linkId out of the generated URL.
+  var LINK_IDS = {
+    "0321601912": "c1375273cd69e6676b80a898435c9a0f"  // Continuous Delivery
+    // "0471081124": "",  // Lessons Learned in Software Testing
+    // "1937785025": "",  // Explore It!
+    // "0321534468": "",  // Agile Testing
+    // "0321967054": "",  // More Agile Testing
+    // "0131495054": ""   // xUnit Test Patterns
+  };
 
   var DISCLOSURE =
     "As an Amazon Associate I earn from qualifying purchases. " +
     "Book links on this page are affiliate links — they cost you nothing extra, " +
     "and none of the recommendations were chosen because of them.";
 
+  function asinOf(url) {
+    var m = url.match(/\/dp\/([A-Z0-9]{10})/);
+    return m ? m[1] : null;
+  }
+
+  // Rebuilds the SiteStripe parameter set rather than storing six near-identical
+  // long URLs in the markup. Same result, one place to change it.
+  //
+  // Note SiteStripe emits gaOptInStatus twice in its copied URLs. A repeated
+  // query parameter has no meaning beyond the first, so it appears once here.
   function tagUrl(url) {
     if (url.indexOf("tag=") !== -1) return url;
-    return url + (url.indexOf("?") === -1 ? "?" : "&") + "tag=" + encodeURIComponent(ASSOCIATE_TAG);
+
+    var asin = asinOf(url);
+    var params = [
+      "gaOptInStatus=true",
+      "linkCode=ll2",
+      "tag=" + encodeURIComponent(ASSOCIATE_TAG)
+    ];
+    if (asin && LINK_IDS[asin]) params.push("linkId=" + encodeURIComponent(LINK_IDS[asin]));
+    params.push("language=en_US");
+    params.push("ref_=as_li_ss_tl");
+
+    return url + (url.indexOf("?") === -1 ? "?" : "&") + params.join("&");
   }
 
   function decorate() {

@@ -153,6 +153,32 @@ function check(ok, label, detail) {
   const saved = await page.getByTestId('artifact-bug-report').count();
   check(saved === 1, 'a draft autosaves and appears in the portfolio', saved + ' found');
 
+  // Worth checking in production specifically: affiliate decoration runs in
+  // the browser, so a script that fails to deploy leaves plain links that look
+  // completely normal and silently earn nothing.
+  console.log('\nAffiliate links:');
+  await page.goto(BASE + '/pages/resources.html', { waitUntil: 'networkidle' });
+  const aff = await page.evaluate(() => {
+    const links = [...document.querySelectorAll('a[data-affiliate="amazon"]')];
+    const box = document.querySelector('[data-testid="affiliate-disclosure"]');
+    return {
+      total: links.length,
+      tagged: links.filter((a) => /[?&]tag=[^&]+/.test(a.href)).length,
+      sponsored: links.filter((a) => /sponsored/.test(a.rel)).length,
+      tags: [...new Set(links.map((a) => (a.href.match(/[?&]tag=([^&]+)/) || [])[1]))],
+      disclosureShown: !!box && box.offsetParent !== null,
+    };
+  });
+  check(aff.total > 0 && aff.tagged === aff.total,
+        'every book link carries a tracking ID', `${aff.tagged}/${aff.total} tagged`);
+  check(aff.tags.length === 1, 'one tracking ID across all links', aff.tags.join(', ') || 'none');
+  check(aff.sponsored === aff.total,
+        'monetised links are marked rel=sponsored', `${aff.sponsored}/${aff.total}`);
+  // Undisclosed affiliate links breach the Associates Operating Agreement and
+  // the FTC endorsement guides. If the links are live, this must be too.
+  check(aff.tagged === 0 || aff.disclosureShown,
+        'the affiliate disclosure is visible', aff.disclosureShown ? 'shown' : 'MISSING');
+
   console.log('\nFooter links:');
   await page.goto(BASE + '/index.html', { waitUntil: 'networkidle' });
   const links = await page.evaluate(() => {

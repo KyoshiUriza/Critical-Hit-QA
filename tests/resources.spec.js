@@ -89,27 +89,66 @@ test.describe('Amazon Associates compliance', () => {
     }
   });
 
-  test('a configured tag reaches every book link and reveals the disclosure', async ({ page }) => {
-    // Proves the wiring works without waiting for a real tracking ID. Runs the
-    // same decoration the shipped file does, with a tag injected.
+  test('every book link carries the tracking ID and the SiteStripe parameters', async ({ page }) => {
     await page.goto(PAGE + '?reset');
-    const src = affiliateSrc().replace('var ASSOCIATE_TAG = ""', 'var ASSOCIATE_TAG = "unittest-20"');
-    await page.evaluate((code) => {
-      // eslint-disable-next-line no-eval
-      window.eval(code);
-    }, src);
+    const tag = configuredTag();
+    test.skip(!tag, 'no tracking ID configured');
 
     const hrefs = await page
       .locator('a[data-affiliate="amazon"]')
       .evaluateAll((els) => els.map((e) => e.getAttribute('href')));
     expect(hrefs.length).toBe(6);
-    for (const href of hrefs) {
-      expect(href).toContain('tag=unittest-20');
-    }
 
-    const disclosure = page.getByTestId('affiliate-disclosure');
-    await expect(disclosure).toBeVisible();
-    await expect(disclosure).toContainText('As an Amazon Associate I earn from qualifying purchases');
+    for (const href of hrefs) {
+      const url = new URL(href);
+      // tag is the only parameter that attributes commission. If this is
+      // wrong or missing, the link earns nothing and nothing else matters.
+      expect(url.searchParams.get('tag'), `wrong tag on ${href}`).toBe(tag);
+      expect(url.searchParams.get('linkCode')).toBe('ll2');
+      expect(url.searchParams.get('language')).toBe('en_US');
+      expect(url.searchParams.get('ref_')).toBe('as_li_ss_tl');
+      expect(url.searchParams.get('gaOptInStatus')).toBe('true');
+
+      // SiteStripe emits gaOptInStatus twice in its copied URLs; a repeated
+      // query parameter means nothing past the first, so we emit one.
+      expect(href.match(/gaOptInStatus=/g).length, 'duplicated parameter').toBe(1);
+      expect(href.match(/tag=/g).length, 'tag applied more than once').toBe(1);
+    }
+  });
+
+  test('linkId is present only where a real one is known', async ({ page }) => {
+    // A linkId is per-link Amazon reporting metadata, not the commission.
+    // Reusing one book's id on another would keep the earnings correct while
+    // silently attributing them to the wrong title in the dashboard — so a
+    // book without its own id must carry none at all.
+    await page.goto(PAGE + '?reset');
+    test.skip(!configuredTag(), 'no tracking ID configured');
+
+    const known = affiliateSrc().match(/"([A-Z0-9]{10})":\s*"([a-f0-9]{16,})"/g) || [];
+    const knownAsins = known.map((k) => k.match(/"([A-Z0-9]{10})"/)[1]);
+    expect(knownAsins.length, 'expected at least one known linkId').toBeGreaterThan(0);
+
+    const links = await page.locator('a[data-affiliate="amazon"]').evaluateAll((els) =>
+      els.map((e) => e.getAttribute('href'))
+    );
+
+    const seen = new Set();
+    for (const href of links) {
+      const asin = href.match(/\/dp\/([A-Z0-9]{10})/)[1];
+      const linkId = new URL(href).searchParams.get('linkId');
+      if (knownAsins.includes(asin)) {
+        expect(linkId, `${asin} has a known linkId but did not emit it`).toBeTruthy();
+        expect(seen.has(linkId), `linkId reused across products: ${linkId}`).toBe(false);
+        seen.add(linkId);
+      } else {
+        expect(linkId, `${asin} emitted a linkId it does not own`).toBeNull();
+      }
+    }
+  });
+
+  test('monetised links are marked sponsored and the disclosure is shown', async ({ page }) => {
+    await page.goto(PAGE + '?reset');
+    test.skip(!configuredTag(), 'no tracking ID configured');
 
     const rels = await page
       .locator('a[data-affiliate="amazon"]')
@@ -118,15 +157,9 @@ test.describe('Amazon Associates compliance', () => {
       expect(rel, 'monetised links should be marked sponsored').toContain('sponsored');
       expect(rel).toContain('noopener');
     }
-  });
 
-  test('applying the tag twice does not double it', async ({ page }) => {
-    await page.goto(PAGE + '?reset');
-    const src = affiliateSrc().replace('var ASSOCIATE_TAG = ""', 'var ASSOCIATE_TAG = "unittest-20"');
-    await page.evaluate((code) => { window.eval(code); }, src);
-    await page.evaluate((code) => { window.eval(code); }, src);
-
-    const href = await page.locator('a[data-affiliate="amazon"]').first().getAttribute('href');
-    expect((href.match(/tag=/g) || []).length).toBe(1);
+    const disclosure = page.getByTestId('affiliate-disclosure');
+    await expect(disclosure).toBeVisible();
+    await expect(disclosure).toContainText('As an Amazon Associate I earn from qualifying purchases');
   });
 });
