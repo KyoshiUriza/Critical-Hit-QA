@@ -47,11 +47,26 @@ of running them through Jekyll.
 ### Verifying a deploy
 
 ```bash
-curl -sI https://kyoshiuriza.github.io/QAHub/ | head -1
+node verify-deploy.js
 ```
 
-Then click through: home → Practice Apps → Bug Bounty → Portfolio, and confirm
-the nav highlights correctly and no console errors appear.
+Drives the live site in a real browser and checks the things that can only
+break in production:
+
+- all 11 key pages return 200, render the injected chrome, load CSS, and
+  produce zero console errors and zero failed requests
+- no nav link escapes the `/QAHub/` subpath
+- repo internals (`tests/`, `package.json`, `README.md`) are **not** served —
+  catching a regression in the workflow's assemble step
+- the quiz, Locator Lab, and SQL Sandbox actually execute
+- a draft autosaves and appears in the portfolio
+- the footer points feedback at Issues rather than a mailto
+
+Exits non-zero on any problem, so it can gate a release.
+
+Pointing it at the local dev server will fail the "repo internals" block, and
+that is correct — `python -m http.server` serves the whole working directory
+while the deploy serves only the assembled `_site/`.
 
 ### If the first run fails
 
