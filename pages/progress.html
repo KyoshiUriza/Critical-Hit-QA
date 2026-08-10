@@ -234,7 +234,7 @@
       document.getElementById("import-file").click();
     });
     // Strict schema-validated import — never trust a file's contents.
-    const ALLOWED_CATEGORIES = new Set(["fundamentals", "manual", "automation", "api", "agile", "performance"]);
+    const ALLOWED_CATEGORIES = new Set(["fundamentals", "manual", "automation", "api", "agile", "performance", "sql"]);
     const ALLOWED_APPS = new Set(Object.keys(window.APP_DEFECTS || {}));
 
     function sanitizeProgress(raw) {

@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SQL for QA — Learn — QA Prep Hub</title>
+  <link rel="stylesheet" href="../../css/styles.css" />
+</head>
+<body data-page="learn-sql" data-depth="2">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div id="site-header"></div>
+
+  <main id="main" class="container">
+    <div class="page-header">
+      <h1>SQL for QA</h1>
+      <p>You don't need to write reports. You need to prove the UI actually wrote what it claimed, and to clean up after yourself.</p>
+    </div>
+
+    <div class="section-toc">
+      <h4>◈ On this page</h4>
+      <ul>
+        <li><a href="#why">Why a tester needs SQL</a></li>
+        <li><a href="#six">The six queries that cover most days</a></li>
+        <li><a href="#joins">Joins, without the diagram</a></li>
+        <li><a href="#null">NULL is not empty string</a></li>
+        <li><a href="#danger">Deleting test data without an incident</a></li>
+        <li><a href="#interview">What interviewers actually ask</a></li>
+        <li><a href="#practice">Practice</a></li>
+      </ul>
+    </div>
+
+    <section id="why" class="panel">
+      <h2>Why a tester needs SQL</h2>
+      <p>A UI that shows "Saved" is a claim, not evidence. SQL is how you check the claim. Three situations come up constantly:</p>
+      <ul>
+        <li><strong>Verify a write.</strong> The form said success — did a row actually appear, with the right values, in the right table?</li>
+        <li><strong>Set up state.</strong> You need a user with 47 orders and an expired subscription. Clicking through the UI to build that takes twenty minutes; a seed script takes one.</li>
+        <li><strong>Explain a defect.</strong> "The dashboard total is wrong" becomes actionable when you can say the aggregate query returns 14 but the UI renders 12.</li>
+      </ul>
+      <p>You are not expected to optimise queries. You are expected to read data confidently and not break the environment.</p>
+    </section>
+
+    <section id="six" class="panel">
+      <h2>The six queries that cover most days</h2>
+
+      <h3>1. Verify a record</h3>
+      <pre class="code">SELECT * FROM users WHERE email = 'qa@test.com';</pre>
+      <p class="text-dim">Confirm the UI wrote to the database. Run it before the action too — knowing the row didn't already exist is half the evidence.</p>
+
+      <h3>2. Check related data</h3>
+      <pre class="code">SELECT o.id, o.total, o.status
+FROM orders o
+JOIN users u ON o.user_id = u.id
+WHERE u.email = 'qa@test.com';</pre>
+      <p class="text-dim">Follow a record across tables after a workflow. Most "the data looks fine" bugs are actually a broken foreign key relationship.</p>
+
+      <h3>3. Count and group</h3>
+      <pre class="code">SELECT status, COUNT(*) AS total
+FROM orders
+GROUP BY status
+ORDER BY total DESC;</pre>
+      <p class="text-dim">Validate dashboard aggregates. If the UI says 12 Pending and this says 14, you have a filter bug — and you have the number to put in the report.</p>
+
+      <h3>4. Find the newest row</h3>
+      <pre class="code">SELECT * FROM logs
+ORDER BY created_at DESC
+LIMIT 10;</pre>
+      <p class="text-dim">Pull the record your test just created. <code class="inline">ORDER BY … DESC LIMIT n</code> is the single most-used pattern in test verification.</p>
+
+      <h3>5. Catch missing data</h3>
+      <pre class="code">SELECT * FROM users WHERE last_login IS NULL;</pre>
+      <p class="text-dim">NULL means "no value." It is not an empty string and it is not zero. Test both — see below.</p>
+
+      <h3>6. Clean up test data</h3>
+      <pre class="code">-- ALWAYS run the SELECT first.
+SELECT * FROM users WHERE email LIKE '%@test.example%';
+
+-- Only then, with the same WHERE clause:
+DELETE FROM users WHERE email LIKE '%@test.example%';</pre>
+      <p class="text-dim">The SELECT-first rule exists because <code class="inline">DELETE</code> has no undo. See the section below before you run this anywhere real.</p>
+    </section>
+
+    <section id="joins" class="panel">
+      <h2>Joins, without the diagram</h2>
+      <p>Four joins matter. The difference is only ever "what happens to rows with no match on the other side."</p>
+      <table class="data-table">
+        <thead><tr><th>Join</th><th>Returns</th><th>Test use</th></tr></thead>
+        <tbody>
+          <tr><td><code class="inline">INNER JOIN</code></td><td>Only rows matching in both tables</td><td>Default. "Orders that have a valid user."</td></tr>
+          <tr><td><code class="inline">LEFT JOIN</code></td><td>All left rows; NULLs where no match</td><td>Finding orphans — the highest-value join for a tester.</td></tr>
+          <tr><td><code class="inline">RIGHT JOIN</code></td><td>All right rows; NULLs where no match</td><td>Rare. Usually a LEFT JOIN written backwards.</td></tr>
+          <tr><td><code class="inline">FULL OUTER JOIN</code></td><td>Everything from both sides</td><td>Reconciliation between two systems.</td></tr>
+        </tbody>
+      </table>
+
+      <p class="mt-16"><strong>The orphan check</strong> — worth memorising, because it finds real data-integrity bugs:</p>
+      <pre class="code">-- Orders whose user no longer exists.
+SELECT o.id, o.user_id
+FROM orders o
+LEFT JOIN users u ON o.user_id = u.id
+WHERE u.id IS NULL;</pre>
+      <p class="text-dim">If this returns rows, either a delete cascaded wrongly or one never cascaded at all. Both are bugs worth filing.</p>
+    </section>
+
+    <section id="null" class="panel">
+      <h2>NULL is not empty string</h2>
+      <p>This distinction produces real defects and comes up in interviews often enough to be worth over-learning.</p>
+      <pre class="code">-- These are three DIFFERENT states:
+SELECT * FROM users WHERE nickname IS NULL;   -- never set
+SELECT * FROM users WHERE nickname = '';      -- set, but empty
+SELECT * FROM users WHERE nickname = ' ';     -- set to whitespace</pre>
+      <p>Two consequences that catch people out:</p>
+      <ul>
+        <li><code class="inline">nickname = NULL</code> never matches anything. NULL is not equal to itself. You must use <code class="inline">IS NULL</code>.</li>
+        <li><code class="inline">COUNT(column)</code> skips NULLs; <code class="inline">COUNT(*)</code> doesn't. A dashboard that undercounts is often exactly this.</li>
+      </ul>
+      <p><strong>The test-design takeaway:</strong> any nullable column has at least three cases to cover, not two.</p>
+    </section>
+
+    <section id="danger" class="panel panel-danger">
+      <h2>Deleting test data without an incident</h2>
+      <p>Every experienced tester has a story here, and the ones who don't have simply not run <code class="inline">DELETE</code> yet. Four rules:</p>
+      <ol>
+        <li><strong>SELECT first, always.</strong> Run the exact <code class="inline">WHERE</code> clause as a SELECT and read the row count. If it surprises you, stop.</li>
+        <li><strong>Wrap it in a transaction</strong> where the engine supports it:
+          <pre class="code">BEGIN;
+DELETE FROM users WHERE email LIKE '%@test.example%';
+-- check the reported row count, THEN:
+COMMIT;   -- or ROLLBACK; if it looks wrong</pre>
+        </li>
+        <li><strong>Never <code class="inline">DELETE</code> without a <code class="inline">WHERE</code>.</strong> It empties the table. Some clients have a safe-mode setting that blocks this — leave it on.</li>
+        <li><strong>Know which environment you're connected to.</strong> Colour-code your production connection in whatever client you use. The most expensive incidents in this category are a correct query run against the wrong database.</li>
+      </ol>
+      <p><strong>A note on <code class="inline">LIKE '%test%'</code>:</strong> that pattern matches <code class="inline">contest@real-customer.com</code>. Prefer a reserved domain like <code class="inline">@test.example</code> — <code class="inline">.example</code> is reserved by RFC 2606 and can never belong to a real user.</p>
+    </section>
+
+    <section id="interview" class="panel">
+      <h2>What interviewers actually ask</h2>
+      <ul>
+        <li><strong>"Write a query to find users who haven't logged in."</strong> Watch for the NULL trap — they want <code class="inline">IS NULL</code>, and often a follow-up about users who never had the column set versus users who logged out.</li>
+        <li><strong>"How would you verify this feature end to end?"</strong> A strong answer includes checking the database, not just the UI.</li>
+        <li><strong>"Second-highest salary."</strong> A classic. Know both approaches:
+          <pre class="code">-- With a subquery
+SELECT MAX(salary) FROM employees
+WHERE salary &lt; (SELECT MAX(salary) FROM employees);
+
+-- With a window function (preferred in modern engines)
+SELECT DISTINCT salary FROM (
+  SELECT salary, DENSE_RANK() OVER (ORDER BY salary DESC) AS rnk
+  FROM employees
+) ranked
+WHERE rnk = 2;</pre>
+        </li>
+        <li><strong>"Find duplicates."</strong> <code class="inline">GROUP BY … HAVING COUNT(*) &gt; 1</code>. The follow-up is usually "now delete them but keep one" — say out loud that you'd SELECT first.</li>
+        <li><strong>"What's the difference between <code class="inline">WHERE</code> and <code class="inline">HAVING</code>?"</strong> <code class="inline">WHERE</code> filters rows before grouping; <code class="inline">HAVING</code> filters groups after.</li>
+      </ul>
+    </section>
+
+    <section id="practice" class="panel panel-accent">
+      <h2>Practice — earn Star-Dust</h2>
+      <ol>
+        <li>Work the <a href="../../practice-apps/sql-sandbox.html">SQL Sandbox</a> — it runs real queries against an in-browser dataset and grades your answers.</li>
+        <li>Take the <a href="../practice-tests.html?category=sql">SQL quiz</a>.</li>
+        <li>For any practice app you've tested, write the query you'd run to verify the write actually happened.</li>
+        <li>Write the cleanup query for your own test data — then write the SELECT you'd run first.</li>
+      </ol>
+    </section>
+
+    <p class="mt-16"><a href="../learn.html">← Back to Learn</a></p>
+  </main>
+
+  <div id="site-footer"></div>
+
+  <script src="../../js/test-hooks.js"></script>
+  <script src="../../js/site-chrome.js"></script>
+  <script src="../../js/data/defects.js"></script>
+  <script src="../../js/progress.js"></script>
+  <script src="../../js/rpg.js"></script>
+</body>
+</html>

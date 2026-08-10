@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Practice: Locator Lab — QA Prep Hub</title>
+  <link rel="stylesheet" href="../css/styles.css" />
+</head>
+<body data-page="practice-app-detail" data-depth="1">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div id="site-header"></div>
+
+  <main id="main" class="container">
+    <div class="page-header">
+      <h1>Locator Lab</h1>
+      <p>Write a selector, get it graded live — for whether it matches, and for whether it will still match in six months.</p>
+    </div>
+
+    <div class="panel panel-warn">
+      <strong>How this works.</strong> Each exercise names one element in the sandbox below.
+      Type a CSS selector (or an XPath starting with <code class="inline">/</code>) and the lab
+      evaluates it against the real DOM: how many elements it matches, whether it hit the
+      right one, and whether it leans on anything that tends to break. Playwright's own
+      locator API is shown once you land it.
+    </div>
+
+    <div class="two-col locator-lab-layout">
+      <!-- ── Exercises ── -->
+      <div>
+        <div class="panel">
+          <div class="lab-ex-head">
+            <h2 id="ex-title">Exercise</h2>
+            <div class="lab-ex-nav">
+              <button class="btn btn-ghost btn-sm" id="ex-prev" data-testid="ex-prev">← Prev</button>
+              <span class="text-dim" id="ex-counter" data-testid="ex-counter"></span>
+              <button class="btn btn-ghost btn-sm" id="ex-next" data-testid="ex-next">Next →</button>
+            </div>
+          </div>
+
+          <p id="ex-brief" data-testid="ex-brief"></p>
+          <p class="text-dim lab-teaches"><strong>Teaches:</strong> <span id="ex-teaches"></span></p>
+
+          <label class="lab-input-label" for="locator-input">Your selector</label>
+          <div class="lab-input-row">
+            <input type="text" id="locator-input" data-testid="locator-input"
+                   placeholder="e.g. [data-testid=&quot;signup-submit&quot;]"
+                   autocomplete="off" spellcheck="false" />
+            <button class="btn btn-primary" id="locator-check" data-testid="locator-check">Evaluate</button>
+          </div>
+
+          <div id="locator-result" data-testid="locator-result" role="status" aria-live="polite"></div>
+
+          <div class="lab-actions">
+            <button class="btn btn-ghost btn-sm" id="ex-hint" data-testid="ex-hint">Show a resilient answer</button>
+            <button class="btn btn-ghost btn-sm" id="ex-highlight" data-testid="ex-highlight">Flash the target</button>
+          </div>
+
+          <div id="ex-hint-box" class="hidden"></div>
+        </div>
+
+        <div class="panel">
+          <div class="lab-ex-head">
+            <h3 style="margin:0;">Playwright equivalent</h3>
+            <span data-code-lang-toggle></span>
+          </div>
+          <p class="text-dim" style="font-size:0.88rem;">Solve the exercise to reveal it.</p>
+          <div id="ex-playwright" class="code-sample"></div>
+        </div>
+      </div>
+
+      <!-- ── Scoring ── -->
+      <div>
+        <div class="panel">
+          <h3 style="margin-top:0;">Your run</h3>
+          <div class="quiz-progress"><div class="quiz-progress-bar" id="lab-progress" style="width:0%"></div></div>
+          <p class="text-dim" id="lab-score" data-testid="lab-score">0 of 6 solved</p>
+          <ul id="lab-checklist" class="lab-checklist"></ul>
+        </div>
+
+        <div class="panel">
+          <h3 style="margin-top:0;">Locator priority</h3>
+          <ol class="lab-priority">
+            <li><code class="inline">getByRole</code> <span class="text-dim">— what a screen reader sees. Tests a11y for free.</span></li>
+            <li><code class="inline">getByLabel</code> <span class="text-dim">— form controls.</span></li>
+            <li><code class="inline">getByPlaceholder</code> <span class="text-dim">— when there's no label (there should be).</span></li>
+            <li><code class="inline">getByText</code> <span class="text-dim">— static copy only, never stateful text.</span></li>
+            <li><code class="inline">getByTestId</code> <span class="text-dim">— your escape hatch. Stable by contract.</span></li>
+            <li><code class="inline">CSS</code> <span class="text-dim">— when nothing above fits.</span></li>
+            <li><code class="inline">XPath</code> <span class="text-dim">— last resort. Never absolute.</span></li>
+          </ol>
+        </div>
+
+        <div class="panel panel-danger">
+          <h3 style="margin-top:0;">Flake signatures</h3>
+          <p class="text-dim" style="font-size:0.88rem;">The lab flags these automatically:</p>
+          <ul class="text-dim" style="font-size:0.88rem;">
+            <li>Generated classes — <code class="inline">.css-1x2y3z</code>, <code class="inline">.sc-AbCdEf</code></li>
+            <li>Generated ids — <code class="inline">#input-48213</code>, <code class="inline">#:r7:</code></li>
+            <li>Positional — <code class="inline">:nth-child()</code>, <code class="inline">.nth(2)</code></li>
+            <li>Absolute XPath — <code class="inline">/html/body/div[3]/…</code></li>
+            <li>Stateful text — <code class="inline">"Cart (0)"</code></li>
+            <li>Matching more than one element</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── The sandbox: every exercise targets something in here ── -->
+    <h2 class="lab-sandbox-title">The sandbox</h2>
+    <p class="text-dim">A deliberately mixed-quality DOM. Some elements are well-marked; others carry exactly the traps you'll meet in a real app.</p>
+
+    <div class="app-frame lab-sandbox" id="lab-sandbox">
+
+      <section id="lab-signup" class="lab-block">
+        <h3>Create your account</h3>
+        <form onsubmit="return false;">
+          <div class="form-field">
+            <label for="input-48213">Email address</label>
+            <!-- Trap: the id looks usable but is regenerated on every render. -->
+            <input type="email" id="input-48213" class="css-1x2y3z" data-testid="signup-email" />
+          </div>
+          <div class="form-field">
+            <label for="input-48214">Password</label>
+            <input type="password" id="input-48214" class="css-9k8j7h" data-testid="signup-password" />
+          </div>
+          <button type="submit" class="btn btn-primary btn-a7f3c2" data-testid="signup-submit">Create account</button>
+        </form>
+      </section>
+
+      <section id="lab-table" class="lab-block">
+        <h3>Invoices</h3>
+        <table class="data-table">
+          <thead>
+            <tr><th>Invoice</th><th>Amount</th><th>Status</th><th>Actions</th></tr>
+          </thead>
+          <tbody>
+            <tr data-invoice="1041">
+              <td>Invoice #1041</td><td>$240.00</td><td>Paid</td>
+              <td><button class="btn btn-ghost btn-sm row-delete" data-testid="delete-1041">Delete</button></td>
+            </tr>
+            <tr data-invoice="1042">
+              <td>Invoice #1042</td><td>$1,180.00</td><td>Overdue</td>
+              <td><button class="btn btn-ghost btn-sm row-delete" data-testid="delete-1042">Delete</button></td>
+            </tr>
+            <tr data-invoice="1043">
+              <td>Invoice #1043</td><td>$95.50</td><td>Draft</td>
+              <td><button class="btn btn-ghost btn-sm row-delete" data-testid="delete-1043">Delete</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section id="lab-subscription" class="lab-block">
+        <h3>Subscription</h3>
+        <div class="sub-wrap"><div class="sub-inner"><div class="sub-deep">
+          <span class="badge-active" data-testid="sub-status" role="status">Active</span>
+          <span class="text-dim">Renews 12 Sep 2026</span>
+        </div></div></div>
+      </section>
+
+      <section class="lab-block">
+        <h3>Toolbar</h3>
+        <div class="lab-toolbar">
+          <!-- Trap: label carries the item count, so the text is state. -->
+          <button id="lab-cart-toggle" class="btn btn-ghost btn-sm" data-testid="cart-toggle">Cart (0)</button>
+          <button class="btn btn-ghost btn-sm" id="lab-add-item">Add an item</button>
+          <button class="btn btn-ghost btn-sm confirm-btn" data-testid="page-confirm">Confirm</button>
+          <button class="btn btn-primary btn-sm" id="lab-open-modal">Open modal</button>
+        </div>
+      </section>
+    </div>
+
+    <!-- Modal contains a Confirm identical to the one on the page behind it. -->
+    <div class="modal-backdrop" id="lab-modal-backdrop">
+      <div class="modal" role="dialog" aria-modal="true" aria-labelledby="lab-modal-title" id="lab-modal">
+        <h2 id="lab-modal-title">Confirm this action</h2>
+        <p>There is another button labelled "Confirm" on the page behind this dialog.</p>
+        <div class="modal-footer">
+          <button class="btn btn-ghost confirm-cancel" data-testid="modal-cancel">Cancel</button>
+          <button class="btn btn-primary confirm-btn" data-testid="modal-confirm">Confirm</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <div class="container">
+    <div class="panel app-next-steps">
+      <span class="text-dim">Ready for more?</span>
+      <a class="btn btn-primary btn-sm" href="../pages/learn/locators.html">Read the locator guide →</a>
+      <a class="btn btn-ghost btn-sm" href="../pages/automation-lab.html">Automation Lab</a>
+      <a class="btn btn-ghost btn-sm" href="../pages/practice-apps.html">All practice apps</a>
+    </div>
+  </div>
+
+  <script src="../js/test-hooks.js"></script>
+  <script src="../js/site-chrome.js"></script>
+  <script src="../js/data/defects.js"></script>
+  <script src="../js/data/locator-exercises.js"></script>
+  <script src="../js/progress.js"></script>
+  <script src="../js/rpg.js"></script>
+  <script src="../js/code-lang.js"></script>
+  <script src="../js/locator-lab.js"></script>
+  <div id="site-footer"></div>
+</body>
+</html>

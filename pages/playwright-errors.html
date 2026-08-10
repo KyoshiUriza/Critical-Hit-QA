@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Playwright Errors &amp; CLI — QA Prep Hub</title>
+  <link rel="stylesheet" href="../css/styles.css" />
+</head>
+<body data-page="playwright-errors" data-depth="1">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div id="site-header"></div>
+
+  <main id="main" class="container">
+    <div class="page-header">
+      <h1>Playwright Errors &amp; CLI</h1>
+      <p>The errors you'll actually hit, what causes them, and the command you need next.</p>
+    </div>
+
+    <div class="section-toc">
+      <h4>◈ On this page</h4>
+      <ul>
+        <li><a href="#errors">Ten errors and their real fixes</a></li>
+        <li><a href="#cli">CLI commands worth memorising</a></li>
+        <li><a href="#debug">A debugging order of operations</a></li>
+      </ul>
+    </div>
+
+    <section id="errors" class="panel">
+      <h2>Ten errors and their real fixes</h2>
+      <p class="text-dim">Note the pattern: most of these are a locator problem wearing a timing costume. Diagnose the locator first.</p>
+
+      <table class="data-table err-table">
+        <thead>
+          <tr><th>#</th><th>Error</th><th>Cause</th><th>Fix</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1</td>
+            <td><code class="inline">TimeoutError</code></td>
+            <td>Element never became actionable within the timeout.</td>
+            <td>Check the locator resolves at all before touching the timeout. Raising the timeout on a wrong locator just makes the failure slower.</td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td><code class="inline">strict mode violation</code></td>
+            <td>Locator resolved to several elements.</td>
+            <td>Scope to a stable ancestor or use <code class="inline">filter()</code>. Reaching for <code class="inline">.first()</code> re-introduces positional brittleness.</td>
+          </tr>
+          <tr>
+            <td>3</td>
+            <td><code class="inline">element is not visible</code></td>
+            <td>Hidden, zero-size, or covered by an overlay.</td>
+            <td>Wait for the state that reveals it. <code class="inline">scrollIntoViewIfNeeded()</code> only if genuinely off-screen. Never <code class="inline">{ force: true }</code> as a first move.</td>
+          </tr>
+          <tr>
+            <td>4</td>
+            <td><code class="inline">element is not attached to the DOM</code></td>
+            <td>Component re-rendered between locate and act.</td>
+            <td>Use a <code class="inline">Locator</code> — it re-resolves on each action. Captured <code class="inline">ElementHandle</code>s go stale.</td>
+          </tr>
+          <tr>
+            <td>5</td>
+            <td><code class="inline">Navigation timeout</code></td>
+            <td>Waiting for a load state that never settles.</td>
+            <td>Wait for a specific element or response. Avoid <code class="inline">networkidle</code> — polling apps never reach it.</td>
+          </tr>
+          <tr>
+            <td>6</td>
+            <td><code class="inline">Assertion failed</code></td>
+            <td>Expected value doesn't match actual.</td>
+            <td>Use auto-retrying web assertions (<code class="inline">expect(locator).toHaveText()</code>) rather than reading a value then asserting on the snapshot.</td>
+          </tr>
+          <tr>
+            <td>7</td>
+            <td><code class="inline">File upload failed</code></td>
+            <td>Wrong path, or the input is hidden behind a styled label.</td>
+            <td><code class="inline">setInputFiles()</code> on the <code class="inline">&lt;input type="file"&gt;</code> itself; resolve paths from <code class="inline">__dirname</code>.</td>
+          </tr>
+          <tr>
+            <td>8</td>
+            <td><code class="inline">Popup / new tab not detected</code></td>
+            <td>Listener attached after the action that opens it.</td>
+            <td>Start waiting <em>before</em> clicking — <code class="inline">Promise.all([page.waitForEvent('popup'), click])</code>.</td>
+          </tr>
+          <tr>
+            <td>9</td>
+            <td><code class="inline">Flaky test</code></td>
+            <td>Timing, shared state, or non-deterministic data.</td>
+            <td>Diagnose, don't retry. Run it 100× locally to measure the rate, then fix the cause.</td>
+          </tr>
+          <tr>
+            <td>10</td>
+            <td><code class="inline">Browser closed unexpectedly</code></td>
+            <td>Context or browser torn down while a test still runs.</td>
+            <td>Let the test runner own the lifecycle. Don't call <code class="inline">browser.close()</code> inside a test that uses the <code class="inline">page</code> fixture.</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="cli" class="panel">
+      <div class="lab-ex-head">
+        <h2 style="margin:0;">CLI commands worth memorising</h2>
+        <span data-code-lang-toggle></span>
+      </div>
+      <p class="text-dim">Commands are identical in JavaScript and TypeScript projects — only the spec files differ.</p>
+
+      <h3>Running</h3>
+      <pre class="code">npx playwright test                      # every spec
+npx playwright test login.spec.js        # one file
+npx playwright test --grep "checkout"    # by title pattern
+npx playwright test --project=chromium   # one browser
+npx playwright test --workers=1          # serial, for debugging
+npx playwright test --repeat-each=100    # flake hunting</pre>
+
+      <h3>Debugging</h3>
+      <pre class="code">npx playwright test --debug     # step through with the Inspector
+npx playwright test --ui        # interactive UI mode (best default)
+npx playwright test --headed    # watch it run in a real browser
+npx playwright test --trace on  # capture a full trace every run</pre>
+
+      <h3>Code generation &amp; reporting</h3>
+      <pre class="code">npx playwright codegen example.com   # record actions into a spec
+npx playwright show-report           # open the HTML report
+npx playwright show-trace trace.zip  # inspect a captured trace</pre>
+
+      <h3>Setup</h3>
+      <pre class="code">npm init playwright@latest        # scaffold a project
+npx playwright install            # download browser binaries
+npx playwright install --with-deps chromium   # CI-friendly, one browser</pre>
+
+      <div class="panel panel-accent mt-16">
+        <strong>The three that earn their keep.</strong>
+        <code class="inline">--ui</code> for authoring,
+        <code class="inline">--debug</code> when one test misbehaves, and
+        <code class="inline">show-trace</code> when CI fails and you can't reproduce locally.
+        Trace viewer turns "no idea why it failed" into a DOM snapshot at the moment of failure.
+      </div>
+    </section>
+
+    <section id="debug" class="panel">
+      <h2>A debugging order of operations</h2>
+      <p>When a test fails and the reason isn't obvious, work in this order. It's roughly cheapest-to-most-expensive.</p>
+      <ol>
+        <li><strong>Read the error, not the stack.</strong> Playwright's messages name the locator and what it resolved to. That's usually the whole answer.</li>
+        <li><strong>Does the locator resolve?</strong> <code class="inline">await expect(locator).toHaveCount(1)</code>. If it's 0 or 3, stop — you have a locator bug, not a timing bug.</li>
+        <li><strong>Open the trace.</strong> <code class="inline">show-trace</code> gives you a DOM snapshot before and after every action, plus network and console.</li>
+        <li><strong>Re-run in UI mode.</strong> <code class="inline">--ui</code> lets you step and re-run a single test without restarting the suite.</li>
+        <li><strong>Measure the flake rate.</strong> <code class="inline">--repeat-each=100 --workers=1</code>. "Sometimes" is not a diagnosis; 7/100 is.</li>
+        <li><strong>Isolate state.</strong> Run the test alone. If it passes alone and fails in the suite, you have leakage between tests.</li>
+      </ol>
+      <p class="mt-16 text-dim">Steps 1 and 2 resolve the large majority. The instinct to jump straight to raising timeouts is what turns a ten-minute fix into an afternoon.</p>
+    </section>
+
+    <div class="panel app-next-steps">
+      <span class="text-dim">Related:</span>
+      <a class="btn btn-primary btn-sm" href="learn/locators.html">Locators &amp; Flaky Tests →</a>
+      <a class="btn btn-ghost btn-sm" href="../practice-apps/locator-lab.html">Locator Lab</a>
+      <a class="btn btn-ghost btn-sm" href="automation-lab.html">Automation Lab</a>
+    </div>
+  </main>
+
+  <div id="site-footer"></div>
+
+  <script src="../js/test-hooks.js"></script>
+  <script src="../js/site-chrome.js"></script>
+  <script src="../js/data/defects.js"></script>
+  <script src="../js/progress.js"></script>
+  <script src="../js/rpg.js"></script>
+  <script src="../js/code-lang.js"></script>
+</body>
+</html>

@@ -129,8 +129,11 @@ html, body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 60px;
-  gap: 24px;
+  /* min-height, never a fixed height: a fixed 60px let the nav's second row
+     render outside the header box entirely. */
+  min-height: 60px;
+  gap: 16px;
+  flex-wrap: nowrap;
 }
 .brand {
   font-weight: 700;
@@ -145,19 +148,81 @@ html, body {
 }
 .nav {
   display: flex;
-  gap: 6px;
-  flex-wrap: wrap;
+  gap: 2px;
+  flex-wrap: nowrap;
+  align-items: center;
 }
 .nav a {
   color: var(--text-dim);
   text-decoration: none;
-  padding: 8px 12px;
+  padding: 8px 10px;
   border-radius: 6px;
-  font-size: 0.92rem;
-  transition: background 0.12s, color 0.12s;
+  font-size: 0.875rem;
+  white-space: nowrap;
+  transition: background var(--dur-fast), color var(--dur-fast);
 }
 .nav a:hover { background: var(--bg-elev-2); color: var(--text); }
 .nav a.active { color: var(--accent); background: var(--bg-elev-2); }
+
+/* Hamburger — hidden on wide viewports, the only nav control on narrow ones. */
+.nav-toggle {
+  display: none;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  width: 40px;
+  height: 36px;
+  cursor: pointer;
+  padding: 0;
+  align-items: center;
+  justify-content: center;
+  margin-left: auto;
+}
+.nav-toggle:hover { background: var(--bg-elev-2); }
+.nav-toggle-bars,
+.nav-toggle-bars::before,
+.nav-toggle-bars::after {
+  display: block;
+  width: 18px;
+  height: 2px;
+  background: var(--text);
+  border-radius: 1px;
+  position: relative;
+}
+.nav-toggle-bars::before,
+.nav-toggle-bars::after {
+  content: "";
+  position: absolute;
+  left: 0;
+}
+.nav-toggle-bars::before { top: -6px; }
+.nav-toggle-bars::after { top: 6px; }
+
+/* Below this width the 10 items cannot fit on one row without shrinking past
+   a comfortable tap target, so they move into a disclosure panel. */
+@media (max-width: 1180px) {
+  .nav-toggle { display: flex; }
+  .header-inner { flex-wrap: wrap; }
+  .nav {
+    display: none;
+    flex-basis: 100%;
+    flex-wrap: wrap;
+    gap: 4px;
+    padding: 8px 0 12px;
+    border-top: 1px solid var(--border);
+    margin-top: 4px;
+  }
+  .site-header.nav-open .nav { display: flex; }
+  .nav a { font-size: 0.92rem; padding: 10px 12px; }
+
+  /* rpg.js appends its chip last, but in the collapsed layout it belongs on
+     the top row beside the toggle — not below the nav panel. */
+  .header-inner .brand { order: 1; }
+  .header-inner .rpg-chip { order: 2; margin-left: auto; }
+  .header-inner .nav-toggle { order: 3; margin-left: 8px; }
+  .header-inner .nav { order: 4; }
+  .header-inner:not(:has(.rpg-chip)) .nav-toggle { margin-left: auto; }
+}
 
 /* Hero */
 .hero {
@@ -645,8 +710,8 @@ code.inline {
 }
 @media (max-width: 720px) {
   .two-col { grid-template-columns: 1fr; }
-  .header-inner { flex-direction: column; height: auto; padding: 12px 0; gap: 8px; }
   .hero h1 { font-size: 1.8rem; }
+  .nav { max-height: 60vh; overflow-y: auto; }
 }
 .mt-16 { margin-top: 16px; }
 .mb-16 { margin-bottom: 16px; }
@@ -940,3 +1005,201 @@ th[data-sort]:focus-visible { box-shadow: var(--focus-ring); }
   margin-top: 8px;
 }
 .app-next-steps .text-dim { margin-right: 4px; font-weight: 600; }
+
+/* ─── Code language toggle (JS default, TS alternative) ─── */
+.code-lang-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--bg-elev-2);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 3px;
+}
+.code-lang-label {
+  color: var(--text-dim);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 0 6px 0 8px;
+}
+.code-lang-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-dim);
+  font-family: inherit;
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 5px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background var(--dur-fast), color var(--dur-fast);
+}
+.code-lang-btn:hover { color: var(--text); }
+.code-lang-btn.active { background: var(--accent); color: var(--on-accent); }
+
+/* ─── Locator Lab ─── */
+.lab-ex-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+.lab-ex-head h2 { margin: 0; font-size: 1.15rem; }
+.lab-ex-nav { display: flex; align-items: center; gap: 8px; }
+.lab-ex-nav .text-dim { font-family: var(--font-mono); font-size: 0.82rem; }
+.lab-teaches { font-size: 0.88rem; }
+
+.lab-input-label {
+  display: block;
+  color: var(--text-dim);
+  font-size: 0.85rem;
+  margin: 16px 0 6px;
+}
+.lab-input-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.lab-input-row input {
+  flex: 1;
+  min-width: 220px;
+  padding: 11px 12px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+}
+.lab-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
+
+.lab-result { margin-top: 14px; }
+.lab-result:empty { display: none; }
+.lab-result-head { display: flex; align-items: center; gap: 8px; }
+.lab-result-icon {
+  width: 22px; height: 22px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 50%;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 0.8rem;
+  flex-shrink: 0;
+}
+.lab-result-msg { margin: 6px 0 0; font-size: 0.92rem; }
+.lab-result-pass    { padding: 14px; border-radius: 8px; border: 1px solid var(--accent-2); background: rgba(98,211,145,0.08); }
+.lab-result-pass    .lab-result-icon { background: var(--accent-2); color: var(--on-accent-2); }
+.lab-result-fragile { padding: 14px; border-radius: 8px; border: 1px solid var(--warn); background: rgba(242,193,78,0.08); }
+.lab-result-fragile .lab-result-icon { background: var(--warn); color: #1a1200; }
+.lab-result-strict  { padding: 14px; border-radius: 8px; border: 1px solid var(--accent); background: rgba(79,157,255,0.08); }
+.lab-result-strict  .lab-result-icon { background: var(--accent); color: var(--on-accent); }
+.lab-result-fail    { padding: 14px; border-radius: 8px; border: 1px solid var(--danger); background: rgba(255,107,107,0.08); }
+.lab-result-fail    .lab-result-icon { background: var(--danger); color: var(--on-accent); }
+
+.lab-smells { margin: 12px 0 0; padding-left: 18px; font-size: 0.88rem; color: var(--text-dim); }
+.lab-smells li { margin-bottom: 8px; }
+
+.lab-checklist { list-style: none; padding: 0; margin: 12px 0 0; }
+.lab-checklist li { margin-bottom: 4px; }
+.lab-checklist-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-dim);
+  font-family: inherit;
+  font-size: 0.88rem;
+  padding: 6px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+}
+.lab-checklist-btn:hover { background: var(--bg-elev-2); color: var(--text); }
+.lab-checklist li.solved .lab-checklist-btn { color: var(--accent-2); }
+
+.lab-priority { margin: 0; padding-left: 20px; font-size: 0.9rem; }
+.lab-priority li { margin-bottom: 6px; }
+
+.lab-sandbox-title { margin-top: 40px; }
+.lab-sandbox { margin-top: 12px; }
+.lab-block { padding: 18px 0; border-bottom: 1px solid var(--border); }
+.lab-block:last-child { border-bottom: none; }
+.lab-block h3 { margin-top: 0; }
+.lab-toolbar { display: flex; gap: 8px; flex-wrap: wrap; }
+.badge-active {
+  display: inline-block;
+  background: rgba(98,211,145,0.15);
+  color: var(--accent-2);
+  border: 1px solid var(--accent-2);
+  padding: 3px 12px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  margin-right: 10px;
+}
+
+/* Flash highlights during evaluation. */
+.lab-flash-right {
+  outline: 3px solid var(--accent-2) !important;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+.lab-flash-wrong {
+  outline: 3px dashed var(--danger) !important;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+@media (max-width: 900px) {
+  .locator-lab-layout { grid-template-columns: 1fr; }
+}
+
+/* ─── Modal primitives (shared; originally inline in modal.html) ─── */
+.modal-backdrop {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.55);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+.modal-backdrop.open { display: flex; }
+.modal {
+  background: var(--bg-elev);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 24px;
+  width: 90%;
+  max-width: 480px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+}
+.modal h2 { margin: 0 0 12px; }
+.modal-footer { display: flex; justify-content: flex-end; gap: 8px; margin-top: 20px; }
+
+/* ─── SQL Sandbox ─── */
+#sql-input {
+  width: 100%;
+  padding: 12px;
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--code-fg);
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  line-height: 1.5;
+  resize: vertical;
+}
+#sql-input:focus-visible { border-color: var(--accent); }
+
+.sql-table-wrap { overflow-x: auto; margin-top: 12px; }
+.sql-table-wrap .data-table { font-size: 0.85rem; }
+.sql-table-wrap .data-table th { white-space: nowrap; }
+.sql-caption { font-size: 0.82rem; margin: 0 0 6px; font-family: var(--font-mono); }
+
+/* NULL and '' must never look the same — that distinction is the lesson. */
+.sql-null  { color: var(--warn); font-style: italic; font-family: var(--font-mono); }
+.sql-empty { color: var(--text-dim); font-family: var(--font-mono); }
+
+.sql-schema-item { margin-bottom: 12px; font-size: 0.85rem; }
+.sql-schema-item strong { color: var(--accent); font-family: var(--font-mono); }
+.sql-schema-item .text-dim { font-family: var(--font-mono); font-size: 0.78rem; margin-top: 2px; }
+
+#sql-output { margin-top: 14px; }

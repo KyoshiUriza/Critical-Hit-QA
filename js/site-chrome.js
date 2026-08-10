@@ -41,7 +41,10 @@
     "learn-manual": "learn",
     "learn-automation": "learn",
     "learn-codeless": "learn",
-    "learn-frameworks": "learn"
+    "learn-frameworks": "learn",
+    "learn-locators": "learn",
+    "learn-sql": "learn",
+    "playwright-errors": "automation-lab"
   };
 
   var DONATE_URL = "https://buymeacoffee.com/kyoshiuriza";
@@ -85,8 +88,19 @@
     brand.href = p + "index.html";
     brand.textContent = "QA Prep Hub";
 
+    // Ten nav items cannot fit on a narrow viewport. Rather than let them wrap
+    // out of a fixed-height bar, collapse them behind a toggle.
+    var toggle = document.createElement("button");
+    toggle.className = "nav-toggle";
+    toggle.type = "button";
+    toggle.setAttribute("aria-expanded", "false");
+    toggle.setAttribute("aria-controls", "primary-nav");
+    toggle.setAttribute("aria-label", "Menu");
+    toggle.innerHTML = '<span class="nav-toggle-bars" aria-hidden="true"></span>';
+
     var nav = document.createElement("nav");
     nav.className = "nav";
+    nav.id = "primary-nav";
     nav.setAttribute("aria-label", "Main");
 
     NAV.forEach(function (item) {
@@ -100,7 +114,22 @@
       nav.appendChild(a);
     });
 
+    toggle.addEventListener("click", function () {
+      var open = header.classList.toggle("nav-open");
+      toggle.setAttribute("aria-expanded", open ? "true" : "false");
+    });
+
+    // Esc closes the menu and returns focus to the toggle.
+    header.addEventListener("keydown", function (e) {
+      if (e.key === "Escape" && header.classList.contains("nav-open")) {
+        header.classList.remove("nav-open");
+        toggle.setAttribute("aria-expanded", "false");
+        toggle.focus();
+      }
+    });
+
     inner.appendChild(brand);
+    inner.appendChild(toggle);
     inner.appendChild(nav);
     header.appendChild(inner);
     return header;

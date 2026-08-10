@@ -29,6 +29,108 @@ npx serve -p 8080
       <p class="text-dim mt-16">Update the <code class="inline">BASE_URL</code> in each example if you serve on a different port.</p>
     </div>
 
+    <!-- ─── JS / TS ─── -->
+    <section class="panel panel-accent" id="language">
+      <div class="lab-ex-head">
+        <h2 style="margin:0;">JavaScript or TypeScript?</h2>
+        <span data-code-lang-toggle></span>
+      </div>
+      <p>
+        Every Playwright example on this site is written in <strong>JavaScript by default</strong> —
+        it's the shorter path if you're learning automation rather than learning a type system.
+        Flip the toggle and the samples switch to TypeScript; the choice sticks across pages.
+      </p>
+      <p class="text-dim">
+        Worth knowing before you pick: <strong>Playwright test code is close to identical in both.</strong>
+        The fixtures are fully typed, so <code class="inline">page</code>, <code class="inline">expect</code>,
+        and locators get autocomplete in TypeScript without you annotating anything. The real differences
+        are the file extension, the import style, and how you type a Page Object.
+      </p>
+
+      <h3>What actually differs</h3>
+      <div class="code-sample">
+<pre class="code" data-lang="js">// tests/login.spec.js  —  JavaScript
+const { test, expect } = require('@playwright/test');
+// (ESM projects can also use: import { test, expect } from '@playwright/test';)
+
+test('signs in', async ({ page }) =&gt; {
+  await page.goto('/login');            // page is typed for you either way
+  await page.getByLabel('Email').fill('qa@test.com');
+});
+
+// A Page Object in JavaScript — no annotations needed.
+class LoginPage {
+  constructor(page) {
+    this.page = page;
+    this.email = page.getByLabel('Email');
+    this.submit = page.getByRole('button', { name: 'Sign in' });
+  }
+  async login(email, password) {
+    await this.email.fill(email);
+    await this.submit.click();
+  }
+}
+module.exports = { LoginPage };</pre>
+<pre class="code" data-lang="ts">// tests/login.spec.ts  —  TypeScript
+import { test, expect } from '@playwright/test';
+
+test('signs in', async ({ page }) =&gt; {
+  await page.goto('/login');            // page: Page, inferred from the fixture
+  await page.getByLabel('Email').fill('qa@test.com');
+});
+
+// A Page Object in TypeScript — annotate the constructor and the fields.
+import { type Page, type Locator } from '@playwright/test';
+
+export class LoginPage {
+  readonly page: Page;
+  readonly email: Locator;
+  readonly submit: Locator;
+
+  constructor(page: Page) {
+    this.page = page;
+    this.email = page.getByLabel('Email');
+    this.submit = page.getByRole('button', { name: 'Sign in' });
+  }
+
+  async login(email: string, password: string): Promise&lt;void&gt; {
+    await this.email.fill(email);
+    await this.submit.click();
+  }
+}</pre>
+      </div>
+
+      <h3 class="mt-16">Setup differences</h3>
+      <div class="code-sample">
+<pre class="code" data-lang="js">npm init playwright@latest
+#   -&gt; choose JavaScript
+#   -&gt; creates playwright.config.js and tests/example.spec.js
+
+# No compile step. Run directly:
+npx playwright test</pre>
+<pre class="code" data-lang="ts">npm init playwright@latest
+#   -&gt; choose TypeScript
+#   -&gt; creates playwright.config.ts, tests/example.spec.ts, tsconfig.json
+
+# Playwright transpiles on the fly — still no build step:
+npx playwright test
+
+# Optional: type-check separately in CI
+npx tsc --noEmit</pre>
+      </div>
+
+      <div class="panel mt-16">
+        <strong>Which should you learn?</strong>
+        <p class="text-dim" style="margin-bottom:0;">
+          If the job description says TypeScript, learn TypeScript — but learn it
+          <em>after</em> you can write a working test. The concepts that make automation hard
+          (locators, waits, isolation, flake) are identical in both. Types help most once your
+          suite is large enough that a rename breaks something silently, which is a problem you
+          have to earn.
+        </p>
+      </div>
+    </section>
+
     <!-- ─── Login example ─── -->
     <section class="panel">
       <h2>Login form — happy path + lockout</h2>
@@ -483,5 +585,9 @@ test('BUG: user input must not execute as HTML (XSS)', async ({ page }) =&gt; {
   </script>
   <script src="../js/test-hooks.js"></script>
   <script src="../js/site-chrome.js"></script>
+  <script src="../js/data/defects.js"></script>
+  <script src="../js/progress.js"></script>
+  <script src="../js/rpg.js"></script>
+  <script src="../js/code-lang.js"></script>
 </body>
 </html>

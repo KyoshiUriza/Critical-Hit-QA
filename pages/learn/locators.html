@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Locators &amp; Flaky Tests — Learn — QA Prep Hub</title>
+  <link rel="stylesheet" href="../../css/styles.css" />
+</head>
+<body data-page="learn-locators" data-depth="2">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div id="site-header"></div>
+
+  <main id="main" class="container">
+    <div class="page-header">
+      <h1>Locators &amp; Flaky Tests</h1>
+      <p>Locator choice is the single largest maintenance cost in UI automation — and the most common cause of tests that fail for reasons unrelated to the bug you were looking for.</p>
+    </div>
+
+    <div class="section-toc">
+      <h4>◈ On this page</h4>
+      <ul>
+        <li><a href="#priority">The priority order</a></li>
+        <li><a href="#smells">Six locator smells</a></li>
+        <li><a href="#strict">Strict mode, and why it's a feature</a></li>
+        <li><a href="#scoping">Scoping: the technique that solves most of it</a></li>
+        <li><a href="#waits">Locators vs. waits — a related failure</a></li>
+        <li><a href="#errors">Common Playwright errors, decoded</a></li>
+        <li><a href="#practice">Practice</a></li>
+      </ul>
+    </div>
+
+    <div class="panel panel-accent">
+      <strong>Practice as you read.</strong> The <a href="../../practice-apps/locator-lab.html">Locator Lab</a>
+      grades selectors live against a sandbox DOM built with exactly these traps — it tells you not just whether
+      your selector matches, but whether it will still match after the next deploy.
+    </div>
+
+    <section id="priority" class="panel">
+      <h2>The priority order</h2>
+      <p>Work down this list and stop at the first one that fits. The order is not arbitrary — it runs from "describes what the user perceives" to "describes where the element happens to sit in the DOM today."</p>
+
+      <table class="data-table">
+        <thead><tr><th>#</th><th>Locator</th><th>Use when</th><th>Why it's durable</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td><code class="inline">getByRole</code></td><td>Almost always</td><td>Matches the accessibility tree. Changes only when the element's meaning changes — and it tests a11y as a side effect.</td></tr>
+          <tr><td>2</td><td><code class="inline">getByLabel</code></td><td>Form controls</td><td>Labels are user-visible copy. If it changes, a human decided it should.</td></tr>
+          <tr><td>3</td><td><code class="inline">getByPlaceholder</code></td><td>Inputs with no label</td><td>Workable, but a missing label is itself an a11y defect worth filing.</td></tr>
+          <tr><td>4</td><td><code class="inline">getByText</code></td><td>Static copy</td><td>Fine for fixed text. Never for text that carries state.</td></tr>
+          <tr><td>5</td><td><code class="inline">getByTestId</code></td><td>Nothing above fits</td><td>Stable by contract — it exists only for tests, so nobody refactors it away by accident.</td></tr>
+          <tr><td>6</td><td><code class="inline">CSS</code></td><td>Structural targeting</td><td>Depends entirely on which attributes you lean on. See the smells below.</td></tr>
+          <tr><td>7</td><td><code class="inline">XPath</code></td><td>Genuinely last resort</td><td>Powerful, but the syntax invites absolute paths — the most brittle thing you can commit.</td></tr>
+        </tbody>
+      </table>
+
+      <p class="mt-16"><strong>The one-line version:</strong> locate the element the way a user would describe it, not the way the DOM happens to be assembled.</p>
+    </section>
+
+    <section id="smells" class="panel">
+      <h2>Six locator smells</h2>
+      <p>Each of these produces a test that passes in review and fails later — the expensive kind of failure, because nobody is watching when it breaks.</p>
+
+      <h3>1. Build-generated class names</h3>
+      <p><code class="inline">.css-1x2y3z</code>, <code class="inline">.sc-AbCdEf</code>, <code class="inline">.Button_root__3kd9f</code></p>
+      <p>CSS-in-JS and CSS Modules hash class names from file content. Change the stylesheet — or just upgrade the bundler — and every one of these changes. You will get a red suite from a deploy that touched no behaviour at all.</p>
+
+      <h3>2. Framework-generated ids</h3>
+      <p><code class="inline">#input-48213</code>, <code class="inline">#mui-4821</code>, <code class="inline">#:r7:</code></p>
+      <p>These are assigned per render. They differ between your machine and CI, and often between two runs on the same machine. This is the number one source of "it passes locally."</p>
+
+      <h3>3. Positional selectors</h3>
+      <p><code class="inline">:nth-child(3)</code>, <code class="inline">.nth(2)</code>, <code class="inline">tr[4]</code></p>
+      <p>Position is not identity. The failure mode here is the nastiest on the list: after a sort order changes or a row is inserted, the locator still <em>matches something</em> — just the wrong thing. The test keeps passing while asserting against the wrong record.</p>
+
+      <h3>4. Absolute XPath</h3>
+      <p><code class="inline">/html/body/div[2]/div[3]/main/div/form/button</code></p>
+      <p>This is what "Copy full XPath" in DevTools gives you. It encodes every ancestor. One new layout wrapper — a banner, an A/B test container, a theme provider — and every locator of this shape breaks simultaneously.</p>
+
+      <h3>5. Stateful text</h3>
+      <p><code class="inline">getByText('Cart (0)')</code>, <code class="inline">getByText('3 unread')</code></p>
+      <p>The text encodes application state, so the locator only matches in one state. Tests pass or fail depending on execution order — the definition of flaky.</p>
+
+      <h3>6. Styling attributes</h3>
+      <p><code class="inline">[style*="display: block"]</code>, <code class="inline">.mt-4</code></p>
+      <p>Presentation changes for visual reasons that have nothing to do with what the element <em>is</em>.</p>
+    </section>
+
+    <section id="strict" class="panel">
+      <h2>Strict mode, and why it's a feature</h2>
+      <p>When a Playwright locator resolves to more than one element, it throws rather than guessing:</p>
+      <pre class="code">Error: strict mode violation: locator('.row-delete') resolved to 3 elements</pre>
+      <p>This reads like an obstacle the first time you hit it. It isn't. The alternative — silently acting on the first match, which is what older tools did — means your test clicks Delete on whichever invoice happens to be first. It passes. It deletes the wrong record.</p>
+      <p><strong>Strict mode converts a silent wrong-element bug into a loud error.</strong> Fix it by narrowing, never by adding <code class="inline">.first()</code> reflexively — that just re-introduces the positional problem you were warned about.</p>
+    </section>
+
+    <section id="scoping" class="panel">
+      <h2>Scoping: the technique that solves most of it</h2>
+      <p>Most strict-mode violations are not "I need a more specific selector." They're "I need to say <em>which region</em> I mean." Chain from a stable ancestor:</p>
+
+      <div class="lab-ex-head">
+        <h3 style="margin:0;">Row-scoped action</h3>
+        <span data-code-lang-toggle></span>
+      </div>
+      <div class="code-sample">
+<pre class="code" data-lang="js">// Brittle: which of the three Delete buttons?
+await page.locator('.row-delete').nth(1).click();
+
+// Durable: name the row, then the action inside it.
+await page
+  .getByRole('row', { name: /Invoice #1042/ })
+  .getByRole('button', { name: 'Delete' })
+  .click();</pre>
+<pre class="code" data-lang="ts">// Brittle: which of the three Delete buttons?
+await page.locator('.row-delete').nth(1).click();
+
+// Durable: name the row, then the action inside it.
+await page
+  .getByRole('row', { name: /Invoice #1042/ })
+  .getByRole('button', { name: 'Delete' })
+  .click();</pre>
+      </div>
+
+      <p class="mt-16">The same shape solves duplicate buttons inside dialogs:</p>
+      <div class="code-sample">
+<pre class="code" data-lang="js">await page
+  .getByRole('dialog')
+  .getByRole('button', { name: 'Confirm' })
+  .click();</pre>
+<pre class="code" data-lang="ts">await page
+  .getByRole('dialog')
+  .getByRole('button', { name: 'Confirm' })
+  .click();</pre>
+      </div>
+
+      <p class="mt-16">Two more scoping tools worth knowing:</p>
+      <div class="code-sample">
+<pre class="code" data-lang="js">// filter() — narrow a set by what it contains
+await page.getByRole('listitem')
+  .filter({ hasText: 'Overdue' })
+  .getByRole('button', { name: 'Pay' })
+  .click();
+
+// and() — require several conditions at once
+await page.getByRole('button')
+  .and(page.getByTitle('Save draft'))
+  .click();</pre>
+<pre class="code" data-lang="ts">// filter() — narrow a set by what it contains
+await page.getByRole('listitem')
+  .filter({ hasText: 'Overdue' })
+  .getByRole('button', { name: 'Pay' })
+  .click();
+
+// and() — require several conditions at once
+await page.getByRole('button')
+  .and(page.getByTitle('Save draft'))
+  .click();</pre>
+      </div>
+    </section>
+
+    <section id="waits" class="panel">
+      <h2>Locators vs. waits — a related failure</h2>
+      <p>A locator problem and a timing problem produce the same symptom: an intermittent failure. Telling them apart saves hours.</p>
+      <ul>
+        <li><strong>Locator problem</strong> — fails consistently on a given state, or matches the wrong element. Reproduces reliably once you know the state.</li>
+        <li><strong>Timing problem</strong> — same locator, sometimes found, sometimes not. Usually correlates with machine load or network speed.</li>
+      </ul>
+      <p>Playwright's auto-waiting removes most timing problems for you. Before acting, it waits until the element is attached, visible, stable (not animating), enabled, and able to receive events. So:</p>
+      <div class="code-sample">
+<pre class="code" data-lang="js">// Wrong: fixed sleeps are both slow AND still flaky.
+await page.waitForTimeout(3000);
+await page.locator('#save').click();
+
+// Right: assert the condition you actually care about.
+await expect(page.getByRole('button', { name: 'Save' })).toBeEnabled();
+await page.getByRole('button', { name: 'Save' }).click();
+
+// Also right: let auto-wait do it. click() already waits for actionability.
+await page.getByRole('button', { name: 'Save' }).click();</pre>
+<pre class="code" data-lang="ts">// Wrong: fixed sleeps are both slow AND still flaky.
+await page.waitForTimeout(3000);
+await page.locator('#save').click();
+
+// Right: assert the condition you actually care about.
+await expect(page.getByRole('button', { name: 'Save' })).toBeEnabled();
+await page.getByRole('button', { name: 'Save' }).click();
+
+// Also right: let auto-wait do it. click() already waits for actionability.
+await page.getByRole('button', { name: 'Save' }).click();</pre>
+      </div>
+      <p class="mt-16"><strong>If you ever reach for <code class="inline">{ force: true }</code>,</strong> stop. That flag skips the actionability checks — it doesn't fix the reason the element wasn't actionable. Nine times in ten it's covered by something, disabled, or mid-animation, and forcing the click hides a real bug.</p>
+    </section>
+
+    <section id="errors" class="panel">
+      <h2>Common Playwright errors, decoded</h2>
+      <p>Most of these trace back to a locator or a wait. See the full reference on the <a href="../playwright-errors.html">Playwright Errors</a> page.</p>
+      <table class="data-table">
+        <thead><tr><th>Error</th><th>Usual cause</th><th>Fix</th></tr></thead>
+        <tbody>
+          <tr><td><code class="inline">strict mode violation</code></td><td>Locator matched several elements</td><td>Scope to an ancestor or use <code class="inline">filter()</code> — not <code class="inline">.first()</code></td></tr>
+          <tr><td><code class="inline">TimeoutError</code></td><td>Element never became actionable</td><td>Check the locator first; only then consider the wait</td></tr>
+          <tr><td><code class="inline">element is not visible</code></td><td>Hidden, zero-size, or covered</td><td>Wait for the state that reveals it; <code class="inline">scrollIntoViewIfNeeded()</code> if genuinely off-screen</td></tr>
+          <tr><td><code class="inline">element is not attached to the DOM</code></td><td>Re-rendered between locate and act</td><td>Use a <code class="inline">Locator</code> (lazy, re-resolves) rather than a captured handle</td></tr>
+          <tr><td><code class="inline">Navigation timeout</code></td><td>Waiting for a load event that never fires</td><td>Wait for a specific element or response, not <code class="inline">networkidle</code></td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="practice" class="panel panel-accent">
+      <h2>Practice — earn Star-Dust</h2>
+      <ol>
+        <li>Work all six exercises in the <a href="../../practice-apps/locator-lab.html">Locator Lab</a>. Aim for "Solid" on each — "Works now, breaks later" doesn't count.</li>
+        <li>Open the <a href="../../practice-apps/data-table.html">Data Table</a> app and write a locator for the Delete action on a specific employee, without using position.</li>
+        <li>Open the <a href="../../practice-apps/modal.html">Modal</a> app and target the Confirm button inside the dialog while an identical one exists on the page.</li>
+        <li>Take the <a href="../practice-tests.html?category=automation">Automation quiz</a> — the locator questions are in there.</li>
+        <li>Re-read one of your own existing test files and count the smells. Most suites have several.</li>
+      </ol>
+    </section>
+
+    <p class="mt-16"><a href="../learn.html">← Back to Learn</a></p>
+  </main>
+
+  <div id="site-footer"></div>
+
+  <script src="../../js/test-hooks.js"></script>
+  <script src="../../js/site-chrome.js"></script>
+  <script src="../../js/data/defects.js"></script>
+  <script src="../../js/progress.js"></script>
+  <script src="../../js/rpg.js"></script>
+  <script src="../../js/code-lang.js"></script>
+</body>
+</html>

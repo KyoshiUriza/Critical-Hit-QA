@@ -28,6 +28,11 @@ const ALL_PAGES = [
   'practice-apps/file-upload.html',
   'practice-apps/modal.html',
   'practice-apps/a11y-challenge.html',
+  'practice-apps/locator-lab.html',
+  'practice-apps/sql-sandbox.html',
+  'pages/learn/locators.html',
+  'pages/learn/sql.html',
+  'pages/playwright-errors.html',
 ];
 
 test.describe('shared chrome', () => {
@@ -41,7 +46,8 @@ test.describe('shared chrome', () => {
 
       // Chrome is JS-injected, so its presence proves site-chrome.js ran.
       await expect(page.locator('.site-header')).toBeVisible();
-      await expect(page.locator('.site-header nav.nav a')).toHaveCount(10);
+      const navCount = await page.evaluate(() => window.SiteChrome.NAV.length);
+      await expect(page.locator('.site-header nav.nav a')).toHaveCount(navCount);
       await expect(page.locator('.site-footer')).toBeVisible();
       await expect(page.getByTestId('donate-link')).toHaveAttribute('rel', 'noopener noreferrer');
 

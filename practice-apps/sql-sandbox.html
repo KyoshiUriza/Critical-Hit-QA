@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Practice: SQL Sandbox — QA Prep Hub</title>
+  <link rel="stylesheet" href="../css/styles.css" />
+</head>
+<body data-page="practice-app-detail" data-depth="1">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div id="site-header"></div>
+
+  <main id="main" class="container">
+    <div class="page-header">
+      <h1>SQL Sandbox</h1>
+      <p>Run real queries against a real dataset, in your browser. Graded on the result, so any correct approach passes.</p>
+    </div>
+
+    <div class="panel panel-warn">
+      <strong>What runs here.</strong> A small SQL engine supporting
+      <code class="inline">SELECT</code>, <code class="inline">JOIN</code> / <code class="inline">LEFT JOIN</code>,
+      <code class="inline">WHERE</code>, <code class="inline">GROUP BY</code> / <code class="inline">HAVING</code>,
+      <code class="inline">ORDER BY</code>, <code class="inline">LIMIT</code>, the aggregates, and
+      <code class="inline">DELETE</code>. Anything outside that subset returns an error rather than
+      pretending to work. Nothing here touches a server — the dataset lives in memory and
+      resets on reload.
+    </div>
+
+    <div class="two-col locator-lab-layout">
+      <div>
+        <div class="panel">
+          <div class="lab-ex-head">
+            <h2 id="sql-title">Exercise</h2>
+            <div class="lab-ex-nav">
+              <button class="btn btn-ghost btn-sm" id="sql-prev" data-testid="sql-prev">← Prev</button>
+              <span class="text-dim" id="sql-counter" data-testid="sql-counter"></span>
+              <button class="btn btn-ghost btn-sm" id="sql-next" data-testid="sql-next">Next →</button>
+            </div>
+          </div>
+
+          <p id="sql-brief" data-testid="sql-brief"></p>
+          <p class="text-dim lab-teaches"><strong>Teaches:</strong> <span id="sql-teaches"></span></p>
+
+          <label class="lab-input-label" for="sql-input">Your query</label>
+          <textarea id="sql-input" data-testid="sql-input" rows="5" spellcheck="false"
+                    placeholder="SELECT * FROM users WHERE …"></textarea>
+
+          <div class="lab-actions">
+            <button class="btn btn-primary" id="sql-run" data-testid="sql-run">Run query</button>
+            <button class="btn btn-ghost btn-sm" id="sql-hint" data-testid="sql-hint">Show a solution</button>
+            <button class="btn btn-ghost btn-sm" id="sql-reset" data-testid="sql-reset">Reset data</button>
+          </div>
+
+          <div id="sql-verdict" data-testid="sql-verdict" role="status" aria-live="polite"></div>
+          <div id="sql-output" data-testid="sql-output"></div>
+        </div>
+      </div>
+
+      <div>
+        <div class="panel">
+          <h3 style="margin-top:0;">Your run</h3>
+          <div class="quiz-progress"><div class="quiz-progress-bar" id="sql-progress" style="width:0%"></div></div>
+          <p class="text-dim" id="sql-score" data-testid="sql-score">0 of 8 solved</p>
+          <ul id="sql-checklist" class="lab-checklist"></ul>
+        </div>
+
+        <div class="panel">
+          <h3 style="margin-top:0;">Schema</h3>
+          <div id="sql-schema" class="sql-schema"></div>
+        </div>
+      </div>
+    </div>
+
+    <h2 class="lab-sandbox-title">The data</h2>
+    <p class="text-dim">Three tables. Look closely — there's an orphaned order, a NULL/empty-string pair, and an email that a careless <code class="inline">LIKE '%test%'</code> would wrongly match.</p>
+    <div id="sql-tables"></div>
+  </main>
+
+  <div class="container">
+    <div class="panel app-next-steps">
+      <span class="text-dim">Next:</span>
+      <a class="btn btn-primary btn-sm" href="../pages/learn/sql.html">Read the SQL guide →</a>
+      <a class="btn btn-ghost btn-sm" href="../pages/practice-tests.html?category=sql">Take the SQL quiz</a>
+      <a class="btn btn-ghost btn-sm" href="../pages/practice-apps.html">All practice apps</a>
+    </div>
+  </div>
+
+  <script src="../js/test-hooks.js"></script>
+  <script src="../js/site-chrome.js"></script>
+  <script src="../js/data/defects.js"></script>
+  <script src="../js/data/sql-exercises.js"></script>
+  <script src="../js/progress.js"></script>
+  <script src="../js/rpg.js"></script>
+  <script src="../js/mini-sql.js"></script>
+  <script src="../js/sql-sandbox.js"></script>
+  <div id="site-footer"></div>
+</body>
+</html>

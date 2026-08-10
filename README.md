@@ -11,15 +11,18 @@ A self-contained static web app for Software QA interview prep. No build step, n
 ## What's inside
 
 **The core loop**
-- **Practice Apps** — 12 working mini-apps: 8 clean, 4 with intentionally seeded defects (31 total).
+- **Practice Apps** — 14 working mini-apps: 10 clean, 4 with intentionally seeded defects (31 total).
 - **Bug Bounty** — tick off the defects you found; scored against the seeded catalog, weighted by severity.
 - **Bug Report Builder** — turn a find into a real report. Exports Markdown / GitHub Issue / Jira / JSON.
 
 **Learn & drill**
-- **Learn tracks** — manual testing, automation testing, codeless (AccelQ), and code-based frameworks (Playwright, Selenium).
+- **Learn tracks** — manual testing, automation testing, codeless (AccelQ), code-based frameworks (Playwright, Selenium), **locators & flaky tests**, and **SQL for QA**.
+- **Locator Lab** — type a selector, get it graded live against a sandbox DOM: does it match, does it match the *right* element, and will it survive the next deploy. Six exercises covering strict-mode violations, generated classes and ids, positional selectors, absolute XPath, and stateful text.
+- **SQL Sandbox** — a hand-rolled SQL engine (no dependencies) running real `SELECT` / `JOIN` / `GROUP BY` / `HAVING` / `DELETE` against an in-memory dataset seeded with an orphaned row and a NULL-vs-empty-string pair. Eight exercises, graded on the result so any correct approach passes.
+- **Playwright Errors & CLI** — the ten errors you'll actually hit, their real causes, and a debugging order of operations.
 - **Quizzes** — timed multiple-choice with instant explanations, filterable by category, deep-linkable via `?category=`.
 - **Interview Questions** — curated Q&A with model answers, searchable and filterable by difficulty.
-- **Automation Lab** — copy-paste Playwright / Cypress / Selenium specs that run against the practice apps, including a "bug-hunt regression suite" that fails against the buggy builds.
+- **Automation Lab** — copy-paste Playwright / Cypress / Selenium specs that run against the practice apps, including a "bug-hunt regression suite" that fails against the buggy builds. Playwright samples are **JavaScript by default with a TypeScript toggle** that persists across pages.
 
 **Build your portfolio**
 - **Test Case Builder** — structured test case authoring, exports Markdown or JSON.
@@ -90,12 +93,17 @@ QA Website Project/
 ├── js/
 │   ├── site-chrome.js              # single source of truth for header/footer
 │   ├── test-hooks.js               # ?reset and window.__qa
+│   ├── code-lang.js                # JS/TS toggle for Playwright samples
+│   ├── locator-lab.js              # live selector grading
+│   ├── mini-sql.js                 # dependency-free SQL engine
+│   ├── sql-sandbox.js              # SQL exercise controller
 │   ├── progress.js                 # localStorage state (qaprep_progress_v1)
 │   ├── rpg.js                      # derived RPG layer (ranks, XP, unlocks)
 │   ├── quiz.js  interview.js  home.js
 │   └── data/                       # quiz-questions, interview-questions, defects
 ├── pages/
-│   ├── learn.html + learn/{manual,automation,codeless,frameworks}.html
+│   ├── learn.html + learn/{manual,automation,codeless,frameworks,locators,sql}.html
+│   ├── playwright-errors.html      # errors + CLI reference
 │   ├── practice-tests.html  interview-questions.html  practice-apps.html
 │   ├── bug-bounty.html  automation-lab.html  resources.html
 │   ├── test-case-builder.html  bug-report-builder.html
@@ -111,7 +119,8 @@ These are deliberate. Breaking one requires an explicit trade-off, not a silent 
 - **Zero runtime dependencies.** No framework, no bundler, no CDN scripts, no external fonts or stylesheets. The site works offline and satisfies a strict CSP.
 - **Static only.** No backend, no accounts. State lives in `localStorage` per browser under `qaprep_progress_v1`.
 - **`data-testid` on every interactive element** in the practice apps — automation-first by design.
-- **One header, one footer.** [`js/site-chrome.js`](js/site-chrome.js) renders both; pages declare only `data-page` and `data-depth`. Never hand-write a nav.
+- **One header, one footer.** [`js/site-chrome.js`](js/site-chrome.js) renders both; pages declare only `data-page` and `data-depth`. Never hand-write a nav. The nav collapses behind an accessible toggle below 1180px — a fixed-height header once let items render outside it.
+- **JavaScript first.** Playwright examples default to JS; TypeScript is a toggle, not a fork. Add both variants inside a `.code-sample` wrapper with `data-lang="js"` / `data-lang="ts"`.
 - **User input never touches `innerHTML`.** Use `textContent` or `createElement` + `append`.
 - **Both themes are first-class.** Every color is a token with a light-mode override that meets WCAG AA.
 
@@ -120,6 +129,8 @@ These are deliberate. Breaking one requires an explicit trade-off, not a silent 
 - Quiz questions → append to [`js/data/quiz-questions.js`](js/data/quiz-questions.js).
 - Interview questions → append to [`js/data/interview-questions.js`](js/data/interview-questions.js) (new categories auto-tab).
 - Practice apps → new file in `practice-apps/`, link it from `pages/practice-apps.html`, give it `data-page="practice-app-detail" data-depth="1"` and the chrome slots.
+- Locator exercises → [`js/data/locator-exercises.js`](js/data/locator-exercises.js); add a target element to the lab's sandbox.
+- SQL exercises → [`js/data/sql-exercises.js`](js/data/sql-exercises.js); `check` grades the engine's result object.
 - Seeded defects → [`js/data/defects.js`](js/data/defects.js); they appear in Bug Bounty and the RPG scoring automatically.
 - Nav items → [`js/site-chrome.js`](js/site-chrome.js) `NAV` array, one place.
 - Study plans → the `PLANS` object in `pages/study-plan.html`.
