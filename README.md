@@ -1,8 +1,7 @@
 # QA Prep Hub
 
-<!-- Replace USER/REPO once the remote exists. -->
-[![E2E tests](https://github.com/USER/REPO/actions/workflows/e2e.yml/badge.svg)](https://github.com/USER/REPO/actions/workflows/e2e.yml)
-[![Deploy](https://github.com/USER/REPO/actions/workflows/deploy-pages.yml/badge.svg)](https://github.com/USER/REPO/actions/workflows/deploy-pages.yml)
+[![E2E tests](https://github.com/KyoshiUriza/QAHub/actions/workflows/e2e.yml/badge.svg?branch=main)](https://github.com/KyoshiUriza/QAHub/actions/workflows/e2e.yml)
+[![Deploy](https://github.com/KyoshiUriza/QAHub/actions/workflows/deploy-pages.yml/badge.svg?branch=main)](https://github.com/KyoshiUriza/QAHub/actions/workflows/deploy-pages.yml)
 
 A self-contained static web app for Software QA interview prep. No build step, no backend, no signup, works offline.
 
@@ -51,9 +50,19 @@ The site has zero runtime dependencies. Playwright is a devDependency used only 
 npm install && npx playwright install chromium && npm test
 ```
 
-The suite (`tests/`) has two halves:
-- **`smoke.spec.js`** — every page renders the shared chrome, exposes a skip link, and produces **zero console errors**.
-- **`regression.spec.js`** — one test per bug found in review, each asserting the *correct* behaviour so a reverted fix goes red.
+The suite (`tests/`) is five specs:
+
+| Spec | Guards |
+|---|---|
+| `smoke.spec.js` | Every page renders the shared chrome, exposes a skip link, and produces **zero console errors** |
+| `regression.spec.js` | One test per bug found in review, asserting the *correct* behaviour so a reverted fix goes red |
+| `contrast.spec.js` | WCAG AA text contrast on 8 pages × 2 themes, computed from live styles; `--on-*` token pairs; WCAG 1.4.11 control boundaries |
+| `focus-contrast.spec.js` | WCAG 2.4.11 — tab-walks each page and measures the focus indicator against the surface behind it |
+| `header.spec.js` | No nav item escapes the header at 10 widths (375–1440px); the collapse toggle; chip and brand never wrap |
+| `labs.spec.js` | Locator Lab grading, SQL Sandbox execution, and the JS/TS code toggle |
+
+The contrast specs exist because hand-auditing a palette does not survive a
+second pass — six WCAG failures shipped despite an earlier manual fix round.
 
 CI runs both on every push and PR via [`.github/workflows/e2e.yml`](.github/workflows/e2e.yml).
 
@@ -89,7 +98,8 @@ QA Website Project/
 │   ├── deploy-pages.yml            # GitHub Pages deploy
 │   └── e2e.yml                     # Playwright suite on push + PR
 ├── .claude/agents/                 # 9-role agile team (see its README)
-├── css/styles.css                  # tokens + all component styles
+├── css/styles.css                  # token scales + all component styles
+│                                   #   colour, radius, elevation, spacing, type
 ├── js/
 │   ├── site-chrome.js              # single source of truth for header/footer
 │   ├── test-hooks.js               # ?reset and window.__qa
@@ -109,7 +119,10 @@ QA Website Project/
 │   ├── test-case-builder.html  bug-report-builder.html
 │   └── progress.html  tester-lattice.html  study-plan.html
 ├── practice-apps/                  # 8 clean + 4 buggy
-└── tests/                          # smoke.spec.js  regression.spec.js
+├── tests/                          # smoke, regression, contrast, focus-contrast,
+│                                   #   header, labs
+├── design-audit/                   # reference screenshots (gitignored)
+└── capture-design-audit.js         # regenerates them
 ```
 
 ## Design constraints
@@ -122,7 +135,15 @@ These are deliberate. Breaking one requires an explicit trade-off, not a silent 
 - **One header, one footer.** [`js/site-chrome.js`](js/site-chrome.js) renders both; pages declare only `data-page` and `data-depth`. Never hand-write a nav. The nav collapses behind an accessible toggle below 1180px — a fixed-height header once let items render outside it.
 - **JavaScript first.** Playwright examples default to JS; TypeScript is a toggle, not a fork. Add both variants inside a `.code-sample` wrapper with `data-lang="js"` / `data-lang="ts"`.
 - **User input never touches `innerHTML`.** Use `textContent` or `createElement` + `append`.
-- **Both themes are first-class.** Every color is a token with a light-mode override that meets WCAG AA.
+- **Both themes are first-class.** Every colour is a token with a light-mode override that meets WCAG AA, and `tests/contrast.spec.js` enforces it.
+- **Everything visual is a token.** Five scales, and they are the contract:
+  `--rad-xs…full` (radius tracks element size), `--shadow-sm/md/lg` (layered,
+  with separate light values), `--sp-1…12` (4px grid), `--fs-xs…5xl` (type),
+  and three border roles — `--border` decorative, `--border-strong` for card
+  edges, `--border-control` for form controls, which needs 3:1 under WCAG
+  1.4.11. Do not hardcode a px value where a scale exists.
+- **`--on-*` colours are theme-aware.** A bright accent takes dark text; a dark
+  accent takes light text. Getting this backwards shipped 2.76:1 buttons.
 
 ## Extending it
 

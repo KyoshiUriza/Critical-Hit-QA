@@ -55,9 +55,27 @@ function auditContrast() {
     if (cs.visibility === 'hidden' || cs.display === 'none' || cs.opacity === '0') continue;
     if (!el.getClientRects().length) continue;
 
-    // Text over a gradient or image can't be measured this way — skip and
-    // rely on a manual check rather than reporting a wrong number.
-    if (cs.backgroundImage && cs.backgroundImage !== 'none') continue;
+    // Text over a gradient can't be measured by luminance alone. The guard has
+    // to look at ANCESTORS, not just this element: every gradient container on
+    // the site (.rpg-chip, .rpg-hero, .next-action, .resume-card) is
+    // transparent-with-a-background-image, and its text lives in child spans
+    // whose own backgroundImage is 'none'. Checking only the element let those
+    // through and measured them against the surface *below* the gradient —
+    // reporting a confident, wrong number instead of skipping.
+    let overGradient = false;
+    for (let n = el; n && n !== document.body; n = n.parentElement) {
+      const bi = getComputedStyle(n).backgroundImage;
+      if (bi && bi !== 'none') { overGradient = true; break; }
+    }
+    if (overGradient) continue;
+
+    // Parent opacity fades text the walker would otherwise read at full
+    // strength (.rpg-achievement renders locked at opacity: 0.6).
+    let faded = false;
+    for (let n = el; n && n !== document.body; n = n.parentElement) {
+      if (parseFloat(getComputedStyle(n).opacity) < 0.99) { faded = true; break; }
+    }
+    if (faded) continue;
 
     const fg = parse(cs.color).slice(0, 3);
     if (fg.length < 3) continue;

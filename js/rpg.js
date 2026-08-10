@@ -172,13 +172,38 @@
   function toast(title, body) {
     const t = document.createElement("div");
     t.className = "rpg-toast";
-    t.innerHTML = `<div class="rpg-toast-title">${title}</div><div class="rpg-toast-body">${body}</div>`;
-    document.body.appendChild(t);
-    requestAnimationFrame(() => t.classList.add("visible"));
-    setTimeout(() => {
+    // It announces an achievement, so assistive tech needs to hear it — and a
+    // timed notification that cannot be dismissed fails 2.2.1.
+    t.setAttribute("role", "status");
+    t.setAttribute("aria-live", "polite");
+
+    const h = document.createElement("div");
+    h.className = "rpg-toast-title";
+    h.textContent = title;
+
+    const b = document.createElement("div");
+    b.className = "rpg-toast-body";
+    b.textContent = body;
+
+    const close = document.createElement("button");
+    close.type = "button";
+    close.className = "rpg-toast-dismiss";
+    close.setAttribute("aria-label", "Dismiss notification");
+    close.textContent = "×";
+
+    let done = false;
+    const remove = () => {
+      if (done) return;
+      done = true;
       t.classList.remove("visible");
       setTimeout(() => t.remove(), 400);
-    }, 4200);
+    };
+    close.addEventListener("click", remove);
+
+    t.append(h, b, close);
+    document.body.appendChild(t);
+    requestAnimationFrame(() => t.classList.add("visible"));
+    setTimeout(remove, 6000);
   }
 
   // Header chip — mount if a header nav exists.

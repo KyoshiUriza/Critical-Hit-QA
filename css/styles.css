@@ -79,8 +79,12 @@
   --dur-slow: 320ms;
   --ease: cubic-bezier(.2,.6,.2,1);
 
-  /* Focus ring — visible in both themes, meets 3:1 against every surface. */
-  --focus-ring: 0 0 0 3px rgba(79,157,255,0.55);
+  /* Focus indicator. Opaque, not translucent: a semi-transparent ring
+     composites toward the surface behind it, and the previous
+     rgba(79,157,255,0.55) measured 2.85 / 2.76 / 2.61:1 against our three
+     dark surfaces — a WCAG 2.4.11 failure the old comment claimed it passed.
+     Measured now: 8.78 / 7.87 / 6.96:1. */
+  --focus-ring-color: #7ab6ff;
 }
 
 @media (prefers-color-scheme: light) {
@@ -95,7 +99,6 @@
     --shadow-sm: 0 1px 2px rgba(15,25,40,0.06);
     --shadow-md: 0 1px 3px rgba(15,25,40,0.08), 0 6px 14px -3px rgba(15,25,40,0.10);
     --shadow-lg: 0 2px 6px rgba(15,25,40,0.08), 0 14px 32px -8px rgba(15,25,40,0.14);
-    --shadow: var(--shadow-md);
     /* #ffffff on #f7f9fc is 1.05:1 — cards are invisible without a border. */
     --border-strong: #cbd5e1;
     --border-control: #7c8a9e;  /* 3.33:1 on --bg, 3.51:1 on --bg-elev */
@@ -112,7 +115,7 @@
     --on-accent-2: #ffffff;    /* on --accent-2 #0f7a43 -> 5.41:1 */
     --on-danger: #ffffff;      /* on --danger   #c92a2a -> 5.46:1 */
     --on-warn: #ffffff;        /* on --warn     #8a5a00 -> 5.93:1 */
-    --focus-ring: 0 0 0 3px rgba(30,111,217,0.45);
+    --focus-ring-color: #1b64c4;   /* 5.43 / 5.73 / 5.09:1 on the light surfaces */
   }
 }
 
@@ -158,19 +161,14 @@ a:hover {
 
 /* Global focus system. Never remove an outline without providing this. */
 :focus-visible {
-  outline: none;
-  box-shadow: var(--focus-ring);
+  outline: 3px solid var(--focus-ring-color);
+  outline-offset: 2px;
 }
-a:focus-visible,
-button:focus-visible,
-input:focus-visible,
-select:focus-visible,
-textarea:focus-visible,
-summary:focus-visible,
-[tabindex]:focus-visible {
-  outline: none;
-  box-shadow: var(--focus-ring);
-  border-radius: var(--rad-sm);
+
+/* .q-item sets overflow:hidden to clip its rounded corners, which would also
+   clip an outset ring on the summary. Inset it there instead. */
+.q-item summary:focus-visible {
+  outline-offset: -3px;
 }
 
 /* Heading rhythm. Replaces 85 inline `style="margin-top:0"` attributes.
@@ -398,6 +396,7 @@ html, body {
   border-radius: var(--radius);
   padding: 20px;
   margin: 32px 0;
+  box-shadow: var(--shadow-sm);
 }
 .stats-strip > div {
   display: flex;
@@ -434,6 +433,7 @@ html, body {
   border-radius: var(--radius);
   padding: 20px;
   margin-bottom: 16px;
+  box-shadow: var(--shadow-sm);
 }
 
 /* Quiz */
@@ -446,7 +446,7 @@ html, body {
 }
 .quiz-controls select, .quiz-controls input {
   background: var(--bg-elev);
-  border: 1px solid var(--border);
+  border: 1px solid var(--border-control);
   color: var(--text);
   padding: 8px 10px;
   border-radius: var(--rad-md);
@@ -527,7 +527,7 @@ html, body {
 .q-item {
   background: var(--bg-elev);
   border: 1px solid var(--border);
-  border-radius: var(--rad-md);
+  border-radius: var(--rad-lg);
   margin-bottom: 8px;
   overflow: hidden;
 }
@@ -555,12 +555,12 @@ html, body {
   font-size: var(--fs-base);
   white-space: pre-wrap;
 }
-.q-item .tag {
+.q-item .tag { /* small inline chip, not a container */
   display: inline-block;
   background: var(--bg-elev-2);
   color: var(--text-dim);
   padding: 2px 8px;
-  border-radius: var(--rad-lg);
+  border-radius: var(--rad-sm);
   font-size: var(--fs-xs);
   margin-right: 6px;
   margin-top: 4px;
@@ -580,6 +580,7 @@ html, body {
   border: 1px solid var(--border-strong);
   border-radius: var(--radius);
   padding: 20px;
+  box-shadow: var(--shadow-sm);
 }
 .app-card h3 { margin: 0 0 6px; }
 .app-card .app-meta { color: var(--text-dim); font-size: var(--fs-md); margin-bottom: 12px; }
@@ -616,7 +617,7 @@ code.inline {
   padding: 8px 16px;
   border: 1px solid var(--border);
   border-bottom: none;
-  border-radius: var(--rad-md) 6px 0 0;
+  border-radius: var(--rad-md) var(--rad-md) 0 0;
   cursor: pointer;
   font-family: inherit;
   font-size: var(--fs-md);
@@ -666,8 +667,13 @@ code.inline {
   font-family: inherit;
   font-size: var(--fs-base);
 }
-.form-field input:focus, .form-field textarea:focus, .form-field select:focus {
-  outline: none;
+/* `outline: none` here beat the global :focus-visible rule on specificity
+   (0,2,1 vs 0,1,0), leaving every form control in the site with a border
+   colour change as its ONLY focus indicator — which is not a 2.4.11 indicator
+   at all. Keep the accent border as reinforcement; let the outline through. */
+.form-field input:focus-visible,
+.form-field textarea:focus-visible,
+.form-field select:focus-visible {
   border-color: var(--accent);
 }
 .form-error { color: var(--danger); font-size: var(--fs-sm); margin-top: 4px; display: none; }
@@ -703,7 +709,7 @@ code.inline {
   border: 1px solid var(--border);
   color: var(--text-dim);
   padding: 4px 10px;
-  border-radius: var(--rad-lg);
+  border-radius: var(--rad-full);
   cursor: pointer;
   font-size: var(--fs-sm);
   font-family: inherit;
@@ -771,7 +777,7 @@ code.inline {
 .step-row input, .step-row textarea {
   padding: 6px 8px;
   background: var(--bg);
-  border: 1px solid var(--border);
+  border: 1px solid var(--border-control);
   color: var(--text);
   border-radius: var(--rad-sm);
   font-family: inherit;
@@ -847,7 +853,10 @@ code.inline {
 }
 
 .rpg-toast {
-  position: fixed; top: 80px; right: 20px;
+  /* Was top:80px right:20px, which put it straight over the hero headline —
+     and on a 375px viewport its 340px width covered the H1 entirely. Bottom
+     corner keeps it clear of page content at every width. */
+  position: fixed; bottom: 20px; right: 20px;
   background: var(--bg-elev);
   border: 1px solid var(--accent);
   border-left: 4px solid var(--accent);
@@ -857,18 +866,37 @@ code.inline {
   box-shadow: var(--shadow-lg), 0 0 20px rgba(79,157,255,0.15);
   max-width: 340px;
   opacity: 0;
-  transform: translateX(20px);
-  transition: opacity 0.3s, transform 0.3s;
+  transform: translateY(12px);
+  transition: opacity var(--dur-med) var(--ease), transform var(--dur-med) var(--ease);
   z-index: 300;
 }
-.rpg-toast.visible { opacity: 1; transform: translateX(0); }
+.rpg-toast.visible { opacity: 1; transform: translateY(0); }
+.rpg-toast-dismiss {
+  position: absolute;
+  top: 6px; right: 8px;
+  background: transparent;
+  border: none;
+  color: var(--text-dim);
+  font-size: var(--fs-lg);
+  line-height: 1;
+  padding: 4px 6px;
+  cursor: pointer;
+  border-radius: var(--rad-sm);
+}
+.rpg-toast-dismiss:hover { color: var(--text); background: var(--bg-elev-2); }
+.rpg-toast-title { padding-right: 20px; }
+
+/* On narrow screens a corner card still crowds the layout — go full width. */
+@media (max-width: 640px) {
+  .rpg-toast { left: 12px; right: 12px; bottom: 12px; max-width: none; }
+}
 .rpg-toast-title { font-weight: 700; color: var(--accent); font-family: var(--font-mono); font-size: var(--fs-md); letter-spacing: 0.02em; }
 .rpg-toast-body { color: var(--text-dim); font-size: var(--fs-md); margin-top: 4px; font-style: italic; }
 
 .rpg-hero {
   position: relative;
   background: linear-gradient(135deg, rgba(79,157,255,0.12), rgba(98,211,145,0.08), transparent);
-  border: 1px solid var(--border);
+  border: 1px solid var(--border-strong);
   border-radius: var(--radius);
   padding: 32px;
   margin-bottom: 20px;
@@ -947,7 +975,7 @@ code.inline {
 
 /* Learning path styles */
 .learn-track {
-  border: 1px solid var(--border);
+  border: 1px solid var(--border-strong);
   border-radius: var(--radius);
   padding: 20px;
   margin-bottom: 16px;
@@ -1036,7 +1064,7 @@ code.inline {
 
 /* Sortable table headers need to look interactive and take focus. */
 th[data-sort] { cursor: pointer; user-select: none; }
-th[data-sort]:focus-visible { box-shadow: var(--focus-ring); }
+th[data-sort]:focus-visible { outline: 3px solid var(--focus-ring-color); outline-offset: -3px; }
 
 /* ─── Sprint 2: home page grouping + resume strip ─── */
 
@@ -1167,7 +1195,7 @@ th[data-sort]:focus-visible { box-shadow: var(--focus-ring); }
   min-width: 220px;
   padding: 11px 12px;
   background: var(--bg);
-  border: 1px solid var(--border);
+  border: 1px solid var(--border-control);
   border-radius: var(--rad-md);
   color: var(--text);
   font-family: var(--font-mono);
@@ -1267,7 +1295,7 @@ th[data-sort]:focus-visible { box-shadow: var(--focus-ring); }
 .modal {
   background: var(--bg-elev);
   color: var(--text);
-  border: 1px solid var(--border);
+  border: 1px solid var(--border-strong);
   border-radius: var(--rad-lg);
   padding: 24px;
   width: 90%;
@@ -1282,7 +1310,7 @@ th[data-sort]:focus-visible { box-shadow: var(--focus-ring); }
   width: 100%;
   padding: 12px;
   background: var(--code-bg);
-  border: 1px solid var(--border);
+  border: 1px solid var(--border-control);
   border-radius: var(--rad-md);
   color: var(--code-fg);
   font-family: var(--font-mono);
