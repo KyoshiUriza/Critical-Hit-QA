@@ -57,8 +57,15 @@ jobs:
           fi
           echo "Build looks good."
 
+      # enablement turns Pages on via the API if it has never been configured,
+      # using the pages: write token above. Without it this step is what fails
+      # on a fresh repo — the build succeeds, then Setup Pages errors and both
+      # deploy steps skip, which reads as "the site is broken" when in fact
+      # nothing was ever published. It is a no-op once Pages exists.
       - name: Setup Pages
         uses: actions/configure-pages@v5
+        with:
+          enablement: true
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
