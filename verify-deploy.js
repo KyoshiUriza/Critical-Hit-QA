@@ -55,6 +55,17 @@ function check(ok, label, detail) {
   const ctx = await browser.newContext();
   const page = await ctx.newPage();
 
+  // Read the nav size out of the deployed source, so this check verifies that
+  // every page renders the same nav rather than that the nav is a fixed size.
+  const chromeSrc = await (await ctx.request.get(BASE + '/js/site-chrome.js')).text();
+  const navBlock = chromeSrc.slice(chromeSrc.indexOf('var NAV = ['), chromeSrc.indexOf('];'));
+  const expectedNavCount = (navBlock.match(/\{\s*key:/g) || []).length;
+  if (expectedNavCount < 5) {
+    console.log('* FAIL  could not read the NAV array from the deployed site-chrome.js');
+    process.exit(1);
+  }
+  console.log(`Deployed nav declares ${expectedNavCount} items.\n`);
+
   console.log('Pages render, with no console errors or failed requests:');
   for (const path of PAGES) {
     const consoleErrors = [];
@@ -86,13 +97,18 @@ function check(ok, label, detail) {
       };
     });
 
-    const ok = status === 200 && state.chrome && state.navCount === 10 && state.styled
+    // Derived from the deployed site-chrome.js rather than hard-coded. The
+    // literal 10 here failed every page the moment an 11th nav item shipped —
+    // reporting a correct site as broken, which is the worse failure for a
+    // check whose whole job is to be believed.
+    const ok = status === 200 && state.chrome && state.navCount === expectedNavCount && state.styled
                && consoleErrors.length === 0 && netFailures.length === 0 && state.escaped.length === 0;
     const detail = [
       status !== 200 ? 'HTTP ' + status : null,
       !state.chrome ? 'chrome missing (site-chrome.js did not run)' : null,
       !state.styled ? 'CSS did not load' : null,
-      state.navCount !== 10 ? 'nav has ' + state.navCount + ' items' : null,
+      state.navCount !== expectedNavCount
+        ? `nav has ${state.navCount} items, expected ${expectedNavCount}` : null,
       consoleErrors.length ? consoleErrors.length + ' console error(s): ' + consoleErrors[0] : null,
       netFailures.length ? 'failed request: ' + netFailures[0] : null,
       state.escaped.length ? 'link escapes subpath: ' + state.escaped[0] : null,
