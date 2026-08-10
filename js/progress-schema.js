@@ -13,7 +13,7 @@
 (function () {
   "use strict";
 
-  var ALLOWED_CATEGORIES = ["fundamentals", "manual", "automation", "api", "agile", "performance", "sql"];
+  var ALLOWED_CATEGORIES = ["fundamentals", "manual", "automation", "api", "agile", "performance", "sql", "ai"];
   var ALLOWED_PLANS = ["3-day", "1-week", "1-month"];
   var ALLOWED_ARTIFACT_TYPES = ["bug-report", "test-case"];
 

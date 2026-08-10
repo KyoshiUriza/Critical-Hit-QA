@@ -5,9 +5,9 @@ const PAGE = '/pages/tester-lattice.html';
 test.describe('character sheet', () => {
   test('empty state renders every skill as Untrained with an honest zero', async ({ page }) => {
     await page.goto(PAGE + '?reset');
-    // 7 knowledge + 4 craft. .skill-row, not [data-testid^="skill-"] — that
+    // 8 knowledge + 4 craft. .skill-row, not [data-testid^="skill-"] — that
     // prefix also matches the skill-tier span inside every row.
-    await expect(page.locator('.skill-row')).toHaveCount(11);
+    await expect(page.locator(".skill-row")).toHaveCount(12);
     const tiers = await page.getByTestId('skill-tier').allTextContents();
     expect(tiers.every((t) => t === 'Untrained')).toBe(true);
     await expect(page.getByTestId('activity-log')).toContainText('Nothing yet');
@@ -117,7 +117,7 @@ test.describe('character sheet', () => {
   test('skill bars expose meter semantics to assistive tech', async ({ page }) => {
     await page.goto(PAGE + '?reset');
     const meters = page.locator('[role="meter"]');
-    await expect(meters).toHaveCount(11);
+    await expect(meters).toHaveCount(12);
     const first = meters.first();
     await expect(first).toHaveAttribute('aria-valuemin', '0');
     await expect(first).toHaveAttribute('aria-valuemax', '5');

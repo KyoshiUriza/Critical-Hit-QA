@@ -93,7 +93,8 @@
     { id: "api",          name: "API Testing" },
     { id: "agile",        name: "Agile & Process" },
     { id: "performance",  name: "Performance" },
-    { id: "sql",          name: "SQL & Data" }
+    { id: "sql",          name: "SQL & Data" },
+    { id: "ai",           name: "AI in Testing" }
   ];
 
   // Tier requires BOTH volume and accuracy: accuracy alone can be three lucky

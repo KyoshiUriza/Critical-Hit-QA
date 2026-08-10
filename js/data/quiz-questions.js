@@ -1,5 +1,5 @@
 // Practice quiz question bank.
-// Categories: fundamentals, manual, automation, api, agile, performance, sql
+// Categories: fundamentals, manual, automation, api, agile, performance, sql, ai
 window.QUIZ_QUESTIONS = [
   // ── SQL ──────────────────────────────────────────────────────────────
   {
@@ -411,5 +411,305 @@ window.QUIZ_QUESTIONS = [
     ],
     answer: 2,
     explanation: "Explore the feature to understand it, ask clarifying questions of the PM/devs/designers, and capture the shared understanding as you go. Testing without any oracle is impossible, but requirements can be built collaboratively."
+  },
+  // ── AI in Testing ────────────────────────────────────────────────────
+  {
+    category: "ai",
+    difficulty: "easy",
+    question: "You use an LLM to generate test cases from a requirements document. What is the biggest risk?",
+    choices: [
+      "Generation takes longer than writing cases by hand",
+      "Plausible-looking cases that assert behavior the requirement never specified",
+      "The cases will be formatted inconsistently",
+      "The tool cannot output enough cases"
+    ],
+    answer: 1,
+    explanation: "Generated cases read as confident and complete while quietly inventing behavior — the review effort doesn't disappear, it moves. Every generated case needs checking against the actual spec before it becomes an oracle."
+  },
+  {
+    category: "ai",
+    difficulty: "medium",
+    question: "Your automation tool 'self-heals' locators when the UI changes. What is the main danger?",
+    choices: [
+      "Healing makes the suite run slower",
+      "Healed locators are longer and harder to read",
+      "Tests keep passing against the WRONG element, masking a real regression",
+      "The tool needs network access to heal"
+    ],
+    answer: 2,
+    explanation: "Self-healing trades visible flakiness for silent mis-targeting: when the intended element disappears, the tool may 'heal' onto whatever else matches. Review healed locators the way you review code changes — a heal is a change."
+  },
+  {
+    category: "ai",
+    difficulty: "easy",
+    question: "Which QA task is LLM assistance currently best suited for?",
+    choices: [
+      "Deciding what is worth testing",
+      "Judging the severity of a found defect",
+      "Signing off a release",
+      "Drafting boilerplate: page objects, test data, first-pass cases for human review"
+    ],
+    answer: 3,
+    explanation: "Generation is where the leverage is; judgment is where it isn't. Boilerplate and drafts save real time precisely because a human reviews them — the tasks that ARE the review (risk, severity, sign-off) can't be delegated to the thing being reviewed."
+  },
+  {
+    category: "ai",
+    difficulty: "medium",
+    question: "A colleague pastes real customer records into a public AI chatbot to generate test data. What is the problem?",
+    choices: [
+      "The chatbot may rate-limit them",
+      "Confidential data has left the organization — a privacy/GDPR incident, regardless of the output",
+      "Generated data will be unrealistic",
+      "Nothing, if the results are only used internally"
+    ],
+    answer: 1,
+    explanation: "The breach happens on paste, not on use. Production data in an external service is disclosure. Use synthetic data, or mask before anything leaves the boundary — and know your employer's AI-tool policy before, not after."
+  },
+  {
+    category: "ai",
+    difficulty: "hard",
+    question: "An AI wrote a test for a new feature and the test passes. Why is that weak evidence the feature works?",
+    choices: [
+      "AI-written tests run nondeterministically",
+      "The test may assert what the code DOES rather than what it SHOULD do",
+      "Passing tests prove nothing in general",
+      "The test framework may not support AI output"
+    ],
+    answer: 1,
+    explanation: "This is the oracle problem: a test generated from the implementation can simply mirror the implementation, bugs included. A useful test encodes intent from somewhere outside the code — the spec, the user, the tester's judgment."
+  },
+  {
+    category: "ai",
+    difficulty: "hard",
+    question: "Testing an LLM-powered feature differs from testing deterministic code mainly because…",
+    choices: [
+      "LLM features cannot be tested automatically",
+      "the same input can produce different valid outputs, so exact-match assertions break",
+      "LLM features have no requirements",
+      "only the vendor can test an LLM feature"
+    ],
+    answer: 1,
+    explanation: "Assert properties, not strings: length limits, required/forbidden content, format, policy compliance, refusal behavior. Evaluation sets and thresholds replace single expected values. The skill is designing checks that hold across valid variation."
+  },
+  {
+    category: "ai",
+    difficulty: "medium",
+    question: "What is a sensible policy for AI-generated test code entering your repository?",
+    choices: [
+      "Merge directly — the code was machine-checked at generation",
+      "Keep it in a separate repo that CI ignores",
+      "The same review bar as human-written code",
+      "Only allow it for non-critical paths"
+    ],
+    answer: 2,
+    explanation: "Authorship doesn't change the risk model — wrong assertions merge equally well from humans and machines. One review bar keeps responsibility clear: whoever merges it owns it."
+  },
+  {
+    category: "ai",
+    difficulty: "hard",
+    question: "Prompt injection against an LLM feature is most analogous to which classic vulnerability class?",
+    choices: [
+      "Buffer overflow",
+      "Cross-site request forgery",
+      "SQL injection — untrusted input being interpreted as instructions",
+      "Race condition"
+    ],
+    answer: 2,
+    explanation: "Same shape, new channel: data crosses into the instruction stream. Test it the same way — feed inputs that try to override instructions ('ignore previous directions and…') through every field the model reads, including indirect ones like file contents."
+  },
+  // ── Performance (expansion) ──────────────────────────────────────────
+  {
+    category: "performance",
+    difficulty: "easy",
+    question: "What distinguishes stress testing from load testing?",
+    choices: [
+      "Stress tests run longer",
+      "Load tests expected volume; stress pushes beyond capacity to find the breaking point",
+      "Stress testing is manual, load testing is automated",
+      "They are synonyms"
+    ],
+    answer: 1,
+    explanation: "Load testing answers 'does it handle what we expect?'. Stress testing answers 'where does it break, and HOW?' — graceful degradation vs. cascade failure is often the real finding."
+  },
+  {
+    category: "performance",
+    difficulty: "medium",
+    question: "The dashboard shows average response time 180ms, but users complain of slowness. What should you look at?",
+    choices: [
+      "Nothing — 180ms is fast",
+      "The percentiles: p95/p99 latency, where tail pain hides behind a healthy average",
+      "The server's CPU brand",
+      "Whether users have fast machines"
+    ],
+    answer: 1,
+    explanation: "An average blends thousands of fast requests with the slow ones users actually feel. If p99 is 4 seconds, one request in a hundred is painful — at scale, that is every user, several times a day."
+  },
+  {
+    category: "performance",
+    difficulty: "medium",
+    question: "Which test type finds a slow memory leak?",
+    choices: [
+      "Spike test — sudden surge of traffic",
+      "Smoke test",
+      "Soak test — sustained realistic load over hours or days",
+      "A single load test run of 10 minutes"
+    ],
+    answer: 2,
+    explanation: "Leaks and gradual degradation only show over duration. Spike tests find recovery problems; soak tests find the things that get worse the longer you run."
+  },
+  {
+    category: "performance",
+    difficulty: "hard",
+    question: "As you add load, throughput stops rising while latency keeps climbing. What does this indicate?",
+    choices: [
+      "The test tool is broken",
+      "A saturated resource — requests are queuing behind a bottleneck",
+      "The system is scaling elastically",
+      "Latency and throughput are unrelated"
+    ],
+    answer: 1,
+    explanation: "Flat throughput plus rising latency is the signature of saturation: some resource (CPU, pool, lock, disk) is at capacity, and extra load just lengthens the queue. Finding WHICH resource is the actual work."
+  },
+  // ── Agile (expansion) ────────────────────────────────────────────────
+  {
+    category: "agile",
+    difficulty: "easy",
+    question: "When does testing happen in a well-run Scrum sprint?",
+    choices: [
+      "In a testing phase after development completes",
+      "Throughout the sprint — testing is part of a story being Done",
+      "In the following sprint",
+      "Only during the sprint review"
+    ],
+    answer: 1,
+    explanation: "A story isn't Done until tested, so testing runs alongside development — reviewing ACs before code exists, testing slices as they land. A 'testing phase' at sprint end is a mini-waterfall with a standup."
+  },
+  {
+    category: "agile",
+    difficulty: "medium",
+    question: "A story reaches the sprint with no acceptance criteria. Best move?",
+    choices: [
+      "Test it against your own assumptions",
+      "Refuse to test it",
+      "Raise it in refinement and help write the criteria before work starts",
+      "Wait for the PO to notice"
+    ],
+    answer: 2,
+    explanation: "Missing ACs are a defect in the story, cheapest to fix before code exists. The three-amigos conversation (PO, dev, tester) is exactly for this — testers asking 'what should happen when…' up front is shift-left in practice."
+  },
+  {
+    category: "agile",
+    difficulty: "medium",
+    question: "What is the difference between the Definition of Done and acceptance criteria?",
+    choices: [
+      "They are the same thing",
+      "DoD is per-story; acceptance criteria apply to every story",
+      "DoD applies to every story (the team's quality bar); acceptance criteria are per-story behavior",
+      "Acceptance criteria are written by developers only"
+    ],
+    answer: 2,
+    explanation: "DoD is the standing checklist — tested, reviewed, deployed, documented — that every story must meet. ACs describe what THIS story must do. A story can pass its ACs and still not be Done."
+  },
+  // ── API (expansion) ──────────────────────────────────────────────────
+  {
+    category: "api",
+    difficulty: "easy",
+    question: "A DELETE succeeds and the response deliberately has no body. Which status code fits best?",
+    choices: ["200 OK", "204 No Content", "202 Accepted", "404 Not Found"],
+    answer: 1,
+    explanation: "204 is success-with-no-body by definition. 200 with an empty body works but is sloppier; 202 means 'accepted for LATER processing' — a different claim; 404 after a successful delete is a contradiction (though you should test what a SECOND delete returns)."
+  },
+  {
+    category: "api",
+    difficulty: "medium",
+    question: "Which methods should be idempotent — and what does that mean for testing?",
+    choices: [
+      "POST — send it twice and check for two records",
+      "GET, PUT, DELETE — repeating the request must leave the same state as sending it once",
+      "All methods are idempotent",
+      "Idempotency only matters for GraphQL"
+    ],
+    answer: 1,
+    explanation: "Retries happen — networks fail mid-request. Test idempotency directly: send the same PUT twice, assert one record with the final values; DELETE twice, assert the second is handled gracefully. POST is the one where a retry can legitimately duplicate."
+  },
+  {
+    category: "api",
+    difficulty: "hard",
+    question: "What problem does contract testing solve that end-to-end API tests do not?",
+    choices: [
+      "It tests the UI as well",
+      "It catches provider/consumer drift without needing both systems deployed together",
+      "It removes the need for unit tests",
+      "It is a faster name for load testing"
+    ],
+    answer: 1,
+    explanation: "E2E tests need every service up, so they run late and break broadly. A contract pins what the consumer actually relies on; the provider verifies it in ITS pipeline, catching a breaking change before any shared environment exists."
+  },
+  // ── Manual (expansion) ───────────────────────────────────────────────
+  {
+    category: "manual",
+    difficulty: "easy",
+    question: "What separates exploratory testing from ad-hoc poking?",
+    choices: [
+      "Nothing — they are synonyms",
+      "Exploratory is structured: a charter, a time-box, and notes that let someone else follow your path",
+      "Exploratory requires automation tools",
+      "Ad-hoc finds more bugs"
+    ],
+    answer: 1,
+    explanation: "The charter gives it a mission, the time-box gives it a budget, the notes make it repeatable and reportable. Same curiosity as ad-hoc — with evidence at the end."
+  },
+  {
+    category: "manual",
+    difficulty: "medium",
+    question: "You hit a serious bug you can only reproduce 1 time in 5. What do you do?",
+    choices: [
+      "Wait until you can reproduce it reliably before filing",
+      "File it now: frequency, everything you know, logs and recording attached, marked intermittent",
+      "Ignore it — intermittent bugs are usually environment noise",
+      "Ask a developer to find it for you"
+    ],
+    answer: 1,
+    explanation: "An unreliable repro is information, not a reason to sit on a serious find. '2 in 10 tries, here is the recording of the one that failed' starts the investigation today. Intermittent is a property of the bug — often timing or state — not a defect in your report."
+  },
+  {
+    category: "manual",
+    difficulty: "medium",
+    question: "Which situation is HIGH severity but LOW priority?",
+    choices: [
+      "A typo in the checkout button",
+      "A crash in a legacy report used by three internal users, replaced next quarter",
+      "Checkout total calculates wrong by one cent",
+      "The login page is down"
+    ],
+    answer: 1,
+    explanation: "Severity measures impact when it happens (a crash — high). Priority measures how urgently to fix it (tiny audience, feature is being retired — low). Being able to argue the two independently is what the interview question is really testing."
+  },
+  // ── Fundamentals (expansion) ─────────────────────────────────────────
+  {
+    category: "fundamentals",
+    difficulty: "easy",
+    question: "What is the difference between retesting and regression testing?",
+    choices: [
+      "They are the same activity",
+      "Retesting verifies the fix; regression verifies the fix broke nothing else",
+      "Regression is manual, retesting is automated",
+      "Retesting happens before the fix"
+    ],
+    answer: 1,
+    explanation: "Retest: run the failing scenario again and confirm it now passes. Regression: run what USED to pass and confirm it still does. A fix that passes retest and fails regression made things worse."
+  },
+  {
+    category: "fundamentals",
+    difficulty: "medium",
+    question: "Why can testing never prove software is defect-free?",
+    choices: [
+      "Testers lack access to the source code",
+      "Exhaustive input coverage is impossible — testing shows the presence of defects, not their absence",
+      "Modern software has no defects to find",
+      "Because requirements always change"
+    ],
+    answer: 1,
+    explanation: "One of the classic testing principles. Even a single text field has effectively infinite inputs. Testing samples the risk intelligently — which is why WHAT you choose to test matters more than how much."
   }
 ];
