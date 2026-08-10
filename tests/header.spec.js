@@ -77,6 +77,33 @@ test('Escape closes the menu and restores focus to the toggle', async ({ page })
   await expect(toggle).toBeFocused();
 });
 
+test('a long rank name does not wrap the chip or the brand', async ({ page }) => {
+  // Regression: at Lv.3 the rank reads "Contract Tester", which was wide enough
+  // to wrap the chip to three lines and push the brand onto two.
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto('/index.html?reset');
+  await page.evaluate(() => {
+    for (let i = 0; i < 6; i++) {
+      window.Progress.recordQuizRun({ category: 'manual', correct: 9, total: 10, elapsedMs: 60000 });
+    }
+  });
+  await page.reload();
+
+  const chip = page.locator('.rpg-chip');
+  await expect(chip).toBeVisible();
+  await expect(chip).toContainText('Lv.');
+
+  const chipBox = await chip.boundingBox();
+  const brandBox = await page.locator('.brand').boundingBox();
+  const headerBox = await page.locator('.site-header').boundingBox();
+
+  // Single-line heights: anything taller means it wrapped.
+  expect(chipBox.height, 'chip wrapped to multiple lines').toBeLessThan(40);
+  expect(brandBox.height, 'brand wrapped to two lines').toBeLessThan(36);
+  // And nothing spills out of the bar.
+  expect(chipBox.y + chipBox.height).toBeLessThanOrEqual(headerBox.y + headerBox.height + 1);
+});
+
 test('the RPG chip stays on the top row when the nav collapses', async ({ page }) => {
   await page.setViewportSize({ width: 900, height: 900 });
   await page.goto('/index.html?reset');

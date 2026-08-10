@@ -141,6 +141,8 @@ html, body {
   color: var(--text);
   text-decoration: none;
   letter-spacing: -0.01em;
+  white-space: nowrap;   /* was wrapping to two lines once the chip grew */
+  flex-shrink: 0;
 }
 .brand::before {
   content: "◈ ";
@@ -721,6 +723,10 @@ code.inline {
 /* ─── RPG layer: The Tester's Lattice ─── */
 .rpg-chip {
   display: inline-flex; align-items: center; gap: 8px;
+  /* A long rank name ("Contract Tester") used to wrap the chip to three lines
+     and push it out of the header. */
+  white-space: nowrap;
+  flex-shrink: 0;
   padding: 4px 10px 4px 8px;
   background: linear-gradient(90deg, rgba(79,157,255,0.14), rgba(98,211,145,0.12));
   border: 1px solid var(--accent);
@@ -732,8 +738,22 @@ code.inline {
   transition: transform 0.12s, box-shadow 0.12s;
 }
 .rpg-chip:hover { transform: translateY(-1px); box-shadow: 0 4px 14px rgba(79,157,255,0.25); }
-.rpg-chip-rank { color: var(--accent); font-weight: 700; }
-.rpg-chip-dust { color: var(--accent-2); }
+.rpg-chip-rank {
+  color: var(--accent);
+  font-weight: 700;
+  white-space: nowrap;
+  max-width: 15ch;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.rpg-chip-dust { color: var(--accent-2); white-space: nowrap; }
+
+/* Below the nav breakpoint the header is tight — drop the rank name and keep
+   the level and score, which is the part that changes. */
+@media (max-width: 640px) {
+  .rpg-chip-rank { max-width: 5ch; }
+  .rpg-chip-bar { display: none; }
+}
 .rpg-chip-bar {
   display: inline-block; width: 40px; height: 4px;
   background: var(--bg-elev-2); border-radius: 2px; overflow: hidden;

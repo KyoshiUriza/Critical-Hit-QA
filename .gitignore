@@ -30,3 +30,6 @@ credentials.json
 .netlify/
 .vercel/
 coverage/
+
+# Regenerable design reference shots (node capture-design-audit.js)
+/design-audit/
