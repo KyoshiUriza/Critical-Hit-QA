@@ -157,6 +157,30 @@ test('a long rank name does not wrap the chip or the brand', async ({ page }) =>
   expect(chipBox.y + chipBox.height).toBeLessThanOrEqual(headerBox.y + headerBox.height + 1);
 });
 
+test('the nav does not shift horizontally between pages', async ({ page }) => {
+  // The symptom as reported: navigating from Home to Quizzes (and five other
+  // pages) made the header options jump right. Cause: those pages did not
+  // load rpg.js, so no chip mounted and justify-between re-spaced the row.
+  // Guard the invariant itself — same nav x-position on every page — rather
+  // than only the chip's presence, so any future cause of the jump is caught.
+  await page.setViewportSize({ width: 1440, height: 900 });
+
+  const navX = async (path) => {
+    await page.goto(`/${path}?reset`);
+    await page.locator('.site-header .rpg-chip').waitFor();
+    return (await page.locator('.site-header nav.nav').boundingBox()).x;
+  };
+
+  const home = await navX('index.html');
+  for (const path of [
+    'pages/practice-tests.html', 'pages/practice-apps.html', 'pages/bug-bounty.html',
+    'pages/progress.html', 'pages/study-plan.html', 'pages/resources.html',
+  ]) {
+    const x = await navX(path);
+    expect(Math.abs(x - home), `nav shifted ${Math.round(x - home)}px on ${path}`).toBeLessThanOrEqual(1);
+  }
+});
+
 test('the RPG chip stays on the top row when the nav collapses', async ({ page }) => {
   await page.setViewportSize({ width: 900, height: 900 });
   await page.goto('/index.html?reset');

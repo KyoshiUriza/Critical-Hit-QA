@@ -69,6 +69,35 @@ test.describe('profiles', () => {
   });
 });
 
+test('progress recorded on OTHER pages lands in the active profile', async ({ page }) => {
+  // The bug this guards: profiles.js was only loaded on three pages, and
+  // progress.js silently falls back to the default storage key when it is
+  // absent. So with a second profile active, taking a quiz on the quiz page
+  // recorded into the default profile — data quietly crossing accounts.
+  await page.goto(ACCOUNT + '?reset');
+  await page.getByTestId('new-profile-name').fill('Second');
+  await page.getByTestId('create-profile').click();
+
+  // Record progress from a page that is NOT the account page.
+  await page.goto('/pages/practice-tests.html');
+  await page.evaluate(() => {
+    window.Progress.recordQuizRun({ category: 'sql', correct: 3, total: 5, elapsedMs: 500 });
+  });
+
+  const keys = await page.evaluate(() => {
+    const reg = JSON.parse(localStorage.getItem('qaprep_profiles_v1'));
+    const activeId = reg.activeId;
+    const activeData = JSON.parse(localStorage.getItem('qaprep_progress_v1:' + activeId) || '{}');
+    const defaultData = JSON.parse(localStorage.getItem('qaprep_progress_v1') || '{}');
+    return {
+      activeRuns: (activeData.quiz && activeData.quiz.runs || []).length,
+      defaultRuns: (defaultData.quiz && defaultData.quiz.runs || []).length,
+    };
+  });
+  expect(keys.activeRuns, 'run should land in the active profile').toBe(1);
+  expect(keys.defaultRuns, 'run must not leak into the default profile').toBe(0);
+});
+
 test.describe('sync codes', () => {
   test('a code round-trips progress into a fresh profile', async ({ page }) => {
     await page.goto(ACCOUNT + '?reset');

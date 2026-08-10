@@ -56,6 +56,12 @@ test.describe('shared chrome', () => {
       await expect(page.locator('.skip-link')).toHaveAttribute('href', '#main');
       await expect(page.locator('#main')).toHaveCount(1);
 
+      // The RPG chip must mount on EVERY page. Nine pages shipped without
+      // rpg.js, so the chip was absent there and the header's justify-between
+      // slid the nav to the right edge — the nav visibly jumped sideways as
+      // you navigated between chip and chip-less pages.
+      await expect(page.locator('.site-header .rpg-chip')).toBeVisible();
+
       expect(errors, `console errors on ${path}`).toEqual([]);
     });
   }
