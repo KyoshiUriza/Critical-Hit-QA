@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Automation Lab — QA Prep Hub</title>
+  <link rel="stylesheet" href="../css/styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="../index.html" class="brand">QA Prep Hub</a>
+      <nav class="nav">
+        <a href="../index.html">Home</a>
+        <a href="practice-tests.html">Practice Tests</a>
+        <a href="interview-questions.html">Interview Questions</a>
+        <a href="practice-apps.html">Practice Apps</a>
+        <a href="bug-bounty.html">Bug Bounty</a>
+        <a href="automation-lab.html" class="active">Automation Lab</a>
+        <a href="progress.html">Progress</a>
+        <a href="study-plan.html">Study Plan</a>
+        <a href="resources.html">Resources</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="page-header">
+      <h1>Automation Lab</h1>
+      <p>Copy-paste examples targeting the Practice Apps in Playwright, Cypress, and Selenium.</p>
+    </div>
+
+    <div class="panel">
+      <h3 style="margin-top:0;">Setup</h3>
+      <p class="text-dim">Serve this project locally so the practice apps are reachable at <code class="inline">http://localhost:8080</code>:</p>
+      <pre class="code"># Python
+python -m http.server 8080
+
+# Node
+npx serve -p 8080
+
+# Then open http://localhost:8080</pre>
+      <p class="text-dim mt-16">Update the <code class="inline">BASE_URL</code> in each example if you serve on a different port.</p>
+    </div>
+
+    <!-- ─── Login example ─── -->
+    <section class="panel">
+      <h2>Login form — happy path + lockout</h2>
+      <p class="text-dim">Target: <a href="../practice-apps/login.html" target="_blank">practice-apps/login.html</a></p>
+
+      <div class="code-tabs" role="tablist">
+        <button class="code-tab active" data-target="login-pw">Playwright</button>
+        <button class="code-tab" data-target="login-cy">Cypress</button>
+        <button class="code-tab" data-target="login-se">Selenium (Python)</button>
+      </div>
+
+      <div class="code-panel active" id="login-pw">
+        <button class="code-copy" data-copy>Copy</button>
+<pre class="code">// tests/login.spec.js
+import { test, expect } from '@playwright/test';
+
+const BASE_URL = 'http://localhost:8080';
+
+test.describe('Login form', () =&gt; {
+  test.beforeEach(async ({ page }) =&gt; {
+    await page.goto(`${BASE_URL}/practice-apps/login.html`);
+    await page.getByTestId('reset-lockout').click();
+  });
+
+  test('signs in with valid credentials', async ({ page }) =&gt; {
+    await page.getByTestId('login-email').fill('demo@qa.test');
+    await page.getByTestId('login-password').fill('Passw0rd!');
+    await page.getByTestId('login-submit').click();
+    await expect(page.getByTestId('login-result')).toContainText('Welcome');
+  });
+
+  test('shows validation errors on empty submit', async ({ page }) =&gt; {
+    await page.getByTestId('login-submit').click();
+    await expect(page.getByTestId('email-error')).toHaveText(/required/i);
+    await expect(page.getByTestId('password-error')).toHaveText(/required/i);
+  });
+
+  test('locks account after 3 failed attempts', async ({ page }) =&gt; {
+    for (let i = 0; i &lt; 3; i++) {
+      await page.getByTestId('login-email').fill('demo@qa.test');
+      await page.getByTestId('login-password').fill('wrongPass1!');
+      await page.getByTestId('login-submit').click();
+    }
+    await expect(page.getByTestId('login-result')).toContainText(/locked/i);
+  });
+
+  test('toggles password visibility', async ({ page }) =&gt; {
+    const pw = page.getByTestId('login-password');
+    await expect(pw).toHaveAttribute('type', 'password');
+    await page.getByTestId('toggle-password').click();
+    await expect(pw).toHaveAttribute('type', 'text');
+  });
+});</pre>
+      </div>
+
+      <div class="code-panel" id="login-cy">
+        <button class="code-copy" data-copy>Copy</button>
+<pre class="code">// cypress/e2e/login.cy.js
+describe('Login form', () =&gt; {
+  const url = '/practice-apps/login.html';
+
+  beforeEach(() =&gt; {
+    cy.visit(url);
+    cy.get('[data-testid=reset-lockout]').click();
+  });
+
+  it('signs in with valid credentials', () =&gt; {
+    cy.get('[data-testid=login-email]').type('demo@qa.test');
+    cy.get('[data-testid=login-password]').type('Passw0rd!');
+    cy.get('[data-testid=login-submit]').click();
+    cy.get('[data-testid=login-result]').should('contain', 'Welcome');
+  });
+
+  it('locks after 3 failed attempts', () =&gt; {
+    for (let i = 0; i &lt; 3; i++) {
+      cy.get('[data-testid=login-email]').clear().type('demo@qa.test');
+      cy.get('[data-testid=login-password]').clear().type('wrongPass1!');
+      cy.get('[data-testid=login-submit]').click();
+    }
+    cy.get('[data-testid=login-result]').should('match', /locked/i);
+  });
+});</pre>
+      </div>
+
+      <div class="code-panel" id="login-se">
+        <button class="code-copy" data-copy>Copy</button>
+<pre class="code"># test_login.py
+import pytest
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+
+BASE_URL = "http://localhost:8080"
+
+@pytest.fixture
+def driver():
+    d = webdriver.Chrome()
+    yield d
+    d.quit()
+
+def testid(v):
+    return (By.CSS_SELECTOR, f'[data-testid="{v}"]')
+
+def test_valid_login(driver):
+    driver.get(f"{BASE_URL}/practice-apps/login.html")
+    driver.find_element(*testid("reset-lockout")).click()
+    driver.find_element(*testid("login-email")).send_keys("demo@qa.test")
+    driver.find_element(*testid("login-password")).send_keys("Passw0rd!")
+    driver.find_element(*testid("login-submit")).click()
+    result = WebDriverWait(driver, 5).until(
+        EC.visibility_of_element_located(testid("login-result"))
+    )
+    assert "Welcome" in result.text
+
+def test_lockout(driver):
+    driver.get(f"{BASE_URL}/practice-apps/login.html")
+    driver.find_element(*testid("reset-lockout")).click()
+    for _ in range(3):
+        driver.find_element(*testid("login-email")).clear()
+        driver.find_element(*testid("login-email")).send_keys("demo@qa.test")
+        driver.find_element(*testid("login-password")).clear()
+        driver.find_element(*testid("login-password")).send_keys("wrongPass1!")
+        driver.find_element(*testid("login-submit")).click()
+    result = driver.find_element(*testid("login-result"))
+    assert "locked" in result.text.lower()</pre>
+      </div>
+    </section>
+
+    <!-- ─── Todo example ─── -->
+    <section class="panel">
+      <h2>Todo list — add, complete, filter</h2>
+      <div class="code-tabs">
+        <button class="code-tab active" data-target="todo-pw">Playwright</button>
+        <button class="code-tab" data-target="todo-cy">Cypress</button>
+      </div>
+
+      <div class="code-panel active" id="todo-pw">
+        <button class="code-copy" data-copy>Copy</button>
+<pre class="code">import { test, expect } from '@playwright/test';
+const URL = 'http://localhost:8080/practice-apps/todo.html';
+
+test.beforeEach(async ({ page }) =&gt; {
+  await page.addInitScript(() =&gt; localStorage.clear());
+  await page.goto(URL);
+});
+
+test('adds a todo and completes it', async ({ page }) =&gt; {
+  await page.getByTestId('new-todo-input').fill('Write test plan');
+  await page.getByTestId('add-todo').click();
+
+  const item = page.locator('[data-testid=todo-item]').first();
+  await expect(item.locator('[data-testid=todo-text]')).toHaveText('Write test plan');
+  await expect(page.getByTestId('items-left')).toHaveText('1 item left');
+
+  await item.locator('[data-testid=todo-toggle]').check();
+  await expect(page.getByTestId('items-left')).toHaveText('0 items left');
+});
+
+test('does not add empty todos', async ({ page }) =&gt; {
+  await page.getByTestId('new-todo-input').fill('   ');
+  await page.getByTestId('add-todo').click();
+  await expect(page.locator('[data-testid=todo-item]')).toHaveCount(0);
+});
+
+test('filters show correct items', async ({ page }) =&gt; {
+  await page.getByTestId('new-todo-input').fill('one');
+  await page.getByTestId('add-todo').click();
+  await page.getByTestId('new-todo-input').fill('two');
+  await page.getByTestId('add-todo').click();
+  await page.locator('[data-testid=todo-item]').first().locator('[data-testid=todo-toggle]').check();
+
+  await page.getByTestId('filter-active').click();
+  await expect(page.locator('[data-testid=todo-item]')).toHaveCount(1);
+  await page.getByTestId('filter-done').click();
+  await expect(page.locator('[data-testid=todo-item]')).toHaveCount(1);
+});</pre>
+      </div>
+
+      <div class="code-panel" id="todo-cy">
+        <button class="code-copy" data-copy>Copy</button>
+<pre class="code">describe('Todo list', () =&gt; {
+  beforeEach(() =&gt; {
+    cy.clearLocalStorage();
+    cy.visit('/practice-apps/todo.html');
+  });
+
+  it('adds and completes a todo', () =&gt; {
+    cy.get('[data-testid=new-todo-input]').type('Write test plan{enter}');
+    cy.get('[data-testid=todo-text]').first().should('have.text', 'Write test plan');
+    cy.get('[data-testid=todo-toggle]').first().check();
+    cy.get('[data-testid=items-left]').should('have.text', '0 items left');
+  });
+});</pre>
+      </div>
+    </section>
+
+    <!-- ─── Cart example ─── -->
+    <section class="panel">
+      <h2>Shopping cart — totals, coupons</h2>
+      <div class="code-tabs">
+        <button class="code-tab active" data-target="cart-pw">Playwright</button>
+      </div>
+      <div class="code-panel active" id="cart-pw">
+        <button class="code-copy" data-copy>Copy</button>
+<pre class="code">import { test, expect } from '@playwright/test';
+const URL = 'http://localhost:8080/practice-apps/cart.html';
+
+test('applies SAVE10 coupon and shows correct total', async ({ page }) =&gt; {
+  await page.goto(URL);
+  await page.getByTestId('add-widget').click();   // $10
+  await page.getByTestId('add-widget').click();   // $10
+  await page.getByTestId('add-gadget').click();   // $25 -&gt; subtotal $45
+  await expect(page.getByTestId('subtotal')).toHaveText('$45.00');
+
+  await page.getByTestId('coupon-input').fill('save10');
+  await page.getByTestId('apply-coupon').click();
+  await expect(page.getByTestId('discount')).toHaveText('−$4.50');
+  // subtotal $45 - $4.50 = $40.50; shipping $5.99 (under $50); tax 8% of $40.50 = $3.24
+  // total = $40.50 + $5.99 + $3.24 = $49.73
+  await expect(page.getByTestId('total')).toHaveText('$49.73');
+});
+
+test('rejects EXPIRED coupon', async ({ page }) =&gt; {
+  await page.goto(URL);
+  await page.getByTestId('add-gizmo').click();
+  await page.getByTestId('coupon-input').fill('EXPIRED');
+  await page.getByTestId('apply-coupon').click();
+  await expect(page.getByTestId('coupon-msg')).toContainText(/expired/i);
+});</pre>
+      </div>
+    </section>
+
+    <!-- ─── API example ─── -->
+    <section class="panel">
+      <h2>API testing example (public sandbox)</h2>
+      <p class="text-dim">Using <code class="inline">https://jsonplaceholder.typicode.com</code> as a public sandbox.</p>
+      <div class="code-tabs">
+        <button class="code-tab active" data-target="api-pw">Playwright (request)</button>
+        <button class="code-tab" data-target="api-py">Python (requests + pytest)</button>
+      </div>
+      <div class="code-panel active" id="api-pw">
+        <button class="code-copy" data-copy>Copy</button>
+<pre class="code">import { test, expect, request } from '@playwright/test';
+
+test('GET /posts/1 returns expected shape', async () =&gt; {
+  const api = await request.newContext();
+  const res = await api.get('https://jsonplaceholder.typicode.com/posts/1');
+  expect(res.status()).toBe(200);
+  const body = await res.json();
+  expect(body).toMatchObject({
+    id: 1,
+    userId: expect.any(Number),
+    title: expect.any(String),
+    body: expect.any(String),
+  });
+});
+
+test('POST /posts creates a new resource', async () =&gt; {
+  const api = await request.newContext();
+  const res = await api.post('https://jsonplaceholder.typicode.com/posts', {
+    data: { title: 'hello', body: 'world', userId: 1 },
+  });
+  expect(res.status()).toBe(201);
+  const body = await res.json();
+  expect(body.id).toBeDefined();
+});</pre>
+      </div>
+      <div class="code-panel" id="api-py">
+        <button class="code-copy" data-copy>Copy</button>
+<pre class="code">import requests
+
+BASE = "https://jsonplaceholder.typicode.com"
+
+def test_get_post():
+    r = requests.get(f"{BASE}/posts/1")
+    assert r.status_code == 200
+    data = r.json()
+    for key in ("id", "userId", "title", "body"):
+        assert key in data
+
+def test_post_creates_resource():
+    r = requests.post(f"{BASE}/posts", json={"title": "hi", "body": "x", "userId": 1})
+    assert r.status_code == 201
+    assert "id" in r.json()</pre>
+      </div>
+    </section>
+
+    <!-- ─── Buggy build regression example ─── -->
+    <section class="panel" style="border-color: var(--warn);">
+      <h2>Bug-hunt regression suite (buggy builds)</h2>
+      <p class="text-dim">Point the same automation at the <strong>buggy</strong> variants and each seeded defect becomes a failing test — the shape of a real regression suite catching real bugs.</p>
+
+      <div class="code-tabs">
+        <button class="code-tab active" data-target="bug-pw">Playwright</button>
+      </div>
+      <div class="code-panel active" id="bug-pw">
+        <button class="code-copy" data-copy>Copy</button>
+<pre class="code">// tests/login-broken.spec.js — each test asserts CORRECT behavior.
+// Against practice-apps/login-broken.html they FAIL, surfacing seeded bugs.
+import { test, expect } from '@playwright/test';
+const URL = 'http://localhost:8080/practice-apps/login-broken.html';
+
+test.beforeEach(async ({ page }) =&gt; {
+  await page.addInitScript(() =&gt; { localStorage.clear(); sessionStorage.clear(); });
+  await page.goto(URL);
+});
+
+test('BUG: email regex must require a TLD', async ({ page }) =&gt; {
+  await page.getByTestId('login-email').fill('a@b');
+  await page.getByTestId('login-password').fill('Passw0rd!');
+  await page.getByTestId('login-submit').click();
+  await expect(page.getByTestId('email-error')).toBeVisible();
+});
+
+test('BUG: email compare must be case-insensitive', async ({ page }) =&gt; {
+  await page.getByTestId('login-email').fill('Demo@qa.test');
+  await page.getByTestId('login-password').fill('Passw0rd!');
+  await page.getByTestId('login-submit').click();
+  await expect(page.getByTestId('login-result')).toContainText('Welcome');
+});
+
+test('BUG: empty password must be rejected', async ({ page }) =&gt; {
+  await page.getByTestId('login-email').fill('demo@qa.test');
+  await page.getByTestId('login-submit').click();
+  await expect(page.getByTestId('password-error')).toBeVisible();
+});
+
+test('BUG: error must not distinguish "wrong password" from "no account"', async ({ page }) =&gt; {
+  await page.getByTestId('login-email').fill('demo@qa.test');
+  await page.getByTestId('login-password').fill('wrongPass1!');
+  await page.getByTestId('login-submit').click();
+  const knownMsg = await page.getByTestId('login-result').textContent();
+  await page.getByTestId('reset-lockout').click();
+  await page.getByTestId('login-email').fill('nobody@qa.test');
+  await page.getByTestId('login-password').fill('wrongPass1!');
+  await page.getByTestId('login-submit').click();
+  const unknownMsg = await page.getByTestId('login-result').textContent();
+  expect(knownMsg).toBe(unknownMsg); // Same message → no enumeration.
+});
+
+test('BUG: "Show" toggle must reverse to hidden', async ({ page }) =&gt; {
+  const pw = page.getByTestId('login-password');
+  await page.getByTestId('toggle-password').click();
+  await expect(pw).toHaveAttribute('type', 'text');
+  await page.getByTestId('toggle-password').click();
+  await expect(pw).toHaveAttribute('type', 'password');
+});
+
+test('BUG: password must NOT be persisted', async ({ page }) =&gt; {
+  await page.getByTestId('login-email').fill('demo@qa.test');
+  await page.getByTestId('login-password').fill('Passw0rd!');
+  await page.getByTestId('remember-me').check();
+  await page.getByTestId('login-submit').click();
+  const stored = await page.evaluate(() =&gt; ({ ...localStorage }));
+  expect(stored).not.toHaveProperty('remembered_pw');
+});</pre>
+      </div>
+
+      <div class="mt-16">
+        <button class="btn btn-ghost btn-sm" onclick="document.getElementById('bug-more').classList.toggle('hidden')">Show more (cart + todo)</button>
+      </div>
+
+      <div id="bug-more" class="hidden mt-16">
+<pre class="code">// tests/cart-broken.spec.js
+import { test, expect } from '@playwright/test';
+const URL = 'http://localhost:8080/practice-apps/cart-broken.html';
+
+test('BUG: tax must apply to DISCOUNTED subtotal', async ({ page }) =&gt; {
+  await page.goto(URL);
+  await page.getByTestId('add-widget').click();   // $10
+  await page.getByTestId('add-widget').click();   // $10
+  await page.getByTestId('add-gadget').click();   // $25 → subtotal $45
+  await page.getByTestId('coupon-input').fill('SAVE10');
+  await page.getByTestId('apply-coupon').click();
+  await expect(page.getByTestId('tax')).toHaveText('$3.24'); // 8% of $40.50
+});
+
+test('BUG: coupons must be case-insensitive', async ({ page }) =&gt; {
+  await page.goto(URL);
+  await page.getByTestId('add-widget').click();
+  await page.getByTestId('coupon-input').fill('save10');
+  await page.getByTestId('apply-coupon').click();
+  await expect(page.getByTestId('coupon-msg')).toContainText(/applied/i);
+});
+
+test('BUG: empty cart must NOT check out', async ({ page }) =&gt; {
+  await page.goto(URL);
+  await page.getByTestId('checkout-btn').click();
+  await expect(page.getByTestId('checkout-result')).toContainText(/empty/i);
+});
+
+// tests/todo-broken.spec.js
+test('BUG: whitespace-only todo must be rejected', async ({ page }) =&gt; {
+  await page.goto('http://localhost:8080/practice-apps/todo-broken.html');
+  await page.getByTestId('new-todo-input').fill('   ');
+  await page.getByTestId('add-todo').click();
+  await expect(page.locator('[data-testid=todo-item]')).toHaveCount(0);
+});
+
+test('BUG: user input must not execute as HTML (XSS)', async ({ page }) =&gt; {
+  await page.goto('http://localhost:8080/practice-apps/todo-broken.html');
+  page.on('dialog', () =&gt; { throw new Error('XSS! alert() fired'); });
+  await page.getByTestId('new-todo-input').fill('&lt;img src=x onerror="alert(1)"&gt;');
+  await page.getByTestId('add-todo').click();
+  // Text should render literally.
+  await expect(page.getByTestId('todo-text').first()).toContainText('&lt;img');
+});</pre>
+      </div>
+
+      <p class="text-dim mt-16">Every one of these tests fails against the buggy build and passes against the clean build. That is exactly the pattern you want in a CI regression suite: green means the fix landed and stuck; red means someone broke a guarantee.</p>
+    </section>
+
+    <div class="panel">
+      <h3 style="margin-top:0;">Suggested next steps</h3>
+      <ul class="text-dim">
+        <li>Extract locators into a Page Object Model for the login and register pages.</li>
+        <li>Add fixtures/helpers to reset app state between tests (localStorage, sessionStorage).</li>
+        <li>Add visual regression checks (Playwright's <code class="inline">toHaveScreenshot</code>).</li>
+        <li>Configure CI (GitHub Actions) to run the suite on every push.</li>
+      </ul>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container"><p>QA Prep Hub — a local study companion.</p></div>
+  </footer>
+
+  <script>
+    document.querySelectorAll(".code-tabs").forEach((group) => {
+      const tabs = group.querySelectorAll(".code-tab");
+      tabs.forEach((tab) => {
+        tab.addEventListener("click", () => {
+          const targetId = tab.dataset.target;
+          const parentSection = group.parentElement;
+          parentSection.querySelectorAll(".code-tab").forEach((t) => t.classList.remove("active"));
+          parentSection.querySelectorAll(".code-panel").forEach((p) => p.classList.remove("active"));
+          tab.classList.add("active");
+          parentSection.querySelector("#" + targetId).classList.add("active");
+        });
+      });
+    });
+    document.querySelectorAll("[data-copy]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const pre = btn.parentElement.querySelector("pre.code");
+        if (!pre) return;
+        navigator.clipboard.writeText(pre.textContent).then(() => {
+          const original = btn.textContent;
+          btn.textContent = "Copied!";
+          setTimeout(() => (btn.textContent = original), 1500);
+        });
+      });
+    });
+  </script>
+</body>
+</html>

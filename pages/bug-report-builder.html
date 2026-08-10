@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bug Report Builder — QA Prep Hub</title>
+  <link rel="stylesheet" href="../css/styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="../index.html" class="brand">QA Prep Hub</a>
+      <nav class="nav">
+        <a href="../index.html">Home</a>
+        <a href="practice-tests.html">Practice Tests</a>
+        <a href="interview-questions.html">Interview Questions</a>
+        <a href="practice-apps.html">Practice Apps</a>
+        <a href="bug-bounty.html">Bug Bounty</a>
+        <a href="automation-lab.html">Automation Lab</a>
+        <a href="progress.html">Progress</a>
+        <a href="resources.html">Resources</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="page-header">
+      <h1>Bug Report Builder</h1>
+      <p>Structured bug report authoring. Export as Markdown, GitHub Issue, or Jira-flavored text.</p>
+    </div>
+
+    <div class="two-col">
+      <div class="panel">
+        <h2 style="margin-top:0;">Bug report</h2>
+        <div class="test-case-form">
+          <div class="two-col">
+            <div class="form-field">
+              <label>ID</label>
+              <input type="text" id="br-id" placeholder="BUG-001" />
+            </div>
+            <div class="form-field">
+              <label>Reporter</label>
+              <input type="text" id="br-reporter" placeholder="Your name" />
+            </div>
+          </div>
+          <div class="form-field">
+            <label>Title <span class="text-dim" style="font-size:0.8rem;">(what + where + observed)</span></label>
+            <input type="text" id="br-title" placeholder="500 error when Notes field &gt; 500 chars on Save (login page)" />
+          </div>
+          <div class="two-col">
+            <div class="form-field">
+              <label>Severity</label>
+              <select id="br-severity">
+                <option>S1 - Critical (blocks core function, no workaround)</option>
+                <option>S2 - High (major function broken, workaround exists)</option>
+                <option>S3 - Medium (minor function broken or noticeable UX issue)</option>
+                <option>S4 - Low (cosmetic, does not affect function)</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label>Priority</label>
+              <select id="br-priority">
+                <option>P1 - Fix immediately</option>
+                <option>P2 - Fix in current sprint</option>
+                <option>P3 - Fix in a future sprint</option>
+                <option>P4 - Fix if time permits</option>
+              </select>
+            </div>
+          </div>
+          <div class="two-col">
+            <div class="form-field">
+              <label>Environment (browser / OS / build)</label>
+              <input type="text" id="br-env" placeholder="Chrome 128 · macOS 14.5 · build 2026.08.10-a1b2c3d" />
+            </div>
+            <div class="form-field">
+              <label>Frequency</label>
+              <select id="br-freq">
+                <option>Always (100%)</option>
+                <option>Frequently (~75%)</option>
+                <option>Sometimes (~50%)</option>
+                <option>Rarely (~25%)</option>
+                <option>Once</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-field">
+            <label>Preconditions</label>
+            <textarea id="br-pre" rows="2" placeholder="A user account exists; user is on /login"></textarea>
+          </div>
+          <div>
+            <label>Steps to reproduce</label>
+            <div id="steps-container"></div>
+            <button class="btn btn-ghost btn-sm" id="add-step">+ Add step</button>
+          </div>
+          <div class="form-field">
+            <label>Expected result</label>
+            <textarea id="br-expected" rows="2" placeholder="Form saves; success toast appears."></textarea>
+          </div>
+          <div class="form-field">
+            <label>Actual result</label>
+            <textarea id="br-actual" rows="2" placeholder="500 error page; nothing saved. Server log shows a stack trace at NotesController.save."></textarea>
+          </div>
+          <div class="form-field">
+            <label>Evidence (URLs to screenshots / recordings / logs)</label>
+            <textarea id="br-evidence" rows="2" placeholder="- Screenshot: https://...\n- HAR: https://..."></textarea>
+          </div>
+          <div class="form-field">
+            <label>Regression? (build introduced, if known)</label>
+            <input type="text" id="br-regression" placeholder="Introduced in 2026.08.09 (worked in 2026.08.08)" />
+          </div>
+          <div class="form-field">
+            <label>Notes / suspected cause</label>
+            <textarea id="br-notes" rows="2" placeholder="Might be related to the new server-side max-length validation added in PR #482."></textarea>
+          </div>
+
+          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <button class="btn btn-primary" data-export="markdown">Export as Markdown</button>
+            <button class="btn btn-primary" data-export="github">Export as GitHub Issue</button>
+            <button class="btn btn-primary" data-export="jira">Export as Jira</button>
+            <button class="btn btn-primary" data-export="json">Export as JSON</button>
+            <button class="btn btn-ghost" id="load-example">Load example</button>
+            <button class="btn btn-ghost" id="clear-form">Clear</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2 style="margin-top:0;">Preview</h2>
+        <pre class="code" id="preview" style="min-height:400px; white-space:pre-wrap;">(Fill in the form and click Export...)</pre>
+        <div style="display:flex; gap:8px;">
+          <button class="btn btn-ghost btn-sm" id="copy-preview">Copy to clipboard</button>
+          <button class="btn btn-ghost btn-sm" id="save-report">Save to progress</button>
+        </div>
+        <p class="text-dim" style="font-size:0.85rem; margin-top:12px;" id="save-note"></p>
+      </div>
+    </div>
+
+    <div class="panel mt-16">
+      <h3 style="margin-top:0;">Bug report quality checklist</h3>
+      <ul class="text-dim" style="font-size:0.9rem;">
+        <li><strong>Title</strong> is specific: what happens, where, under what condition.</li>
+        <li><strong>Steps</strong> are minimal, deterministic, numbered — someone else can reproduce blindly.</li>
+        <li><strong>Environment</strong> covers browser, OS, and the exact build/commit.</li>
+        <li><strong>Expected vs. actual</strong> are separate — no burying the "should have" in prose.</li>
+        <li><strong>Evidence</strong> attached: screenshot at minimum, log/HAR for backend bugs.</li>
+        <li><strong>Severity and priority</strong> are separate judgments with a one-line reason each.</li>
+        <li><strong>Frequency</strong> is quantified ("3 of 5 tries", not "sometimes").</li>
+        <li><strong>Regression?</strong> — if it worked in a prior build, name it. Saves hours in triage.</li>
+      </ul>
+    </div>
+  </main>
+
+  <script src="../js/progress.js"></script>
+  <script>
+    const stepsContainer = document.getElementById("steps-container");
+    function addStep(action = "", expected = "") {
+      const idx = stepsContainer.children.length + 1;
+      const row = document.createElement("div");
+      row.className = "step-row";
+      row.innerHTML = `
+        <div class="step-num">${idx}</div>
+        <textarea class="step-action" rows="1" placeholder="Action">${action}</textarea>
+        <textarea class="step-expected" rows="1" placeholder="Expected at this step (optional)">${expected}</textarea>
+        <button class="btn btn-ghost btn-sm" data-remove>×</button>
+      `;
+      row.querySelector("[data-remove]").addEventListener("click", () => {
+        row.remove();
+        renumber();
+      });
+      stepsContainer.appendChild(row);
+    }
+    function renumber() {
+      Array.from(stepsContainer.children).forEach((r, i) => {
+        r.querySelector(".step-num").textContent = i + 1;
+      });
+    }
+
+    document.getElementById("add-step").addEventListener("click", () => addStep());
+
+    function collect() {
+      const steps = Array.from(stepsContainer.querySelectorAll(".step-row")).map((r, i) => ({
+        step: i + 1,
+        action: r.querySelector(".step-action").value.trim(),
+        expected: r.querySelector(".step-expected").value.trim()
+      }));
+      return {
+        id: document.getElementById("br-id").value.trim(),
+        reporter: document.getElementById("br-reporter").value.trim(),
+        title: document.getElementById("br-title").value.trim(),
+        severity: document.getElementById("br-severity").value,
+        priority: document.getElementById("br-priority").value,
+        environment: document.getElementById("br-env").value.trim(),
+        frequency: document.getElementById("br-freq").value,
+        preconditions: document.getElementById("br-pre").value.trim(),
+        steps,
+        expected: document.getElementById("br-expected").value.trim(),
+        actual: document.getElementById("br-actual").value.trim(),
+        evidence: document.getElementById("br-evidence").value.trim(),
+        regression: document.getElementById("br-regression").value.trim(),
+        notes: document.getElementById("br-notes").value.trim()
+      };
+    }
+
+    function stepsMd(steps) {
+      if (!steps.length) return "1. (add steps)";
+      return steps.map((s) => `${s.step}. ${s.action}${s.expected ? "  — *expected: " + s.expected + "*" : ""}`).join("\n");
+    }
+
+    function toMarkdown(br) {
+      return `# ${br.id || "BUG-XXX"}: ${br.title || "(no title)"}
+
+**Reporter:** ${br.reporter || "-"}
+**Severity:** ${br.severity}
+**Priority:** ${br.priority}
+**Environment:** ${br.environment || "-"}
+**Frequency:** ${br.frequency}
+${br.regression ? "**Regression:** " + br.regression + "\n" : ""}
+## Preconditions
+${br.preconditions || "-"}
+
+## Steps to reproduce
+${stepsMd(br.steps)}
+
+## Expected result
+${br.expected || "-"}
+
+## Actual result
+${br.actual || "-"}
+
+## Evidence
+${br.evidence || "-"}
+
+${br.notes ? "## Notes\n" + br.notes + "\n" : ""}`;
+    }
+
+    function toGithub(br) {
+      return `**Summary:** ${br.title || "(no title)"}
+
+**Environment**
+- Browser/OS: ${br.environment || "-"}
+- Build: ${br.regression || "-"}
+
+**Steps to reproduce**
+${stepsMd(br.steps)}
+
+**Expected:** ${br.expected || "-"}
+**Actual:** ${br.actual || "-"}
+
+**Severity/Priority:** ${br.severity} / ${br.priority}
+**Frequency:** ${br.frequency}
+
+**Evidence**
+${br.evidence || "-"}
+
+${br.notes ? "**Notes**\n" + br.notes : ""}
+
+/label ~bug`;
+    }
+
+    function toJira(br) {
+      return `h2. ${br.id || "BUG-XXX"}: ${br.title || "(no title)"}
+
+|| Reporter || ${br.reporter || "-"} ||
+|| Severity || ${br.severity} ||
+|| Priority || ${br.priority} ||
+|| Environment || ${br.environment || "-"} ||
+|| Frequency || ${br.frequency} ||
+${br.regression ? "|| Regression || " + br.regression + " ||\n" : ""}
+h3. Preconditions
+${br.preconditions || "-"}
+
+h3. Steps to reproduce
+${br.steps.map((s) => `# ${s.action}${s.expected ? " (expected: " + s.expected + ")" : ""}`).join("\n") || "# (add steps)"}
+
+h3. Expected result
+${br.expected || "-"}
+
+h3. Actual result
+${br.actual || "-"}
+
+h3. Evidence
+${br.evidence || "-"}
+
+${br.notes ? "h3. Notes\n" + br.notes : ""}`;
+    }
+
+    function preview(text) { document.getElementById("preview").textContent = text; }
+
+    document.querySelectorAll("[data-export]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const br = collect();
+        const fmt = btn.dataset.export;
+        if (fmt === "markdown") preview(toMarkdown(br));
+        else if (fmt === "github") preview(toGithub(br));
+        else if (fmt === "jira") preview(toJira(br));
+        else preview(JSON.stringify(br, null, 2));
+      });
+    });
+
+    document.getElementById("copy-preview").addEventListener("click", () => {
+      navigator.clipboard.writeText(document.getElementById("preview").textContent);
+      document.getElementById("save-note").textContent = "Copied to clipboard.";
+      setTimeout(() => document.getElementById("save-note").textContent = "", 2000);
+    });
+
+    document.getElementById("save-report").addEventListener("click", () => {
+      if (window.Progress) window.Progress.incrementBugReports();
+      document.getElementById("save-note").textContent = "Counted toward your progress dashboard.";
+      setTimeout(() => document.getElementById("save-note").textContent = "", 2500);
+    });
+
+    document.getElementById("clear-form").addEventListener("click", () => {
+      if (!confirm("Clear the form?")) return;
+      document.querySelectorAll("#br-id, #br-reporter, #br-title, #br-env, #br-pre, #br-expected, #br-actual, #br-evidence, #br-regression, #br-notes").forEach((el) => el.value = "");
+      stepsContainer.innerHTML = "";
+      preview("(Fill in the form and click Export...)");
+    });
+
+    document.getElementById("load-example").addEventListener("click", () => {
+      document.getElementById("br-id").value = "BUG-LOGIN-004";
+      document.getElementById("br-reporter").value = "K. Uriza";
+      document.getElementById("br-title").value = "Login accepts empty password with correct email (login page)";
+      document.getElementById("br-severity").value = "S1 - Critical (blocks core function, no workaround)";
+      document.getElementById("br-priority").value = "P1 - Fix immediately";
+      document.getElementById("br-env").value = "Chrome 128 · Windows 11 · practice-apps/login-broken.html (build 2026.08.10)";
+      document.getElementById("br-freq").value = "Always (100%)";
+      document.getElementById("br-pre").value = "User is on the login page. Lockout counter is reset.";
+      stepsContainer.innerHTML = "";
+      addStep("Enter demo@qa.test in the Email field.", "Field accepts input, no error.");
+      addStep("Leave Password field empty.", "");
+      addStep("Click Sign in.", "Password required error appears; user stays on login page.");
+      document.getElementById("br-expected").value = "The form shows 'Password is required' and the user remains on the login page. No session is established.";
+      document.getElementById("br-actual").value = "Form submits successfully and shows 'Welcome, demo@qa.test' — a session is established with no password verification.";
+      document.getElementById("br-evidence").value = "- Screenshot: [attach in tracker]\n- Repro rate: 5/5 attempts";
+      document.getElementById("br-regression").value = "Present in current build; earlier clean build (login.html) does not exhibit this.";
+      document.getElementById("br-notes").value = "Server-side check for empty password is likely missing. Impacts every account.";
+    });
+
+    addStep();
+  </script>
+</body>
+</html>

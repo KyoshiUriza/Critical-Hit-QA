@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Interview Questions — QA Prep Hub</title>
+  <link rel="stylesheet" href="../css/styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="../index.html" class="brand">QA Prep Hub</a>
+      <nav class="nav">
+        <a href="../index.html">Home</a>
+        <a href="practice-tests.html">Practice Tests</a>
+        <a href="interview-questions.html" class="active">Interview Questions</a>
+        <a href="practice-apps.html">Practice Apps</a>
+        <a href="bug-bounty.html">Bug Bounty</a>
+        <a href="automation-lab.html">Automation Lab</a>
+        <a href="progress.html">Progress</a>
+        <a href="study-plan.html">Study Plan</a>
+        <a href="resources.html">Resources</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="page-header">
+      <h1>Interview Questions</h1>
+      <p>Curated questions with model answers. Click a question to reveal the answer.</p>
+    </div>
+
+    <div class="quiz-controls">
+      <input id="search" type="search" placeholder="Search questions..." style="min-width:240px;" />
+      <select id="difficulty-filter">
+        <option value="all">All difficulties</option>
+        <option value="easy">Easy</option>
+        <option value="medium">Medium</option>
+        <option value="hard">Hard</option>
+      </select>
+      <span class="text-dim" id="result-count"></span>
+    </div>
+
+    <div id="category-tabs" class="category-tabs"></div>
+    <div id="questions-list"></div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container"><p>QA Prep Hub — a local study companion.</p></div>
+  </footer>
+
+  <script src="../js/data/interview-questions.js"></script>
+  <script src="../js/interview.js"></script>
+</body>
+</html>

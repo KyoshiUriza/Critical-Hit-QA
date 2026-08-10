@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>QA Prep Hub — Interview & Testing Resources</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="index.html" class="brand">QA Prep Hub</a>
+      <nav class="nav">
+        <a href="index.html" class="active">Home</a>
+        <a href="pages/practice-tests.html">Practice Tests</a>
+        <a href="pages/interview-questions.html">Interview Questions</a>
+        <a href="pages/practice-apps.html">Practice Apps</a>
+        <a href="pages/bug-bounty.html">Bug Bounty</a>
+        <a href="pages/automation-lab.html">Automation Lab</a>
+        <a href="pages/progress.html">Progress</a>
+        <a href="pages/study-plan.html">Study Plan</a>
+        <a href="pages/resources.html">Resources</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="hero">
+      <h1>Land your next QA role.</h1>
+      <p class="lede">
+        A hands-on prep hub for Software QA interviews — study questions,
+        practice quizzes, real interactive apps to test, and ready-to-run
+        automation examples in Playwright, Cypress, and Selenium.
+      </p>
+      <div class="hero-cta">
+        <a class="btn btn-primary" href="pages/practice-tests.html">Take a Practice Quiz</a>
+        <a class="btn btn-ghost" href="pages/practice-apps.html">Try a Practice App</a>
+      </div>
+    </section>
+
+    <section class="feature-grid">
+      <a class="feature-card" href="pages/practice-tests.html">
+        <div class="feature-icon">?</div>
+        <h3>Practice Tests</h3>
+        <p>Timed multiple-choice quizzes across manual, automation, API, and Agile topics with instant explanations.</p>
+      </a>
+      <a class="feature-card" href="pages/interview-questions.html">
+        <div class="feature-icon">Q</div>
+        <h3>Interview Questions</h3>
+        <p>Curated, categorized Q&A — from "what is regression testing" to "design a test plan for X."</p>
+      </a>
+      <a class="feature-card" href="pages/practice-apps.html">
+        <div class="feature-icon">&#x25A2;</div>
+        <h3>Practice Apps</h3>
+        <p>Interactive front-end apps (login, todo, cart, form) — clean AND buggy variants. Write test cases, then hunt seeded defects.</p>
+      </a>
+      <a class="feature-card" href="pages/automation-lab.html">
+        <div class="feature-icon">&lt;/&gt;</div>
+        <h3>Automation Lab</h3>
+        <p>Copy-paste Playwright, Cypress, and Selenium examples targeting our practice apps.</p>
+      </a>
+      <a class="feature-card" href="pages/test-case-builder.html">
+        <div class="feature-icon">&#10003;</div>
+        <h3>Test Case Builder</h3>
+        <p>Template-driven test case authoring — export as Markdown or JSON for your portfolio.</p>
+      </a>
+      <a class="feature-card" href="pages/bug-report-builder.html">
+        <div class="feature-icon">!</div>
+        <h3>Bug Report Builder</h3>
+        <p>Structured bug report authoring. Export to Markdown, GitHub Issue, or Jira format.</p>
+      </a>
+      <a class="feature-card" href="pages/bug-bounty.html">
+        <div class="feature-icon">&#x1F41B;</div>
+        <h3>Bug Bounty</h3>
+        <p>Score your buggy-app hunts against the seeded defect catalog. Weighted by severity.</p>
+      </a>
+      <a class="feature-card" href="pages/study-plan.html">
+        <div class="feature-icon">&#128197;</div>
+        <h3>Study Plan</h3>
+        <p>3-day, 1-week, or 1-month structured prep plans linking into every tool on the site.</p>
+      </a>
+      <a class="feature-card" href="pages/progress.html">
+        <div class="feature-icon">&#128200;</div>
+        <h3>Progress Dashboard</h3>
+        <p>Track quiz accuracy by category, bug bounty score, streaks, and drafted artifacts.</p>
+      </a>
+      <a class="feature-card" href="pages/resources.html">
+        <div class="feature-icon">i</div>
+        <h3>Resources</h3>
+        <p>Cheat sheets, glossary, and links to ISTQB, testing books, and free tools.</p>
+      </a>
+    </section>
+
+    <section class="stats-strip">
+      <div><strong id="stat-questions">--</strong><span>Quiz questions</span></div>
+      <div><strong id="stat-interview">--</strong><span>Interview prompts</span></div>
+      <div><strong id="stat-apps">12</strong><span>Practice apps (8 clean + 4 buggy)</span></div>
+      <div><strong id="stat-frameworks">3</strong><span>Automation frameworks</span></div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p>QA Prep Hub — a local study companion. Built as a self-contained static site.</p>
+    </div>
+  </footer>
+
+  <script src="js/data/quiz-questions.js"></script>
+  <script src="js/data/interview-questions.js"></script>
+  <script src="js/home.js"></script>
+</body>
+</html>

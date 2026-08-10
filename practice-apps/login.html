@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Practice: Login Form — QA Prep Hub</title>
+  <link rel="stylesheet" href="../css/styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="../index.html" class="brand">QA Prep Hub</a>
+      <nav class="nav">
+        <a href="../index.html">Home</a>
+        <a href="../pages/practice-apps.html">← Back to Practice Apps</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="page-header">
+      <h1>Login Form</h1>
+      <p>Valid credentials for testing: <code class="inline">demo@qa.test</code> / <code class="inline">Passw0rd!</code></p>
+    </div>
+
+    <div class="two-col">
+      <div>
+        <div class="app-frame" role="region" aria-label="Login form">
+          <h2 style="margin-top:0;">Sign in</h2>
+          <form id="login-form" novalidate>
+            <div class="form-field">
+              <label for="email">Email</label>
+              <input type="email" id="email" name="email" data-testid="login-email" autocomplete="username" />
+              <div class="form-error" id="email-error" data-testid="email-error"></div>
+            </div>
+            <div class="form-field">
+              <label for="password">Password</label>
+              <div style="display:flex; gap:8px;">
+                <input type="password" id="password" name="password" data-testid="login-password" autocomplete="current-password" style="flex:1;" />
+                <button type="button" class="btn btn-ghost btn-sm" id="toggle-pw" data-testid="toggle-password">Show</button>
+              </div>
+              <div class="form-error" id="password-error" data-testid="password-error"></div>
+            </div>
+            <div class="form-field">
+              <label><input type="checkbox" id="remember" data-testid="remember-me" /> Remember me</label>
+            </div>
+            <button class="btn btn-primary" type="submit" data-testid="login-submit">Sign in</button>
+            <button class="btn btn-ghost" type="button" id="reset-btn" data-testid="reset-lockout" style="margin-left:8px;">Reset lockout (test)</button>
+          </form>
+          <div id="result" style="margin-top:14px;"></div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3 style="margin-top:0;">Behavior spec (your oracle)</h3>
+        <ul class="text-dim" style="font-size:0.9rem;">
+          <li>Email must be present, valid format.</li>
+          <li>Password must be present, min 8 chars.</li>
+          <li>Valid creds: <code class="inline">demo@qa.test</code> / <code class="inline">Passw0rd!</code>.</li>
+          <li>After 3 failed attempts, account is locked for 30 seconds.</li>
+          <li>"Show" password button toggles input type; button label updates.</li>
+          <li>"Remember me" persists last email in localStorage.</li>
+          <li>Errors are shown per-field and via <code class="inline">role="alert"</code>.</li>
+        </ul>
+        <h3>Testable attributes</h3>
+        <p class="text-dim" style="font-size:0.9rem;">
+          Every interactive element has a stable <code class="inline">data-testid</code>:
+          <code class="inline">login-email</code>, <code class="inline">login-password</code>,
+          <code class="inline">login-submit</code>, <code class="inline">toggle-password</code>,
+          <code class="inline">remember-me</code>, <code class="inline">email-error</code>,
+          <code class="inline">password-error</code>, <code class="inline">login-result</code>.
+        </p>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    (function () {
+      const VALID_EMAIL = "demo@qa.test";
+      const VALID_PW = "Passw0rd!";
+      const MAX_FAILS = 3;
+      const LOCK_MS = 30000;
+
+      const state = {
+        fails: parseInt(sessionStorage.getItem("login_fails") || "0", 10),
+        lockedUntil: parseInt(sessionStorage.getItem("login_locked") || "0", 10)
+      };
+
+      const emailInput = document.getElementById("email");
+      if (localStorage.getItem("remembered_email")) {
+        emailInput.value = localStorage.getItem("remembered_email");
+      }
+
+      document.getElementById("toggle-pw").addEventListener("click", () => {
+        const pw = document.getElementById("password");
+        const btn = document.getElementById("toggle-pw");
+        if (pw.type === "password") { pw.type = "text"; btn.textContent = "Hide"; }
+        else { pw.type = "password"; btn.textContent = "Show"; }
+      });
+
+      document.getElementById("reset-btn").addEventListener("click", () => {
+        sessionStorage.removeItem("login_fails");
+        sessionStorage.removeItem("login_locked");
+        state.fails = 0;
+        state.lockedUntil = 0;
+        document.getElementById("result").innerHTML = "";
+      });
+
+      document.getElementById("login-form").addEventListener("submit", (e) => {
+        e.preventDefault();
+        clearErrors();
+
+        if (Date.now() < state.lockedUntil) {
+          const secs = Math.ceil((state.lockedUntil - Date.now()) / 1000);
+          showResult(`Account locked. Try again in ${secs}s.`, "danger");
+          return;
+        }
+
+        const email = document.getElementById("email").value.trim();
+        const pw = document.getElementById("password").value;
+
+        let hasError = false;
+        if (!email) { setError("email-error", "Email is required."); hasError = true; }
+        else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+          setError("email-error", "Enter a valid email address."); hasError = true;
+        }
+        if (!pw) { setError("password-error", "Password is required."); hasError = true; }
+        else if (pw.length < 8) { setError("password-error", "Password must be at least 8 characters."); hasError = true; }
+        if (hasError) return;
+
+        if (email.toLowerCase() === VALID_EMAIL && pw === VALID_PW) {
+          state.fails = 0;
+          sessionStorage.removeItem("login_fails");
+          if (document.getElementById("remember").checked) {
+            localStorage.setItem("remembered_email", email);
+          } else {
+            localStorage.removeItem("remembered_email");
+          }
+          showResult(`Welcome, ${email}. (Simulated dashboard.)`, "success");
+        } else {
+          state.fails += 1;
+          sessionStorage.setItem("login_fails", String(state.fails));
+          if (state.fails >= MAX_FAILS) {
+            state.lockedUntil = Date.now() + LOCK_MS;
+            sessionStorage.setItem("login_locked", String(state.lockedUntil));
+            showResult(`Too many failed attempts. Locked for 30s.`, "danger");
+          } else {
+            showResult(`Invalid credentials. ${MAX_FAILS - state.fails} attempt(s) remaining.`, "danger");
+          }
+        }
+      });
+
+      function setError(id, msg) {
+        const e = document.getElementById(id);
+        e.textContent = msg;
+        e.classList.add("visible");
+      }
+      function clearErrors() {
+        document.querySelectorAll(".form-error").forEach((e) => {
+          e.textContent = "";
+          e.classList.remove("visible");
+        });
+        document.getElementById("result").innerHTML = "";
+      }
+      function showResult(msg, kind) {
+        const box = document.getElementById("result");
+        box.setAttribute("role", "alert");
+        box.setAttribute("data-testid", "login-result");
+        box.className = kind === "success" ? "form-success" : "form-error visible";
+        box.style.display = "block";
+        box.textContent = msg;
+      }
+    })();
+  </script>
+</body>
+</html>

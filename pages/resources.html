@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Resources — QA Prep Hub</title>
+  <link rel="stylesheet" href="../css/styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="../index.html" class="brand">QA Prep Hub</a>
+      <nav class="nav">
+        <a href="../index.html">Home</a>
+        <a href="practice-tests.html">Practice Tests</a>
+        <a href="interview-questions.html">Interview Questions</a>
+        <a href="practice-apps.html">Practice Apps</a>
+        <a href="bug-bounty.html">Bug Bounty</a>
+        <a href="automation-lab.html">Automation Lab</a>
+        <a href="progress.html">Progress</a>
+        <a href="study-plan.html">Study Plan</a>
+        <a href="resources.html" class="active">Resources</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="page-header">
+      <h1>Resources</h1>
+      <p>Cheat sheets, glossary, and links for deeper study.</p>
+    </div>
+
+    <!-- Cheat sheets -->
+    <section class="panel">
+      <h2 style="margin-top:0;">HTTP status code cheat sheet</h2>
+      <div class="two-col">
+        <div>
+          <strong>2xx — Success</strong>
+          <ul class="text-dim">
+            <li><code class="inline">200</code> OK — generic success</li>
+            <li><code class="inline">201</code> Created — resource created</li>
+            <li><code class="inline">202</code> Accepted — async work started</li>
+            <li><code class="inline">204</code> No Content — success, no body</li>
+          </ul>
+          <strong>3xx — Redirection</strong>
+          <ul class="text-dim">
+            <li><code class="inline">301</code> Moved Permanently</li>
+            <li><code class="inline">302</code> Found (temp redirect)</li>
+            <li><code class="inline">304</code> Not Modified (cache)</li>
+          </ul>
+        </div>
+        <div>
+          <strong>4xx — Client errors</strong>
+          <ul class="text-dim">
+            <li><code class="inline">400</code> Bad Request</li>
+            <li><code class="inline">401</code> Unauthorized (not authenticated)</li>
+            <li><code class="inline">403</code> Forbidden (authenticated but no access)</li>
+            <li><code class="inline">404</code> Not Found</li>
+            <li><code class="inline">409</code> Conflict (e.g., duplicate)</li>
+            <li><code class="inline">422</code> Unprocessable Entity (validation)</li>
+            <li><code class="inline">429</code> Too Many Requests (rate limit)</li>
+          </ul>
+          <strong>5xx — Server errors</strong>
+          <ul class="text-dim">
+            <li><code class="inline">500</code> Internal Server Error</li>
+            <li><code class="inline">502</code> Bad Gateway</li>
+            <li><code class="inline">503</code> Service Unavailable</li>
+            <li><code class="inline">504</code> Gateway Timeout</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2 style="margin-top:0;">Test design techniques cheat sheet</h2>
+      <ul>
+        <li><strong>Equivalence Partitioning</strong> — divide inputs into classes, test one per class.</li>
+        <li><strong>Boundary Value Analysis</strong> — test at, just below, and just above each boundary.</li>
+        <li><strong>Decision Table</strong> — enumerate combinations of conditions and expected outcomes.</li>
+        <li><strong>State Transition</strong> — enumerate states and valid/invalid transitions.</li>
+        <li><strong>Pairwise / All-pairs</strong> — cover all pairs of parameter values with fewer tests than exhaustive.</li>
+        <li><strong>Error Guessing</strong> — apply experience/intuition to guess where defects hide.</li>
+        <li><strong>Exploratory (charter-based)</strong> — time-boxed exploration with an explicit mission.</li>
+        <li><strong>Use case / scenario</strong> — walk through end-to-end user journeys.</li>
+      </ul>
+    </section>
+
+    <section class="panel">
+      <h2 style="margin-top:0;">Testing types quick reference</h2>
+      <div class="two-col">
+        <div>
+          <strong>By level</strong>
+          <ul class="text-dim">
+            <li>Unit</li>
+            <li>Component / Integration</li>
+            <li>System</li>
+            <li>User Acceptance (UAT)</li>
+          </ul>
+          <strong>By purpose</strong>
+          <ul class="text-dim">
+            <li>Smoke — broad, shallow</li>
+            <li>Sanity — narrow, deep</li>
+            <li>Regression — verify nothing broke</li>
+            <li>Retest / Confirmation — verify a fix</li>
+          </ul>
+        </div>
+        <div>
+          <strong>By approach</strong>
+          <ul class="text-dim">
+            <li>Manual vs. Automated</li>
+            <li>Static (reviews) vs. Dynamic (execution)</li>
+            <li>Black-box, White-box, Grey-box</li>
+          </ul>
+          <strong>Non-functional</strong>
+          <ul class="text-dim">
+            <li>Performance (load, stress, spike, soak)</li>
+            <li>Security (OWASP Top 10)</li>
+            <li>Accessibility (WCAG 2.1 AA)</li>
+            <li>Usability</li>
+            <li>Compatibility (browsers, devices, OS)</li>
+            <li>Localization / Internationalization</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2 style="margin-top:0;">Glossary</h2>
+      <dl class="text-dim">
+        <dt><strong>Test case</strong></dt>
+        <dd>A set of preconditions, inputs, steps, and expected results that verifies a specific requirement.</dd>
+        <dt><strong>Test suite</strong></dt>
+        <dd>A collection of related test cases.</dd>
+        <dt><strong>Test plan</strong></dt>
+        <dd>Document describing scope, approach, resources, and schedule of testing.</dd>
+        <dt><strong>Traceability matrix</strong></dt>
+        <dd>Maps requirements to test cases (and defects) to prove coverage.</dd>
+        <dt><strong>DoD / DoR</strong></dt>
+        <dd>Definition of Done / Ready — team agreements on when a story is complete or ready to work on.</dd>
+        <dt><strong>Flaky test</strong></dt>
+        <dd>A test that intermittently passes and fails without code changes. Root causes: timing, shared state, external dependencies.</dd>
+        <dt><strong>Shift-left / Shift-right</strong></dt>
+        <dd>Testing earlier in the SDLC (shift-left) or in production (shift-right, e.g., canary, feature flags, chaos).</dd>
+        <dt><strong>Mock vs. Stub vs. Fake</strong></dt>
+        <dd>Stub returns canned answers; mock verifies interactions were made; fake is a working lightweight implementation (e.g., in-memory DB).</dd>
+        <dt><strong>SUT</strong></dt>
+        <dd>System Under Test.</dd>
+        <dt><strong>Test double</strong></dt>
+        <dd>Umbrella term for anything that replaces a real dependency (mocks, stubs, fakes, spies, dummies).</dd>
+      </dl>
+    </section>
+
+    <section class="panel">
+      <h2 style="margin-top:0;">Suggested reading</h2>
+      <ul class="text-dim">
+        <li><em>Lessons Learned in Software Testing</em> — Kaner, Bach, Pettichord</li>
+        <li><em>Agile Testing</em> and <em>More Agile Testing</em> — Crispin & Gregory</li>
+        <li><em>Explore It!</em> — Elisabeth Hendrickson</li>
+        <li><em>xUnit Test Patterns</em> — Gerard Meszaros</li>
+        <li><em>Continuous Delivery</em> — Humble & Farley</li>
+        <li>ISTQB Foundation Level syllabus (free, ~150 pages) — solid vocabulary base.</li>
+      </ul>
+    </section>
+
+    <section class="panel">
+      <h2 style="margin-top:0;">Interview prep checklist</h2>
+      <ul>
+        <li>Know the definitions: verification vs. validation, severity vs. priority, smoke vs. sanity.</li>
+        <li>Explain the SDLC / STLC and where you fit in Scrum.</li>
+        <li>Design a test plan for a familiar feature end-to-end (login is a classic).</li>
+        <li>Walk through boundary and equivalence with a concrete example.</li>
+        <li>Know when NOT to automate.</li>
+        <li>Explain the test pyramid and page object model.</li>
+        <li>Understand HTTP basics and how you'd test a REST endpoint.</li>
+        <li>Prepare 2–3 STAR stories: critical bug found, disagreement with dev, process improvement.</li>
+        <li>Have questions ready for them: quality culture, ratio of manual to automation, deployment cadence.</li>
+      </ul>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container"><p>QA Prep Hub — a local study companion.</p></div>
+  </footer>
+</body>
+</html>

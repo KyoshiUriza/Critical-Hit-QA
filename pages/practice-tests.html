@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Practice Tests — QA Prep Hub</title>
+  <link rel="stylesheet" href="../css/styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="../index.html" class="brand">QA Prep Hub</a>
+      <nav class="nav">
+        <a href="../index.html">Home</a>
+        <a href="practice-tests.html" class="active">Practice Tests</a>
+        <a href="interview-questions.html">Interview Questions</a>
+        <a href="practice-apps.html">Practice Apps</a>
+        <a href="bug-bounty.html">Bug Bounty</a>
+        <a href="automation-lab.html">Automation Lab</a>
+        <a href="progress.html">Progress</a>
+        <a href="study-plan.html">Study Plan</a>
+        <a href="resources.html">Resources</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="page-header">
+      <h1>Practice Tests</h1>
+      <p>Timed multiple-choice quizzes. Pick a category, get instant explanations after each answer.</p>
+    </div>
+
+    <section id="setup-screen" class="panel">
+      <h2 style="margin-top:0;">Configure your quiz</h2>
+      <div class="quiz-controls">
+        <label>
+          <span class="text-dim">Category:</span>
+          <select id="category-select">
+            <option value="all">All categories</option>
+            <option value="fundamentals">Fundamentals</option>
+            <option value="manual">Manual Testing</option>
+            <option value="automation">Automation</option>
+            <option value="api">API Testing</option>
+            <option value="agile">Agile & Process</option>
+            <option value="performance">Performance</option>
+          </select>
+        </label>
+        <label>
+          <span class="text-dim">Number of questions:</span>
+          <input id="question-count" type="number" min="1" max="30" value="10" />
+        </label>
+        <label>
+          <span class="text-dim">Time limit (minutes, 0 = none):</span>
+          <input id="time-limit" type="number" min="0" max="60" value="10" />
+        </label>
+        <button class="btn btn-primary" id="start-btn">Start quiz</button>
+      </div>
+    </section>
+
+    <section id="quiz-screen" class="panel hidden">
+      <div class="quiz-meta">
+        <span id="progress-label">Question 1 of 10</span> ·
+        <span id="category-label">Category</span> ·
+        <span class="quiz-timer" id="timer-label">--:--</span>
+      </div>
+      <div class="quiz-progress"><div class="quiz-progress-bar" id="progress-bar"></div></div>
+      <div class="quiz-question">
+        <h2 id="question-text"></h2>
+        <div id="choices-list"></div>
+        <div class="quiz-explanation hidden" id="explanation-box"></div>
+      </div>
+      <div class="quiz-nav">
+        <button class="btn btn-ghost" id="quit-btn">Quit</button>
+        <div>
+          <button class="btn btn-ghost hidden" id="check-btn">Check answer</button>
+          <button class="btn btn-primary" id="next-btn" disabled>Next →</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="results-screen" class="panel hidden">
+      <div class="quiz-results">
+        <h2>Quiz complete!</h2>
+        <div class="quiz-score" id="score-display">--/--</div>
+        <p id="score-summary" class="text-dim"></p>
+        <p id="time-summary" class="text-dim"></p>
+        <div style="margin-top:20px;">
+          <button class="btn btn-primary" id="review-btn">Review answers</button>
+          <button class="btn btn-ghost" id="restart-btn">New quiz</button>
+        </div>
+      </div>
+      <div id="review-list" class="hidden mt-16"></div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container"><p>QA Prep Hub — a local study companion.</p></div>
+  </footer>
+
+  <script src="../js/data/quiz-questions.js"></script>
+  <script src="../js/progress.js"></script>
+  <script src="../js/quiz.js"></script>
+</body>
+</html>

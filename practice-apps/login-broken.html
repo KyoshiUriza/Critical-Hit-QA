@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Practice (Broken): Login Form — QA Prep Hub</title>
+  <link rel="stylesheet" href="../css/styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="../index.html" class="brand">QA Prep Hub</a>
+      <nav class="nav">
+        <a href="../index.html">Home</a>
+        <a href="../pages/practice-apps.html">← Back to Practice Apps</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="page-header">
+      <h1>Login Form <span style="color:var(--danger);font-size:1rem;">(Buggy build)</span></h1>
+      <p>Same feature as the clean login — but this build contains real defects. Your mission: find and log them all.</p>
+      <p class="text-dim">Intended valid credentials: <code class="inline">demo@qa.test</code> / <code class="inline">Passw0rd!</code></p>
+    </div>
+
+    <div class="panel" style="border-color: var(--warn);">
+      <strong>Testing charter</strong> — Verify the behavior spec on the right against what the app actually does. File one bug per real defect you find. Try boundary values, invalid input, security-shaped payloads, and repeated actions before revealing the answer key at the bottom.
+    </div>
+
+    <div class="two-col">
+      <div>
+        <div class="app-frame" role="region" aria-label="Login form">
+          <h2 style="margin-top:0;">Sign in</h2>
+          <form id="login-form" novalidate>
+            <div class="form-field">
+              <label for="email">Email</label>
+              <input type="email" id="email" name="email" data-testid="login-email" autocomplete="username" />
+              <div class="form-error" id="email-error" data-testid="email-error"></div>
+            </div>
+            <div class="form-field">
+              <label for="password">Password</label>
+              <div style="display:flex; gap:8px;">
+                <input type="password" id="password" name="password" data-testid="login-password" autocomplete="current-password" style="flex:1;" />
+                <button type="button" class="btn btn-ghost btn-sm" id="toggle-pw" data-testid="toggle-password">Show</button>
+              </div>
+              <div class="form-error" id="password-error" data-testid="password-error"></div>
+            </div>
+            <div class="form-field">
+              <label><input type="checkbox" id="remember" data-testid="remember-me" /> Remember me</label>
+            </div>
+            <button class="btn btn-primary" type="submit" data-testid="login-submit">Sign in</button>
+            <button class="btn btn-ghost" type="button" id="reset-btn" data-testid="reset-lockout" style="margin-left:8px;">Reset lockout (test)</button>
+          </form>
+          <div id="result" style="margin-top:14px;"></div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3 style="margin-top:0;">Behavior spec (your oracle)</h3>
+        <ul class="text-dim" style="font-size:0.9rem;">
+          <li>Email must be present and RFC-valid (require a domain with a dot).</li>
+          <li>Email comparison must be case-insensitive; leading/trailing whitespace trimmed.</li>
+          <li>Password must be present, min 8 chars.</li>
+          <li>Valid creds: <code class="inline">demo@qa.test</code> / <code class="inline">Passw0rd!</code>.</li>
+          <li>After 3 failed attempts, lock for 30 seconds. Counter resets on success.</li>
+          <li>"Show" button toggles password visibility both ways; label updates.</li>
+          <li>"Remember me" persists only the email — never the password.</li>
+          <li>Errors must not reveal whether an account exists.</li>
+        </ul>
+        <h3>Testable attributes</h3>
+        <p class="text-dim" style="font-size:0.9rem;">
+          Same <code class="inline">data-testid</code>s as the clean build: <code class="inline">login-email</code>, <code class="inline">login-password</code>, <code class="inline">login-submit</code>, <code class="inline">toggle-password</code>, <code class="inline">remember-me</code>, <code class="inline">email-error</code>, <code class="inline">password-error</code>, <code class="inline">login-result</code>.
+        </p>
+      </div>
+    </div>
+
+    <div class="panel mt-16">
+      <h3 style="margin-top:0;">Answer key</h3>
+      <p class="text-dim">Test on your own first. Reveal only after you've drafted your bug list.</p>
+      <button class="btn btn-ghost" id="reveal-btn">Reveal known defects</button>
+      <div id="answer-key" class="hidden mt-16">
+        <ol style="line-height:1.7;">
+          <li><strong>Email regex too permissive.</strong> Accepts <code class="inline">a@b</code> (no dot / no TLD) as valid — should reject.</li>
+          <li><strong>Case-sensitive email comparison.</strong> <code class="inline">Demo@qa.test</code> with the correct password fails — email compare should be case-insensitive.</li>
+          <li><strong>Email whitespace not trimmed.</strong> <code class="inline">"demo@qa.test "</code> (trailing space) fails validation.</li>
+          <li><strong>Empty password bypasses validation.</strong> Submitting with the correct email and blank password shows a "Welcome" success — should require a password.</li>
+          <li><strong>Password minimum length not enforced.</strong> Any non-empty password is accepted format-wise; a 1-char password produces no error.</li>
+          <li><strong>Lockout counter not reset on successful login.</strong> Two failed attempts, then a successful login, then a failed attempt → immediately locked. Counter should reset on success.</li>
+          <li><strong>"Show" toggle is one-way.</strong> Clicking again does not hide the password or change the label back to "Show".</li>
+          <li><strong>Info-leak in error messages.</strong> Wrong password on the valid email says "Wrong password"; any other email says "No such account" — enables user enumeration.</li>
+          <li><strong>"Remember me" stores the password</strong> in localStorage under <code class="inline">remembered_pw</code> — should never persist the password.</li>
+        </ol>
+        <p class="text-dim mt-16">Bonus practice: for each defect, write a full bug report using the <a href="../pages/test-case-builder.html">Test Case Builder</a> template — title, steps, expected vs. actual, severity/priority, evidence.</p>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    (function () {
+      // Intentional defects live below. Each is labeled with a "// BUG:" comment
+      // so instructors can see the seams. Learners should discover them via testing.
+
+      const VALID_EMAIL = "demo@qa.test";
+      const VALID_PW = "Passw0rd!";
+      const MAX_FAILS = 3;
+      const LOCK_MS = 30000;
+
+      const state = {
+        fails: parseInt(sessionStorage.getItem("login_fails") || "0", 10),
+        lockedUntil: parseInt(sessionStorage.getItem("login_locked") || "0", 10)
+      };
+
+      const emailInput = document.getElementById("email");
+      if (localStorage.getItem("remembered_email")) {
+        emailInput.value = localStorage.getItem("remembered_email");
+      }
+
+      // BUG 7: "Show" toggle is one-way.
+      document.getElementById("toggle-pw").addEventListener("click", () => {
+        const pw = document.getElementById("password");
+        pw.type = "text";
+        // (never sets back to "password" and never updates the label)
+      });
+
+      document.getElementById("reset-btn").addEventListener("click", () => {
+        sessionStorage.removeItem("login_fails");
+        sessionStorage.removeItem("login_locked");
+        state.fails = 0;
+        state.lockedUntil = 0;
+        document.getElementById("result").innerHTML = "";
+      });
+
+      document.getElementById("login-form").addEventListener("submit", (e) => {
+        e.preventDefault();
+        clearErrors();
+
+        if (Date.now() < state.lockedUntil) {
+          const secs = Math.ceil((state.lockedUntil - Date.now()) / 1000);
+          showResult(`Account locked. Try again in ${secs}s.`, "danger");
+          return;
+        }
+
+        // BUG 3: no trim().
+        const email = document.getElementById("email").value;
+        const pw = document.getElementById("password").value;
+
+        let hasError = false;
+        if (!email) { setError("email-error", "Email is required."); hasError = true; }
+        else if (!/^[^\s@]+@[^\s@]+$/.test(email)) { // BUG 1: missing "\.[^\s@]+" tail
+          setError("email-error", "Enter a valid email address."); hasError = true;
+        }
+        // BUG 4 & 5: password validation missing entirely.
+        if (hasError) return;
+
+        // BUG 2: case-sensitive comparison (no toLowerCase).
+        if (email === VALID_EMAIL && pw === VALID_PW) {
+          // BUG 6: fails counter NOT cleared on success.
+          if (document.getElementById("remember").checked) {
+            localStorage.setItem("remembered_email", email);
+            // BUG 9: also stores password in plaintext.
+            localStorage.setItem("remembered_pw", pw);
+          } else {
+            localStorage.removeItem("remembered_email");
+          }
+          showResult(`Welcome, ${email}. (Simulated dashboard.)`, "success");
+        } else if (email === VALID_EMAIL && pw !== VALID_PW) {
+          state.fails += 1;
+          sessionStorage.setItem("login_fails", String(state.fails));
+          if (state.fails >= MAX_FAILS) {
+            state.lockedUntil = Date.now() + LOCK_MS;
+            sessionStorage.setItem("login_locked", String(state.lockedUntil));
+            showResult(`Too many failed attempts. Locked for 30s.`, "danger");
+          } else {
+            // BUG 8: reveals that the email is valid.
+            showResult(`Wrong password. ${MAX_FAILS - state.fails} attempt(s) remaining.`, "danger");
+          }
+        } else {
+          state.fails += 1;
+          sessionStorage.setItem("login_fails", String(state.fails));
+          if (state.fails >= MAX_FAILS) {
+            state.lockedUntil = Date.now() + LOCK_MS;
+            sessionStorage.setItem("login_locked", String(state.lockedUntil));
+            showResult(`Too many failed attempts. Locked for 30s.`, "danger");
+          } else {
+            // BUG 8: distinct message reveals account does NOT exist.
+            showResult(`No such account. ${MAX_FAILS - state.fails} attempt(s) remaining.`, "danger");
+          }
+        }
+      });
+
+      function setError(id, msg) {
+        const e = document.getElementById(id);
+        e.textContent = msg;
+        e.classList.add("visible");
+      }
+      function clearErrors() {
+        document.querySelectorAll(".form-error").forEach((e) => {
+          e.textContent = "";
+          e.classList.remove("visible");
+        });
+        document.getElementById("result").innerHTML = "";
+      }
+      function showResult(msg, kind) {
+        const box = document.getElementById("result");
+        box.setAttribute("role", "alert");
+        box.setAttribute("data-testid", "login-result");
+        box.className = kind === "success" ? "form-success" : "form-error visible";
+        box.style.display = "block";
+        box.textContent = msg;
+      }
+
+      document.getElementById("reveal-btn").addEventListener("click", () => {
+        document.getElementById("answer-key").classList.toggle("hidden");
+      });
+    })();
+  </script>
+</body>
+</html>

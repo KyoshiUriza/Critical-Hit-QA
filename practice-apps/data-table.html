@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Practice: Data Table — QA Prep Hub</title>
+  <link rel="stylesheet" href="../css/styles.css" />
+  <style>
+    table.dt { width: 100%; border-collapse: collapse; }
+    table.dt th, table.dt td { padding: 8px 10px; border-bottom: 1px solid var(--border); text-align: left; font-size: 0.92rem; }
+    table.dt th { background: var(--bg-elev-2); cursor: pointer; user-select: none; position: relative; }
+    table.dt th[aria-sort="ascending"]::after { content: " ▲"; color: var(--accent); }
+    table.dt th[aria-sort="descending"]::after { content: " ▼"; color: var(--accent); }
+    table.dt tbody tr.selected { background: rgba(79,157,255,0.08); }
+    .pager { display:flex; gap:6px; align-items:center; margin-top:12px; flex-wrap:wrap; }
+    .pager button { background:var(--bg-elev-2); border:1px solid var(--border); color:var(--text); padding:4px 10px; border-radius:4px; cursor:pointer; font-family:inherit; }
+    .pager button[disabled] { opacity:0.4; cursor:not-allowed; }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="../index.html" class="brand">QA Prep Hub</a>
+      <nav class="nav">
+        <a href="../index.html">Home</a>
+        <a href="../pages/practice-apps.html">← Back to Practice Apps</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="page-header">
+      <h1>Data Table</h1>
+      <p>Sortable, filterable, paginated employee table with row selection.</p>
+    </div>
+
+    <div class="two-col">
+      <div>
+        <div class="app-frame">
+          <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-bottom:12px;">
+            <input type="search" id="search" data-testid="search-input" placeholder="Search name or department…" style="flex:1; min-width:200px; padding:8px; background:var(--bg); border:1px solid var(--border); color:var(--text); border-radius:6px;" />
+            <select id="dept-filter" data-testid="dept-filter" style="padding:8px; background:var(--bg); border:1px solid var(--border); color:var(--text); border-radius:6px;">
+              <option value="">All departments</option>
+            </select>
+            <select id="page-size" data-testid="page-size" style="padding:8px; background:var(--bg); border:1px solid var(--border); color:var(--text); border-radius:6px;">
+              <option value="5">5 per page</option>
+              <option value="10" selected>10 per page</option>
+              <option value="25">25 per page</option>
+            </select>
+          </div>
+          <div style="overflow-x:auto;">
+            <table class="dt" data-testid="employee-table">
+              <thead>
+                <tr>
+                  <th data-testid="th-select"><input type="checkbox" id="select-all" data-testid="select-all" aria-label="Select all" /></th>
+                  <th data-sort="id" data-testid="th-id">ID</th>
+                  <th data-sort="name" data-testid="th-name">Name</th>
+                  <th data-sort="department" data-testid="th-dept">Department</th>
+                  <th data-sort="salary" data-testid="th-salary">Salary</th>
+                  <th data-sort="hired" data-testid="th-hired">Hired</th>
+                </tr>
+              </thead>
+              <tbody id="tbody"></tbody>
+            </table>
+          </div>
+          <div class="pager">
+            <button id="prev" data-testid="prev-page">« Prev</button>
+            <span data-testid="page-label" id="page-label"></span>
+            <button id="next" data-testid="next-page">Next »</button>
+            <span class="text-dim" style="margin-left:auto;" data-testid="selection-count" id="selection-count">0 selected</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3 style="margin-top:0;">Behavior spec</h3>
+        <ul class="text-dim" style="font-size:0.9rem;">
+          <li>Column headers sort ascending; second click descending; third click clears.</li>
+          <li>Search matches name OR department, case-insensitive.</li>
+          <li>Department dropdown filters exactly.</li>
+          <li>Filters and search are additive (AND).</li>
+          <li>Page size 5/10/25; pager disables at boundaries.</li>
+          <li>"Select all" selects only visible page; count reflects total selected across pages.</li>
+          <li>Row selection persists across sorts/filters until row leaves the dataset.</li>
+        </ul>
+        <h3>Test ideas</h3>
+        <ul class="text-dim" style="font-size:0.9rem;">
+          <li>Sort a numeric column vs. a string column — is the order correct?</li>
+          <li>Filter to 0 results — is the empty state handled?</li>
+          <li>Select rows on page 1, navigate to page 2 — does the count stay?</li>
+          <li>Change page size after selecting — does selection survive?</li>
+          <li>Keyboard: can you tab to a header and sort with Enter?</li>
+        </ul>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const DEPTS = ["Engineering", "Sales", "Marketing", "Support", "Finance", "People", "Legal"];
+    const FIRST = ["Ada","Rin","Kaito","Luna","Marco","Isla","Priya","Sven","Zara","Ivan","Nia","Kai","Mira","Otto","Yui","Sam","Jade","Ren","Vera","Neo"];
+    const LAST = ["Chen","Patel","Novak","Silva","Kim","Ali","Ito","Rossi","Okafor","Hansen","Cruz","Nakamura","Bishop","Lopez","Kaur","Vega"];
+    const rows = [];
+    let seed = 42;
+    function rand() { seed = (seed * 9301 + 49297) % 233280; return seed / 233280; }
+    for (let i = 1; i <= 87; i++) {
+      const first = FIRST[Math.floor(rand() * FIRST.length)];
+      const last = LAST[Math.floor(rand() * LAST.length)];
+      const dept = DEPTS[Math.floor(rand() * DEPTS.length)];
+      const salary = Math.round((50000 + rand() * 120000) / 500) * 500;
+      const year = 2015 + Math.floor(rand() * 11);
+      const month = 1 + Math.floor(rand() * 12);
+      const day = 1 + Math.floor(rand() * 28);
+      rows.push({
+        id: i,
+        name: `${first} ${last}`,
+        department: dept,
+        salary,
+        hired: `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`
+      });
+    }
+
+    const state = {
+      sortCol: null,
+      sortDir: null,
+      page: 1,
+      pageSize: 10,
+      search: "",
+      dept: "",
+      selected: new Set()
+    };
+
+    // Populate dept filter.
+    const deptFilter = document.getElementById("dept-filter");
+    DEPTS.slice().sort().forEach((d) => {
+      const opt = document.createElement("option");
+      opt.value = d; opt.textContent = d;
+      deptFilter.appendChild(opt);
+    });
+
+    function filtered() {
+      let out = rows;
+      if (state.search) {
+        const s = state.search.toLowerCase();
+        out = out.filter((r) => r.name.toLowerCase().includes(s) || r.department.toLowerCase().includes(s));
+      }
+      if (state.dept) out = out.filter((r) => r.department === state.dept);
+      if (state.sortCol) {
+        const dir = state.sortDir === "descending" ? -1 : 1;
+        out = out.slice().sort((a, b) => {
+          const av = a[state.sortCol], bv = b[state.sortCol];
+          if (av < bv) return -1 * dir;
+          if (av > bv) return 1 * dir;
+          return 0;
+        });
+      }
+      return out;
+    }
+
+    function render() {
+      const list = filtered();
+      const totalPages = Math.max(1, Math.ceil(list.length / state.pageSize));
+      if (state.page > totalPages) state.page = totalPages;
+      const start = (state.page - 1) * state.pageSize;
+      const pageRows = list.slice(start, start + state.pageSize);
+
+      // Header sort indicators.
+      document.querySelectorAll("th[data-sort]").forEach((th) => {
+        th.removeAttribute("aria-sort");
+        if (th.dataset.sort === state.sortCol && state.sortDir) th.setAttribute("aria-sort", state.sortDir);
+      });
+
+      const tbody = document.getElementById("tbody");
+      if (pageRows.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="text-dim" style="text-align:center; padding:24px;" data-testid="empty-state">No results.</td></tr>`;
+      } else {
+        tbody.innerHTML = pageRows.map((r) => `
+          <tr class="${state.selected.has(r.id) ? "selected" : ""}" data-row-id="${r.id}" data-testid="row-${r.id}">
+            <td><input type="checkbox" ${state.selected.has(r.id) ? "checked" : ""} data-select="${r.id}" aria-label="Select row ${r.id}" /></td>
+            <td data-testid="cell-id">${r.id}</td>
+            <td data-testid="cell-name">${r.name}</td>
+            <td data-testid="cell-dept">${r.department}</td>
+            <td data-testid="cell-salary">$${r.salary.toLocaleString()}</td>
+            <td data-testid="cell-hired">${r.hired}</td>
+          </tr>
+        `).join("");
+      }
+
+      document.getElementById("page-label").textContent = `Page ${state.page} of ${totalPages} · ${list.length} row${list.length === 1 ? "" : "s"}`;
+      document.getElementById("prev").disabled = state.page <= 1;
+      document.getElementById("next").disabled = state.page >= totalPages;
+
+      // Select-all reflects page state.
+      const sa = document.getElementById("select-all");
+      const allSelected = pageRows.length > 0 && pageRows.every((r) => state.selected.has(r.id));
+      sa.checked = allSelected;
+      sa.indeterminate = !allSelected && pageRows.some((r) => state.selected.has(r.id));
+
+      document.getElementById("selection-count").textContent = `${state.selected.size} selected`;
+    }
+
+    document.querySelectorAll("th[data-sort]").forEach((th) => {
+      th.addEventListener("click", () => {
+        const col = th.dataset.sort;
+        if (state.sortCol !== col) { state.sortCol = col; state.sortDir = "ascending"; }
+        else if (state.sortDir === "ascending") state.sortDir = "descending";
+        else { state.sortCol = null; state.sortDir = null; }
+        state.page = 1; render();
+      });
+    });
+
+    document.getElementById("search").addEventListener("input", (e) => { state.search = e.target.value.trim(); state.page = 1; render(); });
+    document.getElementById("dept-filter").addEventListener("change", (e) => { state.dept = e.target.value; state.page = 1; render(); });
+    document.getElementById("page-size").addEventListener("change", (e) => { state.pageSize = parseInt(e.target.value, 10); state.page = 1; render(); });
+    document.getElementById("prev").addEventListener("click", () => { state.page--; render(); });
+    document.getElementById("next").addEventListener("click", () => { state.page++; render(); });
+
+    document.getElementById("tbody").addEventListener("change", (e) => {
+      const id = parseInt(e.target.dataset.select, 10);
+      if (!id) return;
+      if (e.target.checked) state.selected.add(id); else state.selected.delete(id);
+      render();
+    });
+
+    document.getElementById("select-all").addEventListener("change", (e) => {
+      const pageRows = filtered().slice((state.page - 1) * state.pageSize, state.page * state.pageSize);
+      if (e.target.checked) pageRows.forEach((r) => state.selected.add(r.id));
+      else pageRows.forEach((r) => state.selected.delete(r.id));
+      render();
+    });
+
+    render();
+  </script>
+</body>
+</html>

@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Study Plan — QA Prep Hub</title>
+  <link rel="stylesheet" href="../css/styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="../index.html" class="brand">QA Prep Hub</a>
+      <nav class="nav">
+        <a href="../index.html">Home</a>
+        <a href="practice-tests.html">Practice Tests</a>
+        <a href="interview-questions.html">Interview Questions</a>
+        <a href="practice-apps.html">Practice Apps</a>
+        <a href="bug-bounty.html">Bug Bounty</a>
+        <a href="automation-lab.html">Automation Lab</a>
+        <a href="progress.html">Progress</a>
+        <a href="study-plan.html" class="active">Study Plan</a>
+        <a href="resources.html">Resources</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="page-header">
+      <h1>Study Plan</h1>
+      <p>Structured prep plans. Pick the one that matches your timeline; tick off each day as you go.</p>
+    </div>
+
+    <div class="category-tabs" id="plan-tabs"></div>
+    <div id="plan-body"></div>
+
+    <div class="panel mt-16" style="text-align:center;">
+      <p class="text-dim">Overall completion for this plan</p>
+      <div class="quiz-score" id="plan-pct">0%</div>
+      <p class="text-dim" id="plan-summary"></p>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container"><p>QA Prep Hub — a local study companion.</p></div>
+  </footer>
+
+  <script src="../js/progress.js"></script>
+  <script>
+    const PLANS = {
+      "3-day": {
+        title: "3-day cram",
+        intro: "Right before the interview. Focus on high-yield fundamentals and rehearsing STAR stories.",
+        days: [
+          {
+            title: "Day 1 · Fundamentals + vocabulary",
+            tasks: [
+              { text: "Read the Interview Questions filtered to 'Fundamentals'", href: "interview-questions.html" },
+              { text: "Take the Fundamentals quiz twice — aim ≥ 80%", href: "practice-tests.html" },
+              { text: "Skim the Resources cheat sheets", href: "resources.html" }
+            ]
+          },
+          {
+            title: "Day 2 · Test design + bug hunting",
+            tasks: [
+              { text: "Read the Manual Testing questions", href: "interview-questions.html" },
+              { text: "Run an exploratory session on the buggy login and cart", href: "practice-apps.html" },
+              { text: "Log defects in the Bug Bounty scorer — aim ≥ 60% score", href: "bug-bounty.html" }
+            ]
+          },
+          {
+            title: "Day 3 · Automation + behavioral polish",
+            tasks: [
+              { text: "Read Automation Q&A + skim the Automation Lab examples", href: "automation-lab.html" },
+              { text: "Draft 2 STAR stories in the Bug Report Builder or a notes app: critical bug found, dev disagreement", href: "bug-report-builder.html" },
+              { text: "Take a mixed 15-question quiz across all categories", href: "practice-tests.html" }
+            ]
+          }
+        ]
+      },
+      "1-week": {
+        title: "1-week prep",
+        intro: "A week gets you real depth across every topic and rehearsal time.",
+        days: [
+          { title: "Day 1 · Foundations", tasks: [
+            { text: "Read Fundamentals interview questions", href: "interview-questions.html" },
+            { text: "Fundamentals quiz — aim ≥ 75%", href: "practice-tests.html" },
+            { text: "Read HTTP status + testing techniques cheat sheets", href: "resources.html" }
+          ]},
+          { title: "Day 2 · Manual testing", tasks: [
+            { text: "Read Manual Testing interview questions", href: "interview-questions.html" },
+            { text: "Design tests for the clean login app in the Test Case Builder", href: "practice-apps.html" },
+            { text: "Manual quiz — aim ≥ 75%", href: "practice-tests.html" }
+          ]},
+          { title: "Day 3 · Bug hunting", tasks: [
+            { text: "Full exploratory session on buggy login and buggy register", href: "practice-apps.html" },
+            { text: "File 3 bug reports in the Bug Report Builder — different severities", href: "bug-report-builder.html" },
+            { text: "Log all finds in Bug Bounty — aim ≥ 50%", href: "bug-bounty.html" }
+          ]},
+          { title: "Day 4 · Automation basics", tasks: [
+            { text: "Read Automation interview questions", href: "interview-questions.html" },
+            { text: "Read Automation Lab: login + todo examples", href: "automation-lab.html" },
+            { text: "Automation quiz — aim ≥ 70%", href: "practice-tests.html" }
+          ]},
+          { title: "Day 5 · API + performance", tasks: [
+            { text: "Read API + Performance interview questions", href: "interview-questions.html" },
+            { text: "Read the Automation Lab API testing section", href: "automation-lab.html" },
+            { text: "API quiz — aim ≥ 70%", href: "practice-tests.html" }
+          ]},
+          { title: "Day 6 · Bug hunt marathon + Agile", tasks: [
+            { text: "Full exploratory session on buggy cart and buggy todo", href: "practice-apps.html" },
+            { text: "Bring Bug Bounty overall score to ≥ 70%", href: "bug-bounty.html" },
+            { text: "Read Agile & Process interview questions", href: "interview-questions.html" }
+          ]},
+          { title: "Day 7 · Rehearsal + polish", tasks: [
+            { text: "Mixed 20-question quiz across all categories", href: "practice-tests.html" },
+            { text: "Read Behavioral interview questions — draft STAR stories", href: "interview-questions.html" },
+            { text: "Review the Interview Prep Checklist in Resources", href: "resources.html" }
+          ]}
+        ]
+      },
+      "1-month": {
+        title: "1-month deep dive",
+        intro: "Depth on every topic plus automation practice against the real apps.",
+        days: [
+          { title: "Week 1 · Foundations", tasks: [
+            { text: "Read ALL Fundamentals + Manual Testing questions over 3 days", href: "interview-questions.html" },
+            { text: "Take Fundamentals quiz to consistent ≥ 90%", href: "practice-tests.html" },
+            { text: "Design test cases for all 4 clean practice apps in the Test Case Builder", href: "test-case-builder.html" },
+            { text: "Read all cheat sheets in Resources", href: "resources.html" }
+          ]},
+          { title: "Week 2 · Test design + exploratory", tasks: [
+            { text: "Full exploratory session on all 4 buggy apps", href: "practice-apps.html" },
+            { text: "Bring Bug Bounty overall score to ≥ 80%", href: "bug-bounty.html" },
+            { text: "Draft 6+ bug reports in the Bug Report Builder — mixed severities", href: "bug-report-builder.html" },
+            { text: "Test the accessibility challenge with keyboard + axe DevTools", href: "practice-apps.html" }
+          ]},
+          { title: "Week 3 · Automation", tasks: [
+            { text: "Install Playwright locally; run the Automation Lab login spec against practice-apps/login.html", href: "automation-lab.html" },
+            { text: "Extend it: convert to a Page Object; add register + cart specs", href: "automation-lab.html" },
+            { text: "Read all Automation interview questions", href: "interview-questions.html" },
+            { text: "Take Automation quiz to consistent ≥ 85%", href: "practice-tests.html" }
+          ]},
+          { title: "Week 4 · API, non-functional, and rehearsal", tasks: [
+            { text: "Read API + Performance + Agile interview questions", href: "interview-questions.html" },
+            { text: "Write API tests against a public sandbox (Automation Lab example)", href: "automation-lab.html" },
+            { text: "Mixed quiz batches — bring per-category accuracy to ≥ 80%", href: "practice-tests.html" },
+            { text: "Rehearse 3 STAR stories out loud. Review Interview Prep Checklist", href: "resources.html" }
+          ]}
+        ]
+      }
+    };
+
+    let activePlan = "1-week";
+    const tabs = document.getElementById("plan-tabs");
+    Object.entries(PLANS).forEach(([key, p]) => {
+      const btn = document.createElement("button");
+      btn.className = "category-tab";
+      btn.dataset.key = key;
+      btn.textContent = p.title;
+      btn.addEventListener("click", () => { activePlan = key; render(); });
+      tabs.appendChild(btn);
+    });
+
+    function render() {
+      Array.from(tabs.children).forEach((b) => b.classList.toggle("active", b.dataset.key === activePlan));
+      const p = PLANS[activePlan];
+      const state = window.Progress.get().studyPlan[activePlan] || {};
+
+      const body = document.getElementById("plan-body");
+      body.innerHTML = `
+        <div class="panel">
+          <h2 style="margin-top:0;">${p.title}</h2>
+          <p class="text-dim">${p.intro}</p>
+        </div>
+        ${p.days.map((day, i) => {
+          const done = !!state[i];
+          return `
+            <div class="panel" style="border-color:${done ? "var(--accent-2)" : "var(--border)"};">
+              <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+                <h3 style="margin:0;">${day.title}</h3>
+                <label style="display:flex; align-items:center; gap:6px; font-size:0.9rem;">
+                  <input type="checkbox" data-day="${i}" ${done ? "checked" : ""} /> Mark complete
+                </label>
+              </div>
+              <ul style="margin-top:12px; padding-left:20px;">
+                ${day.tasks.map((t) => `<li><a href="${t.href}">${t.text}</a></li>`).join("")}
+              </ul>
+            </div>
+          `;
+        }).join("")}
+      `;
+
+      const totalDays = p.days.length;
+      const doneDays = p.days.filter((_, i) => state[i]).length;
+      const pct = Math.round(doneDays / totalDays * 100);
+      document.getElementById("plan-pct").textContent = `${pct}%`;
+      document.getElementById("plan-summary").textContent = `${doneDays} of ${totalDays} days marked complete.`;
+    }
+
+    document.addEventListener("change", (e) => {
+      const day = e.target.dataset.day;
+      if (day == null) return;
+      window.Progress.setStudyPlanDay(activePlan, parseInt(day, 10), e.target.checked);
+      render();
+    });
+
+    render();
+  </script>
+</body>
+</html>

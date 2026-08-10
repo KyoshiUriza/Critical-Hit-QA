@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Progress — QA Prep Hub</title>
+  <link rel="stylesheet" href="../css/styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="../index.html" class="brand">QA Prep Hub</a>
+      <nav class="nav">
+        <a href="../index.html">Home</a>
+        <a href="practice-tests.html">Practice Tests</a>
+        <a href="interview-questions.html">Interview Questions</a>
+        <a href="practice-apps.html">Practice Apps</a>
+        <a href="bug-bounty.html">Bug Bounty</a>
+        <a href="automation-lab.html">Automation Lab</a>
+        <a href="progress.html" class="active">Progress</a>
+        <a href="study-plan.html">Study Plan</a>
+        <a href="resources.html">Resources</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="page-header">
+      <h1>Your Progress</h1>
+      <p>Personal dashboard — quiz history, bug bounty catch rate, and artifacts you've drafted. Stored locally in this browser.</p>
+    </div>
+
+    <div class="stats-strip" id="top-stats"></div>
+
+    <div class="two-col">
+      <div class="panel">
+        <h2 style="margin-top:0;">Quiz performance by category</h2>
+        <div id="quiz-by-cat"></div>
+      </div>
+      <div class="panel">
+        <h2 style="margin-top:0;">Bug bounty by app</h2>
+        <div id="bounty-by-app"></div>
+      </div>
+    </div>
+
+    <div class="panel mt-16">
+      <h2 style="margin-top:0;">Recent quiz runs</h2>
+      <div id="recent-runs"></div>
+    </div>
+
+    <div class="panel mt-16">
+      <h2 style="margin-top:0;">Data controls</h2>
+      <p class="text-dim">All your progress lives in this browser under <code class="inline">qaprep_progress_v1</code>. Export it to move it, or reset to start fresh.</p>
+      <div style="display:flex; gap:8px; flex-wrap:wrap;">
+        <button class="btn btn-ghost" id="export-json">Export as JSON</button>
+        <button class="btn btn-ghost" id="import-btn">Import JSON…</button>
+        <input type="file" id="import-file" accept="application/json,.json" class="hidden" />
+        <button class="btn btn-danger" id="reset-btn">Reset all progress</button>
+      </div>
+      <pre class="code hidden mt-16" id="export-out" style="white-space:pre-wrap;"></pre>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container"><p>QA Prep Hub — a local study companion.</p></div>
+  </footer>
+
+  <script src="../js/data/defects.js"></script>
+  <script src="../js/progress.js"></script>
+  <script>
+    const SEVERITY_WEIGHT = { low: 1, medium: 2, high: 3, critical: 5 };
+    function render() {
+      const data = window.Progress.get();
+
+      // Top stats
+      const totalQuizAttempted = Object.values(data.quiz.byCategory).reduce((s, c) => s + c.attempted, 0);
+      const totalQuizCorrect = Object.values(data.quiz.byCategory).reduce((s, c) => s + c.correct, 0);
+      const accuracy = totalQuizAttempted > 0 ? Math.round(totalQuizCorrect / totalQuizAttempted * 100) : 0;
+
+      let bountyTotal = 0, bountyFound = 0;
+      Object.entries(window.APP_DEFECTS).forEach(([key, app]) => {
+        const found = new Set(data.bugBounty[key] || []);
+        app.defects.forEach((d) => {
+          const w = SEVERITY_WEIGHT[d.severity];
+          bountyTotal += w;
+          if (found.has(d.id)) bountyFound += w;
+        });
+      });
+      const bountyPct = bountyTotal > 0 ? Math.round(bountyFound / bountyTotal * 100) : 0;
+
+      document.getElementById("top-stats").innerHTML = `
+        <div><strong>${data.quiz.runs.length}</strong><span>Quiz runs</span></div>
+        <div><strong>${accuracy}%</strong><span>Overall accuracy</span></div>
+        <div><strong>${bountyPct}%</strong><span>Bug bounty score</span></div>
+        <div><strong>${data.testCases}</strong><span>Test cases drafted</span></div>
+        <div><strong>${data.bugReports}</strong><span>Bug reports drafted</span></div>
+        <div><strong>${data.streak.days}🔥</strong><span>Day streak</span></div>
+      `;
+
+      // Quiz by category
+      const catEl = document.getElementById("quiz-by-cat");
+      const cats = Object.entries(data.quiz.byCategory);
+      if (cats.length === 0) {
+        catEl.innerHTML = `<p class="text-dim">No quiz runs yet. <a href="practice-tests.html">Take a quiz →</a></p>`;
+      } else {
+        catEl.innerHTML = cats.map(([cat, c]) => {
+          const pct = c.attempted > 0 ? Math.round(c.correct / c.attempted * 100) : 0;
+          return `
+            <div style="margin-bottom:12px;">
+              <div style="display:flex; justify-content:space-between; font-size:0.9rem;">
+                <span><strong>${cat}</strong> <span class="text-dim">· ${c.correct}/${c.attempted} across ${c.runs} run${c.runs === 1 ? "" : "s"}</span></span>
+                <span class="${pct >= 75 ? "difficulty-easy" : pct >= 50 ? "difficulty-medium" : "difficulty-hard"}">${pct}%</span>
+              </div>
+              <div class="quiz-progress"><div class="quiz-progress-bar" style="width:${pct}%"></div></div>
+            </div>
+          `;
+        }).join("");
+      }
+
+      // Bounty by app
+      const bEl = document.getElementById("bounty-by-app");
+      bEl.innerHTML = Object.entries(window.APP_DEFECTS).map(([key, app]) => {
+        const found = new Set(data.bugBounty[key] || []);
+        const foundCount = app.defects.filter((d) => found.has(d.id)).length;
+        const pct = Math.round(foundCount / app.defects.length * 100);
+        return `
+          <div style="margin-bottom:12px;">
+            <div style="display:flex; justify-content:space-between; font-size:0.9rem;">
+              <span><strong>${app.name}</strong> <span class="text-dim">· ${foundCount}/${app.defects.length} defects</span></span>
+              <span class="${pct >= 75 ? "difficulty-easy" : pct >= 50 ? "difficulty-medium" : "difficulty-hard"}">${pct}%</span>
+            </div>
+            <div class="quiz-progress"><div class="quiz-progress-bar" style="width:${pct}%"></div></div>
+          </div>
+        `;
+      }).join("");
+
+      // Recent runs
+      const rr = document.getElementById("recent-runs");
+      if (data.quiz.runs.length === 0) {
+        rr.innerHTML = `<p class="text-dim">No runs yet.</p>`;
+      } else {
+        rr.innerHTML = `
+          <table style="width:100%; border-collapse:collapse;">
+            <thead>
+              <tr style="border-bottom:1px solid var(--border); text-align:left;">
+                <th style="padding:8px;">Date</th>
+                <th style="padding:8px;">Category</th>
+                <th style="padding:8px;">Score</th>
+                <th style="padding:8px;">Time</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${data.quiz.runs.slice(0, 15).map((r) => {
+                const pct = r.total > 0 ? Math.round(r.correct / r.total * 100) : 0;
+                const mm = Math.floor(r.elapsedMs / 60000);
+                const ss = Math.floor((r.elapsedMs % 60000) / 1000);
+                return `
+                  <tr style="border-bottom:1px solid var(--border);">
+                    <td style="padding:8px;">${r.at}</td>
+                    <td style="padding:8px;">${r.category}</td>
+                    <td style="padding:8px;"><strong>${r.correct}/${r.total}</strong> <span class="text-dim">(${pct}%)</span></td>
+                    <td style="padding:8px; font-family: var(--font-mono);">${mm}m ${String(ss).padStart(2, "0")}s</td>
+                  </tr>
+                `;
+              }).join("")}
+            </tbody>
+          </table>
+        `;
+      }
+    }
+
+    document.getElementById("export-json").addEventListener("click", () => {
+      const out = document.getElementById("export-out");
+      out.textContent = JSON.stringify(window.Progress.get(), null, 2);
+      out.classList.remove("hidden");
+    });
+
+    document.getElementById("import-btn").addEventListener("click", () => {
+      document.getElementById("import-file").click();
+    });
+    document.getElementById("import-file").addEventListener("change", (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          const parsed = JSON.parse(reader.result);
+          localStorage.setItem("qaprep_progress_v1", JSON.stringify(parsed));
+          alert("Progress imported.");
+          render();
+        } catch (err) {
+          alert("Could not parse that file.");
+        }
+      };
+      reader.readAsText(file);
+    });
+
+    document.getElementById("reset-btn").addEventListener("click", () => {
+      if (!confirm("Delete all your progress? This cannot be undone.")) return;
+      window.Progress.reset();
+      render();
+    });
+
+    render();
+  </script>
+</body>
+</html>

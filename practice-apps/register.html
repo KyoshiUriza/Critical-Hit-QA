@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Practice: Registration — QA Prep Hub</title>
+  <link rel="stylesheet" href="../css/styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="../index.html" class="brand">QA Prep Hub</a>
+      <nav class="nav">
+        <a href="../index.html">Home</a>
+        <a href="../pages/practice-apps.html">← Back to Practice Apps</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="page-header">
+      <h1>Registration Form</h1>
+      <p>Multi-field validation, password strength, and cross-field checks.</p>
+    </div>
+
+    <div class="two-col">
+      <div>
+        <div class="app-frame">
+          <h2 style="margin-top:0;">Create your account</h2>
+          <form id="reg-form" novalidate>
+            <div class="form-field">
+              <label for="fullname">Full name</label>
+              <input type="text" id="fullname" data-testid="reg-fullname" />
+              <div class="form-error" id="fullname-error" data-testid="fullname-error"></div>
+            </div>
+            <div class="form-field">
+              <label for="email">Email</label>
+              <input type="email" id="email" data-testid="reg-email" />
+              <div class="form-error" id="email-error" data-testid="email-error"></div>
+            </div>
+            <div class="form-field">
+              <label for="age">Age</label>
+              <input type="number" id="age" min="0" max="130" data-testid="reg-age" />
+              <div class="form-error" id="age-error" data-testid="age-error"></div>
+            </div>
+            <div class="form-field">
+              <label for="country">Country</label>
+              <select id="country" data-testid="reg-country">
+                <option value="">Select…</option>
+                <option value="US">United States</option>
+                <option value="CA">Canada</option>
+                <option value="MX">Mexico</option>
+                <option value="GB">United Kingdom</option>
+                <option value="JP">Japan</option>
+                <option value="OTHER">Other</option>
+              </select>
+              <div class="form-error" id="country-error" data-testid="country-error"></div>
+            </div>
+            <div class="form-field">
+              <label for="password">Password</label>
+              <input type="password" id="password" data-testid="reg-password" />
+              <div id="pw-strength" class="text-dim" style="font-size:0.8rem; margin-top:4px;" data-testid="pw-strength"></div>
+              <div class="form-error" id="password-error" data-testid="password-error"></div>
+            </div>
+            <div class="form-field">
+              <label for="confirm">Confirm password</label>
+              <input type="password" id="confirm" data-testid="reg-confirm" />
+              <div class="form-error" id="confirm-error" data-testid="confirm-error"></div>
+            </div>
+            <div class="form-field">
+              <label><input type="checkbox" id="tos" data-testid="reg-tos" /> I agree to the Terms of Service</label>
+              <div class="form-error" id="tos-error" data-testid="tos-error"></div>
+            </div>
+            <button type="submit" class="btn btn-primary" data-testid="reg-submit">Create account</button>
+          </form>
+          <div id="reg-result" style="margin-top:12px;"></div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3 style="margin-top:0;">Behavior spec</h3>
+        <ul class="text-dim" style="font-size:0.9rem;">
+          <li>Full name: required, ≥ 2 chars, whitespace trimmed.</li>
+          <li>Email: required, valid format.</li>
+          <li>Age: required, integer 13–120. Under 13 = "Sorry, you must be 13+".</li>
+          <li>Country: required.</li>
+          <li>Password: min 8 chars, needs upper, lower, digit, symbol.</li>
+          <li>Password strength meter: weak / medium / strong.</li>
+          <li>Confirm must match password exactly.</li>
+          <li>Must accept TOS.</li>
+          <li>On success, form is disabled and a success message shown.</li>
+        </ul>
+        <h3>Test ideas</h3>
+        <ul class="text-dim" style="font-size:0.9rem;">
+          <li>Emails: <code class="inline">a@b</code>, <code class="inline">a@b.c</code>, plus-addressing, unicode domain.</li>
+          <li>Age: 12, 13, 120, 121, negative, decimal, letters.</li>
+          <li>Password matching: paste vs. type, trailing whitespace.</li>
+          <li>Tab order and label associations.</li>
+          <li>Submit twice rapidly — double account created?</li>
+        </ul>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    (function () {
+      const pw = document.getElementById("password");
+      const strength = document.getElementById("pw-strength");
+
+      pw.addEventListener("input", () => {
+        const v = pw.value;
+        let score = 0;
+        if (v.length >= 8) score++;
+        if (/[A-Z]/.test(v)) score++;
+        if (/[a-z]/.test(v)) score++;
+        if (/\d/.test(v)) score++;
+        if (/[^A-Za-z0-9]/.test(v)) score++;
+        const labels = ["Very weak", "Weak", "Fair", "Medium", "Strong", "Very strong"];
+        strength.textContent = v ? `Strength: ${labels[score]}` : "";
+      });
+
+      document.getElementById("reg-form").addEventListener("submit", (e) => {
+        e.preventDefault();
+        clearErrors();
+
+        const name = document.getElementById("fullname").value.trim();
+        const email = document.getElementById("email").value.trim();
+        const ageStr = document.getElementById("age").value.trim();
+        const country = document.getElementById("country").value;
+        const password = pw.value;
+        const confirm = document.getElementById("confirm").value;
+        const tos = document.getElementById("tos").checked;
+
+        let ok = true;
+
+        if (name.length < 2) { setError("fullname-error", "Full name must be at least 2 characters."); ok = false; }
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { setError("email-error", "Enter a valid email."); ok = false; }
+
+        const age = parseInt(ageStr, 10);
+        if (!ageStr || isNaN(age)) { setError("age-error", "Age is required."); ok = false; }
+        else if (age < 13) { setError("age-error", "Sorry, you must be 13 or older."); ok = false; }
+        else if (age > 120) { setError("age-error", "Please enter a realistic age."); ok = false; }
+
+        if (!country) { setError("country-error", "Choose a country."); ok = false; }
+
+        const pwErrors = [];
+        if (password.length < 8) pwErrors.push("at least 8 chars");
+        if (!/[A-Z]/.test(password)) pwErrors.push("an uppercase letter");
+        if (!/[a-z]/.test(password)) pwErrors.push("a lowercase letter");
+        if (!/\d/.test(password)) pwErrors.push("a digit");
+        if (!/[^A-Za-z0-9]/.test(password)) pwErrors.push("a symbol");
+        if (pwErrors.length) { setError("password-error", "Password needs " + pwErrors.join(", ") + "."); ok = false; }
+
+        if (confirm !== password) { setError("confirm-error", "Passwords do not match."); ok = false; }
+        if (!tos) { setError("tos-error", "You must accept the Terms of Service."); ok = false; }
+
+        const result = document.getElementById("reg-result");
+        result.setAttribute("data-testid", "reg-result");
+        if (!ok) {
+          result.className = "form-error visible";
+          result.style.display = "block";
+          result.textContent = "Please correct the errors above.";
+          return;
+        }
+        result.className = "form-success";
+        result.style.display = "block";
+        result.textContent = `Account created for ${name} (${email}). (Simulated.)`;
+        document.querySelectorAll("#reg-form input, #reg-form select, #reg-form button").forEach((el) => el.disabled = true);
+      });
+
+      function setError(id, msg) {
+        const e = document.getElementById(id);
+        e.textContent = msg;
+        e.classList.add("visible");
+      }
+      function clearErrors() {
+        document.querySelectorAll(".form-error").forEach((e) => {
+          e.textContent = "";
+          e.classList.remove("visible");
+        });
+      }
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Practice Apps — QA Prep Hub</title>
+  <link rel="stylesheet" href="../css/styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="../index.html" class="brand">QA Prep Hub</a>
+      <nav class="nav">
+        <a href="../index.html">Home</a>
+        <a href="practice-tests.html">Practice Tests</a>
+        <a href="interview-questions.html">Interview Questions</a>
+        <a href="practice-apps.html" class="active">Practice Apps</a>
+        <a href="bug-bounty.html">Bug Bounty</a>
+        <a href="automation-lab.html">Automation Lab</a>
+        <a href="progress.html">Progress</a>
+        <a href="study-plan.html">Study Plan</a>
+        <a href="resources.html">Resources</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="page-header">
+      <h1>Practice Apps</h1>
+      <p>Real, working mini-applications with intentional edge cases. Use them to design test cases, run exploratory sessions, and target from your automation scripts.</p>
+    </div>
+
+    <div class="panel">
+      <h3 style="margin-top:0;">How to use these</h3>
+      <ol class="text-dim">
+        <li>Open an app and interact with it as a user.</li>
+        <li>Write test cases covering positive, negative, boundary, security, and accessibility scenarios (see the <a href="test-case-builder.html">Test Case Builder</a>).</li>
+        <li>Automate them against the same app — locators use <code class="inline">data-testid</code> so your selectors stay stable. See the <a href="automation-lab.html">Automation Lab</a>.</li>
+        <li>Read the "Try to find..." hints to discover intentional bugs and edge cases.</li>
+        <li>Try the <strong>Buggy</strong> variant of each app — it works like the clean version but has intentional defects. See how many you can catalog before revealing the answer key.</li>
+      </ol>
+    </div>
+
+    <h2 style="margin-top:32px;">Clean builds — write positive test cases</h2>
+    <div class="apps-grid">
+      <div class="app-card">
+        <h3>Login Form</h3>
+        <div class="app-meta">Auth · Validation · Security</div>
+        <p class="text-dim">Standard login with validation, lockout, and password toggle.</p>
+        <ul>
+          <li>Try to find: SQL-injection-looking input handling</li>
+          <li>Try to find: what happens after 3 failed attempts</li>
+          <li>Try to find: password visibility toggle behavior</li>
+        </ul>
+        <a class="btn btn-primary btn-sm" href="../practice-apps/login.html">Open app →</a>
+      </div>
+
+      <div class="app-card">
+        <h3>Todo List</h3>
+        <div class="app-meta">CRUD · Filters · State</div>
+        <p class="text-dim">Add, complete, filter, and clear todos with local persistence.</p>
+        <ul>
+          <li>Try to find: max length of a todo item</li>
+          <li>Try to find: filter behavior with 0 items</li>
+          <li>Try to find: what persists on refresh</li>
+        </ul>
+        <a class="btn btn-primary btn-sm" href="../practice-apps/todo.html">Open app →</a>
+      </div>
+
+      <div class="app-card">
+        <h3>Shopping Cart</h3>
+        <div class="app-meta">Ecommerce · Calculations</div>
+        <p class="text-dim">Add products, adjust quantity, apply coupon, calculate totals.</p>
+        <ul>
+          <li>Try to find: coupon edge cases (case sensitivity, expired codes)</li>
+          <li>Try to find: quantity boundary (0, negative, very large)</li>
+          <li>Try to find: tax/shipping calculation accuracy</li>
+        </ul>
+        <a class="btn btn-primary btn-sm" href="../practice-apps/cart.html">Open app →</a>
+      </div>
+
+      <div class="app-card">
+        <h3>Registration Form</h3>
+        <div class="app-meta">Forms · Multi-field validation</div>
+        <p class="text-dim">Multi-field form with password rules, confirm-password, and email format.</p>
+        <ul>
+          <li>Try to find: password rules and how they're communicated</li>
+          <li>Try to find: what invalid emails slip through</li>
+          <li>Try to find: which fields trim whitespace</li>
+        </ul>
+        <a class="btn btn-primary btn-sm" href="../practice-apps/register.html">Open app →</a>
+      </div>
+
+      <div class="app-card">
+        <h3>Data Table</h3>
+        <div class="app-meta">Sorting · Filtering · Pagination · Selection</div>
+        <p class="text-dim">Employee table with search, department filter, column sorting, page size, and row selection.</p>
+        <ul>
+          <li>Try to find: how sort behaves with equal values</li>
+          <li>Try to find: what happens with 0 results</li>
+          <li>Try to find: does selection survive sort/filter changes?</li>
+        </ul>
+        <a class="btn btn-primary btn-sm" href="../practice-apps/data-table.html">Open app →</a>
+      </div>
+
+      <div class="app-card">
+        <h3>File Upload</h3>
+        <div class="app-meta">Drag-drop · Validation · Progress</div>
+        <p class="text-dim">Drop or pick files with type/size limits and simulated per-file upload progress.</p>
+        <ul>
+          <li>Try to find: file exactly at the max size boundary</li>
+          <li>Try to find: does MIME type get checked or just extension?</li>
+          <li>Try to find: what happens dropping a folder</li>
+        </ul>
+        <a class="btn btn-primary btn-sm" href="../practice-apps/file-upload.html">Open app →</a>
+      </div>
+
+      <div class="app-card">
+        <h3>Modal Dialog</h3>
+        <div class="app-meta">Focus trap · ESC · Backdrop</div>
+        <p class="text-dim">Info, confirmation, and destructive dialogs with focus trapping and confirm-typing.</p>
+        <ul>
+          <li>Try to find: does Tab stay inside the modal?</li>
+          <li>Try to find: does focus return to the opener on close?</li>
+          <li>Try to find: is the confirm dialog dismissible by backdrop?</li>
+        </ul>
+        <a class="btn btn-primary btn-sm" href="../practice-apps/modal.html">Open app →</a>
+      </div>
+
+      <div class="app-card" style="border-color: var(--warn);">
+        <h3>Accessibility Challenge</h3>
+        <div class="app-meta">A11y · WCAG 2.1 AA · 13 seeded issues</div>
+        <p class="text-dim">A signup form intentionally failing multiple WCAG criteria. Practice keyboard-only, screen reader, and automated a11y testing.</p>
+        <ul>
+          <li>Try to find: which inputs lack labels</li>
+          <li>Try to find: color-only information</li>
+          <li>Try to find: divs pretending to be buttons</li>
+        </ul>
+        <a class="btn btn-primary btn-sm" href="../practice-apps/a11y-challenge.html">Open app →</a>
+      </div>
+    </div>
+
+    <h2 style="margin-top:40px;">Buggy builds — find and file the defects</h2>
+    <p class="text-dim">Each app below is a mirror of the clean version above but with intentional bugs seeded across validation, calculation, security, and state. Test against the same behavior spec — every deviation is a bug. When you're done, reveal the answer key at the bottom of the page to score yourself.</p>
+
+    <div class="apps-grid">
+      <div class="app-card" style="border-color: var(--danger);">
+        <h3>Login Form <span style="color:var(--danger); font-size:0.8rem;">BUGGY</span></h3>
+        <div class="app-meta">Auth · 9 known defects</div>
+        <p class="text-dim">Validation, security-info leaks, lockout logic, and toggle behavior — all can be broken here.</p>
+        <ul>
+          <li>Hint: try boundary emails and passwords</li>
+          <li>Hint: does the error message tell you too much?</li>
+          <li>Hint: what does "Remember me" actually remember?</li>
+        </ul>
+        <a class="btn btn-danger btn-sm" href="../practice-apps/login-broken.html">Open buggy app →</a>
+      </div>
+
+      <div class="app-card" style="border-color: var(--danger);">
+        <h3>Todo List <span style="color:var(--danger); font-size:0.8rem;">BUGGY</span></h3>
+        <div class="app-meta">CRUD · 6 known defects</div>
+        <p class="text-dim">Filters lie, counters mislead, XSS is possible, and "Clear completed" is a nuclear button.</p>
+        <ul>
+          <li>Hint: what happens with whitespace-only input?</li>
+          <li>Hint: does the "items left" number match reality?</li>
+          <li>Hint: try an HTML-shaped payload as a todo</li>
+        </ul>
+        <a class="btn btn-danger btn-sm" href="../practice-apps/todo-broken.html">Open buggy app →</a>
+      </div>
+
+      <div class="app-card" style="border-color: var(--danger);">
+        <h3>Shopping Cart <span style="color:var(--danger); font-size:0.8rem;">BUGGY</span></h3>
+        <div class="app-meta">Money math · 7 known defects</div>
+        <p class="text-dim">Calculation bugs are the fun ones. Bring a calculator; check tax, shipping, discounts, and rounding.</p>
+        <ul>
+          <li>Hint: do the coupon math yourself and compare</li>
+          <li>Hint: does free-shipping trigger when it should?</li>
+          <li>Hint: can you checkout with an empty cart?</li>
+        </ul>
+        <a class="btn btn-danger btn-sm" href="../practice-apps/cart-broken.html">Open buggy app →</a>
+      </div>
+
+      <div class="app-card" style="border-color: var(--danger);">
+        <h3>Registration Form <span style="color:var(--danger); font-size:0.8rem;">BUGGY</span></h3>
+        <div class="app-meta">Forms · 9 known defects</div>
+        <p class="text-dim">Fields lie about what they'll accept. The strength meter is a liar. TOS may not be enforced.</p>
+        <ul>
+          <li>Hint: test every field's boundary — and just past</li>
+          <li>Hint: try to submit without accepting terms</li>
+          <li>Hint: password strength — does it change?</li>
+        </ul>
+        <a class="btn btn-danger btn-sm" href="../practice-apps/register-broken.html">Open buggy app →</a>
+      </div>
+    </div>
+
+    <div class="panel mt-16" style="border-color: var(--warn);">
+      <h3 style="margin-top:0;">How to work a buggy app — the professional way</h3>
+      <ol class="text-dim">
+        <li><strong>Read the spec.</strong> The panel next to each app tells you what SHOULD happen. That's your oracle.</li>
+        <li><strong>Charter your session.</strong> Time-box (20-30 min), pick a focus (validation? calculations? security?), take notes as you go.</li>
+        <li><strong>Try to break it.</strong> Boundary values, invalid types, empty submits, whitespace, unicode, huge inputs, rapid clicks, refresh mid-flow, back button.</li>
+        <li><strong>Log each defect properly.</strong> Title (what + where + observed), steps to reproduce, expected vs. actual, severity/priority, evidence. Use the <a href="test-case-builder.html">Test Case Builder</a> — its format works for bug reports too.</li>
+        <li><strong>Reveal the answer key ONLY after you've drafted your list.</strong> Then compare: what did you catch? What did you miss? What did you find that isn't on the key (bonus points)?</li>
+      </ol>
+    </div>
+
+    <div class="panel mt-16">
+      <h3 style="margin-top:0;">Test-case starter template</h3>
+      <p class="text-dim">For every practice app, cover at least:</p>
+      <ul class="text-dim">
+        <li><strong>Positive:</strong> happy path with valid input.</li>
+        <li><strong>Negative:</strong> invalid input, missing fields, wrong types.</li>
+        <li><strong>Boundary:</strong> min-1, min, max, max+1 for every constrained input.</li>
+        <li><strong>Security:</strong> XSS payload in each text field, SQL-injection-shaped strings, extremely long input.</li>
+        <li><strong>UX / A11y:</strong> keyboard-only navigation, screen reader labels, focus order, error visibility.</li>
+        <li><strong>State:</strong> refresh page, back button, open in two tabs, offline.</li>
+      </ul>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container"><p>QA Prep Hub — a local study companion.</p></div>
+  </footer>
+</body>
+</html>

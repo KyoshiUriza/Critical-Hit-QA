@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Practice: File Upload — QA Prep Hub</title>
+  <link rel="stylesheet" href="../css/styles.css" />
+  <style>
+    .drop-zone {
+      border: 2px dashed var(--border);
+      border-radius: 12px;
+      padding: 40px 20px;
+      text-align: center;
+      color: var(--text-dim);
+      transition: background 0.12s, border-color 0.12s;
+    }
+    .drop-zone.hover { border-color: var(--accent); background: rgba(79,157,255,0.08); color: var(--text); }
+    .file-row { display:flex; align-items:center; gap:10px; padding:10px; border:1px solid var(--border); border-radius:6px; margin-bottom:6px; }
+    .file-row .fname { flex:1; font-family: var(--font-mono); font-size:0.88rem; }
+    .file-progress { height:4px; background:var(--bg-elev-2); border-radius:2px; overflow:hidden; width:120px; }
+    .file-progress-bar { height:100%; background: var(--accent-2); width: 0%; transition: width 0.2s; }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="../index.html" class="brand">QA Prep Hub</a>
+      <nav class="nav">
+        <a href="../index.html">Home</a>
+        <a href="../pages/practice-apps.html">← Back to Practice Apps</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="page-header">
+      <h1>File Upload</h1>
+      <p>Drag-drop and click-to-pick file uploads with validation and simulated progress.</p>
+    </div>
+
+    <div class="two-col">
+      <div>
+        <div class="app-frame">
+          <div class="drop-zone" id="drop-zone" data-testid="drop-zone" tabindex="0" role="button" aria-label="Drop files here or press Enter to browse">
+            <p style="margin:0 0 8px;">Drop files here <span class="text-dim">or</span></p>
+            <label class="btn btn-primary btn-sm">
+              Choose files
+              <input type="file" id="file-input" data-testid="file-input" multiple accept=".jpg,.jpeg,.png,.pdf,.txt" style="display:none;" />
+            </label>
+            <p class="text-dim" style="margin:10px 0 0; font-size:0.85rem;">Accepted: .jpg, .png, .pdf, .txt · Max 5 files · Max 2 MB each</p>
+          </div>
+
+          <div id="file-list" data-testid="file-list" style="margin-top:16px;"></div>
+
+          <div id="errors" style="margin-top:12px;"></div>
+
+          <div style="display:flex; gap:8px; margin-top:16px;">
+            <button class="btn btn-success" id="upload-btn" data-testid="upload-btn" disabled>Upload</button>
+            <button class="btn btn-ghost" id="clear-btn" data-testid="clear-btn">Clear</button>
+          </div>
+
+          <div id="upload-result" style="margin-top:12px;"></div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3 style="margin-top:0;">Behavior spec</h3>
+        <ul class="text-dim" style="font-size:0.9rem;">
+          <li>Accepts drop OR click-to-pick.</li>
+          <li>Max 5 files total in one batch.</li>
+          <li>Each file ≤ 2 MB (2,097,152 bytes).</li>
+          <li>Allowed types: .jpg, .jpeg, .png, .pdf, .txt.</li>
+          <li>Rejected files appear in the error list with a reason.</li>
+          <li>Upload button disabled until at least one valid file is present.</li>
+          <li>Each file gets its own progress bar (simulated, ~1.5s).</li>
+          <li>Uploading twice with the same set is idempotent (no duplicates).</li>
+          <li>Drop zone reachable and activatable via keyboard.</li>
+        </ul>
+        <h3>Test ideas</h3>
+        <ul class="text-dim" style="font-size:0.9rem;">
+          <li>Drop a folder — what happens?</li>
+          <li>Rename <code class="inline">.exe</code> to <code class="inline">.txt</code> — accepted? MIME check?</li>
+          <li>Drop 6 files at once — is the 6th rejected or does the whole batch fail?</li>
+          <li>A 2 MB file exactly on the boundary.</li>
+          <li>Click Upload rapidly — does progress get confused?</li>
+        </ul>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const MAX_FILES = 5;
+    const MAX_SIZE = 2 * 1024 * 1024;
+    const ALLOWED_EXT = ["jpg", "jpeg", "png", "pdf", "txt"];
+
+    const state = { valid: [], errors: [] };
+    const dropZone = document.getElementById("drop-zone");
+    const list = document.getElementById("file-list");
+    const errorsEl = document.getElementById("errors");
+    const uploadBtn = document.getElementById("upload-btn");
+
+    function validate(files) {
+      state.errors = [];
+      const validAcc = [...state.valid];
+      Array.from(files).forEach((f) => {
+        const ext = f.name.split(".").pop().toLowerCase();
+        if (validAcc.length >= MAX_FILES) {
+          state.errors.push(`${f.name}: max ${MAX_FILES} files reached.`);
+          return;
+        }
+        if (!ALLOWED_EXT.includes(ext)) {
+          state.errors.push(`${f.name}: file type not allowed (must be ${ALLOWED_EXT.join(", ")}).`);
+          return;
+        }
+        if (f.size > MAX_SIZE) {
+          state.errors.push(`${f.name}: file too large (${(f.size / 1024 / 1024).toFixed(2)} MB, max 2 MB).`);
+          return;
+        }
+        // Deduplicate by name+size.
+        if (validAcc.some((v) => v.name === f.name && v.size === f.size)) {
+          state.errors.push(`${f.name}: already in the list.`);
+          return;
+        }
+        validAcc.push({ name: f.name, size: f.size, progress: 0, uploaded: false });
+      });
+      state.valid = validAcc;
+      render();
+    }
+
+    function render() {
+      list.innerHTML = state.valid.length === 0
+        ? `<p class="text-dim" data-testid="empty-list">No files selected.</p>`
+        : state.valid.map((f, i) => `
+          <div class="file-row" data-testid="file-row" data-name="${f.name}">
+            <span class="fname">${f.name}</span>
+            <span class="text-dim" style="font-size:0.82rem;">${(f.size / 1024).toFixed(1)} KB</span>
+            <div class="file-progress"><div class="file-progress-bar" style="width:${f.progress}%"></div></div>
+            <button class="btn btn-ghost btn-sm" data-remove="${i}" aria-label="Remove ${f.name}">×</button>
+          </div>
+        `).join("");
+      errorsEl.innerHTML = state.errors.length === 0 ? "" :
+        `<div class="form-error visible" data-testid="error-list">${state.errors.map((e) => `<div>${e}</div>`).join("")}</div>`;
+      uploadBtn.disabled = state.valid.filter((f) => !f.uploaded).length === 0;
+    }
+
+    document.getElementById("file-input").addEventListener("change", (e) => validate(e.target.files));
+
+    dropZone.addEventListener("dragover", (e) => { e.preventDefault(); dropZone.classList.add("hover"); });
+    dropZone.addEventListener("dragleave", () => dropZone.classList.remove("hover"));
+    dropZone.addEventListener("drop", (e) => {
+      e.preventDefault();
+      dropZone.classList.remove("hover");
+      validate(e.dataTransfer.files);
+    });
+    dropZone.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); document.getElementById("file-input").click(); }
+    });
+
+    list.addEventListener("click", (e) => {
+      const idx = e.target.dataset.remove;
+      if (idx == null) return;
+      state.valid.splice(parseInt(idx, 10), 1);
+      render();
+    });
+
+    document.getElementById("clear-btn").addEventListener("click", () => {
+      state.valid = []; state.errors = [];
+      document.getElementById("upload-result").innerHTML = "";
+      render();
+    });
+
+    uploadBtn.addEventListener("click", () => {
+      uploadBtn.disabled = true;
+      const pending = state.valid.filter((f) => !f.uploaded);
+      let doneCount = 0;
+      pending.forEach((f) => {
+        let p = 0;
+        const iv = setInterval(() => {
+          p += 8 + Math.random() * 12;
+          if (p >= 100) {
+            p = 100; clearInterval(iv);
+            f.uploaded = true;
+            doneCount++;
+            if (doneCount === pending.length) {
+              const box = document.getElementById("upload-result");
+              box.setAttribute("data-testid", "upload-result");
+              box.className = "form-success";
+              box.style.display = "block";
+              box.textContent = `Uploaded ${pending.length} file${pending.length === 1 ? "" : "s"}.`;
+            }
+          }
+          f.progress = p;
+          render();
+        }, 100);
+      });
+    });
+
+    render();
+  </script>
+</body>
+</html>

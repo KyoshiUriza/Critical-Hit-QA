@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Test Case Builder — QA Prep Hub</title>
+  <link rel="stylesheet" href="../css/styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="../index.html" class="brand">QA Prep Hub</a>
+      <nav class="nav">
+        <a href="../index.html">Home</a>
+        <a href="practice-tests.html">Practice Tests</a>
+        <a href="interview-questions.html">Interview Questions</a>
+        <a href="practice-apps.html">Practice Apps</a>
+        <a href="bug-bounty.html">Bug Bounty</a>
+        <a href="automation-lab.html">Automation Lab</a>
+        <a href="progress.html">Progress</a>
+        <a href="study-plan.html">Study Plan</a>
+        <a href="resources.html">Resources</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="page-header">
+      <h1>Test Case Builder</h1>
+      <p>Draft structured test cases and export them as Markdown or JSON for your portfolio.</p>
+    </div>
+
+    <div class="two-col">
+      <div class="panel">
+        <h2 style="margin-top:0;">Test case</h2>
+        <div class="test-case-form">
+          <div class="form-field">
+            <label>ID</label>
+            <input type="text" id="tc-id" placeholder="TC-001" />
+          </div>
+          <div class="form-field">
+            <label>Title</label>
+            <input type="text" id="tc-title" placeholder="Valid user can sign in with correct credentials" />
+          </div>
+          <div class="form-field">
+            <label>Feature / Module</label>
+            <input type="text" id="tc-feature" placeholder="Authentication" />
+          </div>
+          <div class="two-col">
+            <div class="form-field">
+              <label>Priority</label>
+              <select id="tc-priority">
+                <option>P1 - Critical</option>
+                <option>P2 - High</option>
+                <option>P3 - Medium</option>
+                <option>P4 - Low</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label>Type</label>
+              <select id="tc-type">
+                <option>Positive</option>
+                <option>Negative</option>
+                <option>Boundary</option>
+                <option>Security</option>
+                <option>Accessibility</option>
+                <option>Performance</option>
+                <option>Usability</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-field">
+            <label>Preconditions</label>
+            <textarea id="tc-pre" rows="2" placeholder="User exists; user is on the login page"></textarea>
+          </div>
+          <div class="form-field">
+            <label>Test data</label>
+            <textarea id="tc-data" rows="2" placeholder="email=demo@qa.test, password=Passw0rd!"></textarea>
+          </div>
+
+          <div>
+            <label>Steps</label>
+            <div id="steps-container"></div>
+            <button class="btn btn-ghost btn-sm" id="add-step">+ Add step</button>
+          </div>
+
+          <div class="form-field">
+            <label>Expected final result</label>
+            <textarea id="tc-expected" rows="2" placeholder="User lands on dashboard; welcome banner shows their email"></textarea>
+          </div>
+
+          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <button class="btn btn-primary" id="export-md">Export as Markdown</button>
+            <button class="btn btn-primary" id="export-json">Export as JSON</button>
+            <button class="btn btn-ghost" id="load-example">Load example</button>
+            <button class="btn btn-ghost" id="clear-form">Clear</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2 style="margin-top:0;">Preview</h2>
+        <pre class="code" id="preview" style="min-height:400px; white-space:pre-wrap;">(Fill in the form and click Export...)</pre>
+        <div style="display:flex; gap:8px;">
+          <button class="btn btn-ghost btn-sm" id="copy-preview">Copy to clipboard</button>
+          <button class="btn btn-ghost btn-sm" id="save-tc">Save to progress</button>
+        </div>
+        <p class="text-dim" style="font-size:0.85rem; margin-top:8px;" id="save-note"></p>
+      </div>
+    </div>
+  </main>
+
+  <script src="../js/progress.js"></script>
+  <script>
+    (function () {
+      const stepsContainer = document.getElementById("steps-container");
+
+      function addStep(action = "", expected = "") {
+        const idx = stepsContainer.children.length + 1;
+        const row = document.createElement("div");
+        row.className = "step-row";
+        row.innerHTML = `
+          <div class="step-num">${idx}</div>
+          <textarea class="step-action" rows="1" placeholder="Action">${action}</textarea>
+          <textarea class="step-expected" rows="1" placeholder="Expected">${expected}</textarea>
+          <button class="btn btn-ghost btn-sm" data-remove>×</button>
+        `;
+        row.querySelector("[data-remove]").addEventListener("click", () => {
+          row.remove();
+          renumber();
+        });
+        stepsContainer.appendChild(row);
+      }
+      function renumber() {
+        Array.from(stepsContainer.children).forEach((r, i) => {
+          r.querySelector(".step-num").textContent = i + 1;
+        });
+      }
+
+      document.getElementById("add-step").addEventListener("click", () => addStep());
+
+      function collect() {
+        const steps = Array.from(stepsContainer.querySelectorAll(".step-row")).map((r, i) => ({
+          step: i + 1,
+          action: r.querySelector(".step-action").value.trim(),
+          expected: r.querySelector(".step-expected").value.trim()
+        }));
+        return {
+          id: document.getElementById("tc-id").value.trim(),
+          title: document.getElementById("tc-title").value.trim(),
+          feature: document.getElementById("tc-feature").value.trim(),
+          priority: document.getElementById("tc-priority").value,
+          type: document.getElementById("tc-type").value,
+          preconditions: document.getElementById("tc-pre").value.trim(),
+          testData: document.getElementById("tc-data").value.trim(),
+          steps,
+          expectedResult: document.getElementById("tc-expected").value.trim()
+        };
+      }
+
+      function toMarkdown(tc) {
+        const stepsMd = tc.steps.length
+          ? tc.steps.map((s) => `| ${s.step} | ${s.action} | ${s.expected} |`).join("\n")
+          : "| — | — | — |";
+        return `# ${tc.id || "TC-XXX"}: ${tc.title || "(no title)"}
+
+**Feature:** ${tc.feature || "-"}
+**Priority:** ${tc.priority}
+**Type:** ${tc.type}
+
+## Preconditions
+${tc.preconditions || "-"}
+
+## Test data
+${tc.testData || "-"}
+
+## Steps
+| # | Action | Expected |
+|---|--------|----------|
+${stepsMd}
+
+## Expected final result
+${tc.expectedResult || "-"}
+`;
+      }
+
+      function preview(text) {
+        document.getElementById("preview").textContent = text;
+      }
+
+      document.getElementById("export-md").addEventListener("click", () => preview(toMarkdown(collect())));
+      document.getElementById("export-json").addEventListener("click", () => preview(JSON.stringify(collect(), null, 2)));
+      document.getElementById("copy-preview").addEventListener("click", () => {
+        navigator.clipboard.writeText(document.getElementById("preview").textContent);
+        document.getElementById("save-note").textContent = "Copied to clipboard.";
+        setTimeout(() => document.getElementById("save-note").textContent = "", 2000);
+      });
+      document.getElementById("save-tc").addEventListener("click", () => {
+        if (window.Progress) window.Progress.incrementTestCases();
+        document.getElementById("save-note").textContent = "Counted toward your progress dashboard.";
+        setTimeout(() => document.getElementById("save-note").textContent = "", 2500);
+      });
+      document.getElementById("clear-form").addEventListener("click", () => {
+        if (!confirm("Clear the form?")) return;
+        document.querySelectorAll("#tc-id, #tc-title, #tc-feature, #tc-pre, #tc-data, #tc-expected").forEach((el) => el.value = "");
+        stepsContainer.innerHTML = "";
+        preview("(Fill in the form and click Export...)");
+      });
+      document.getElementById("load-example").addEventListener("click", () => {
+        document.getElementById("tc-id").value = "TC-LOGIN-001";
+        document.getElementById("tc-title").value = "Valid credentials sign in successfully";
+        document.getElementById("tc-feature").value = "Authentication / Login";
+        document.getElementById("tc-priority").value = "P1 - Critical";
+        document.getElementById("tc-type").value = "Positive";
+        document.getElementById("tc-pre").value = "The user account demo@qa.test exists and is active. The user is on /practice-apps/login.html.";
+        document.getElementById("tc-data").value = "email=demo@qa.test\npassword=Passw0rd!";
+        stepsContainer.innerHTML = "";
+        addStep("Enter valid email in the Email field.", "Email is displayed in the field. No error is shown.");
+        addStep("Enter valid password in the Password field.", "Password is masked. No error is shown.");
+        addStep("Click the Sign in button.", "Loading state is shown briefly.");
+        document.getElementById("tc-expected").value = "The welcome message 'Welcome, demo@qa.test' is shown. The user session is established (no login form visible).";
+      });
+
+      addStep();
+    })();
+  </script>
+</body>
+</html>

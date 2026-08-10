@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Practice (Broken): Todo List — QA Prep Hub</title>
+  <link rel="stylesheet" href="../css/styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="../index.html" class="brand">QA Prep Hub</a>
+      <nav class="nav">
+        <a href="../index.html">Home</a>
+        <a href="../pages/practice-apps.html">← Back to Practice Apps</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="page-header">
+      <h1>Todo List <span style="color:var(--danger);font-size:1rem;">(Buggy build)</span></h1>
+      <p>Same feature as the clean todo — but this build contains real defects.</p>
+    </div>
+
+    <div class="panel" style="border-color: var(--warn);">
+      <strong>Testing charter</strong> — Verify the behavior spec on the right. Try edge cases: empty input, whitespace, filters with 0 items, refresh, XSS-shaped payloads, the counter after various actions.
+    </div>
+
+    <div class="two-col">
+      <div>
+        <div class="app-frame">
+          <h2 style="margin-top:0;">My Todos</h2>
+          <form id="add-form" class="todo-input-row" onsubmit="return false;">
+            <input type="text" id="new-todo" data-testid="new-todo-input" placeholder="What needs doing?" maxlength="120" />
+            <button class="btn btn-primary" id="add-btn" data-testid="add-todo">Add</button>
+          </form>
+
+          <div class="todo-filters" role="tablist">
+            <button class="todo-filter active" data-filter="all" data-testid="filter-all">All</button>
+            <button class="todo-filter" data-filter="active" data-testid="filter-active">Active</button>
+            <button class="todo-filter" data-filter="done" data-testid="filter-done">Completed</button>
+          </div>
+
+          <ul class="todo-list" id="todo-list" data-testid="todo-list"></ul>
+
+          <div class="todo-count">
+            <span id="count-label" data-testid="items-left">0 items left</span> ·
+            <a href="#" id="clear-completed" data-testid="clear-completed">Clear completed</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3 style="margin-top:0;">Behavior spec</h3>
+        <ul class="text-dim" style="font-size:0.9rem;">
+          <li>Empty or whitespace-only input cannot be added.</li>
+          <li>User input must be rendered as text, never as HTML (no XSS).</li>
+          <li>Filters: All / Active / Completed — Active shows only incomplete items.</li>
+          <li>"X items left" reflects the current INCOMPLETE count.</li>
+          <li>"Clear completed" removes only completed items; active items stay.</li>
+          <li>State persists across refresh.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="panel mt-16">
+      <h3 style="margin-top:0;">Answer key</h3>
+      <button class="btn btn-ghost" id="reveal-btn">Reveal known defects</button>
+      <div id="answer-key" class="hidden mt-16">
+        <ol style="line-height:1.7;">
+          <li><strong>Whitespace-only todos can be added.</strong> Entering <code class="inline">"   "</code> creates a blank item — should be rejected.</li>
+          <li><strong>XSS: input rendered as HTML.</strong> Adding <code class="inline">&lt;img src=x onerror=alert(1)&gt;</code> executes the handler — user input must be textContent, not innerHTML.</li>
+          <li><strong>"Items left" counts total, not incomplete.</strong> The label shows all todos regardless of state.</li>
+          <li><strong>"Active" filter shows completed items too.</strong> Filter predicate is inverted / wrong.</li>
+          <li><strong>"Clear completed" removes everything.</strong> Wipes the whole list, active items included.</li>
+          <li><strong>State does not persist across refresh.</strong> Save function is a no-op; refreshing loses all todos.</li>
+        </ol>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    (function () {
+      const STORAGE_KEY = "practice_todos_broken";
+      let todos = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+      let filter = "all";
+
+      // BUG 6: save() is a no-op — state never persists.
+      function save() { /* intentionally does nothing */ }
+
+      function render() {
+        const list = document.getElementById("todo-list");
+        const shown = todos.filter((t) => {
+          // BUG 4: "active" filter predicate inverted.
+          if (filter === "active") return t.done;
+          if (filter === "done") return t.done;
+          return true;
+        });
+        list.innerHTML = shown.length === 0
+          ? `<li class="text-dim" style="padding:12px;">No items.</li>`
+          : shown.map((t) => `
+            <li class="todo-item ${t.done ? "done" : ""}" data-id="${t.id}" data-testid="todo-item">
+              <input type="checkbox" ${t.done ? "checked" : ""} data-action="toggle" data-testid="todo-toggle" aria-label="Toggle todo" />
+              <span class="todo-text" data-testid="todo-text">${t.text}</span>
+              <button class="btn btn-ghost btn-sm" data-action="delete" data-testid="todo-delete" aria-label="Delete todo">×</button>
+            </li>
+          `).join("");
+        // BUG 2: template above uses ${t.text} directly inside innerHTML → XSS.
+
+        // BUG 3: counts TOTAL, not incomplete.
+        const total = todos.length;
+        document.getElementById("count-label").textContent = `${total} item${total === 1 ? "" : "s"} left`;
+      }
+
+      document.getElementById("add-btn").addEventListener("click", addTodo);
+      document.getElementById("new-todo").addEventListener("keydown", (e) => {
+        if (e.key === "Enter") addTodo();
+      });
+
+      function addTodo() {
+        const input = document.getElementById("new-todo");
+        // BUG 1: no .trim() before the empty check — whitespace-only passes through.
+        const val = input.value;
+        if (val === "") return;
+        todos.push({ id: Date.now() + "-" + Math.random().toString(36).slice(2, 6), text: val, done: false });
+        input.value = "";
+        save(); render();
+      }
+
+      document.getElementById("todo-list").addEventListener("click", (e) => {
+        const li = e.target.closest("li[data-id]");
+        if (!li) return;
+        const id = li.dataset.id;
+        const action = e.target.dataset.action;
+        if (action === "toggle") {
+          const t = todos.find((x) => x.id === id);
+          if (t) t.done = !t.done;
+          save(); render();
+        } else if (action === "delete") {
+          todos = todos.filter((x) => x.id !== id);
+          save(); render();
+        }
+      });
+
+      document.querySelectorAll(".todo-filter").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          document.querySelectorAll(".todo-filter").forEach((b) => b.classList.remove("active"));
+          btn.classList.add("active");
+          filter = btn.dataset.filter;
+          render();
+        });
+      });
+
+      // BUG 5: "Clear completed" wipes everything.
+      document.getElementById("clear-completed").addEventListener("click", (e) => {
+        e.preventDefault();
+        todos = [];
+        save(); render();
+      });
+
+      document.getElementById("reveal-btn").addEventListener("click", () => {
+        document.getElementById("answer-key").classList.toggle("hidden");
+      });
+
+      render();
+    })();
+  </script>
+</body>
+</html>

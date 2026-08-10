@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Practice: Modal Dialog — QA Prep Hub</title>
+  <link rel="stylesheet" href="../css/styles.css" />
+  <style>
+    .modal-backdrop {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.55);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+    }
+    .modal-backdrop.open { display: flex; }
+    .modal {
+      background: var(--bg-elev);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      width: 90%;
+      max-width: 480px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    }
+    .modal h2 { margin: 0 0 12px; }
+    .modal-footer { display:flex; justify-content:flex-end; gap:8px; margin-top:20px; }
+    .toast {
+      position: fixed; bottom: 20px; right: 20px;
+      background: var(--bg-elev); border: 1px solid var(--accent-2);
+      color: var(--accent-2); padding: 12px 18px; border-radius: 8px;
+      box-shadow: var(--shadow);
+      opacity: 0; transform: translateY(10px);
+      transition: opacity 0.2s, transform 0.2s;
+      z-index: 200;
+    }
+    .toast.visible { opacity: 1; transform: translateY(0); }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="../index.html" class="brand">QA Prep Hub</a>
+      <nav class="nav">
+        <a href="../index.html">Home</a>
+        <a href="../pages/practice-apps.html">← Back to Practice Apps</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="page-header">
+      <h1>Modal & Confirmation Dialog</h1>
+      <p>Focus trapping, ESC handling, backdrop clicks — a classic automation and a11y target.</p>
+    </div>
+
+    <div class="two-col">
+      <div>
+        <div class="app-frame">
+          <p class="text-dim">Click a button to open the corresponding modal. When it opens, try Tab/Shift+Tab, Esc, clicking the backdrop, and each action button.</p>
+
+          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <button class="btn btn-primary" data-open="info" data-testid="open-info">Open info modal</button>
+            <button class="btn btn-primary" data-open="confirm" data-testid="open-confirm">Open confirmation</button>
+            <button class="btn btn-danger" data-open="destructive" data-testid="open-destructive">Delete account</button>
+          </div>
+
+          <p class="text-dim mt-16" style="font-size:0.9rem;">Last action: <code class="inline" id="last-action" data-testid="last-action">(none yet)</code></p>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3 style="margin-top:0;">Behavior spec</h3>
+        <ul class="text-dim" style="font-size:0.9rem;">
+          <li>Background is inert and dimmed while a modal is open.</li>
+          <li>Focus moves into the modal on open; first focusable receives focus.</li>
+          <li>Tab and Shift+Tab cycle only within the modal (focus trap).</li>
+          <li>Esc closes the modal (except destructive — requires explicit choice).</li>
+          <li>Backdrop click closes info; does NOT close confirm/destructive.</li>
+          <li>On close, focus returns to the button that opened it.</li>
+          <li>Modals use <code class="inline">role="dialog"</code> and <code class="inline">aria-modal="true"</code>.</li>
+          <li>Toast confirmation appears after destructive delete succeeds.</li>
+        </ul>
+        <h3>Test ideas</h3>
+        <ul class="text-dim" style="font-size:0.9rem;">
+          <li>Screen reader: is the modal title announced?</li>
+          <li>Try Tab past the last focusable — does it wrap?</li>
+          <li>Open a modal, then use browser back button — reasonable?</li>
+          <li>Open modal on mobile viewport — does it fit? Is it scrollable?</li>
+          <li>Rapid open-close-open — any state left over?</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Modals -->
+    <div class="modal-backdrop" id="backdrop-info" data-testid="modal-info-backdrop">
+      <div class="modal" role="dialog" aria-modal="true" aria-labelledby="info-title" data-testid="modal-info">
+        <h2 id="info-title">Heads up</h2>
+        <p>This is an informational message. Click anywhere outside to dismiss, or use the button below.</p>
+        <div class="modal-footer">
+          <button class="btn btn-primary" data-close data-testid="info-ok">Got it</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-backdrop" id="backdrop-confirm" data-testid="modal-confirm-backdrop">
+      <div class="modal" role="dialog" aria-modal="true" aria-labelledby="confirm-title" data-testid="modal-confirm">
+        <h2 id="confirm-title">Are you sure?</h2>
+        <p>Do you want to proceed with this action? Backdrop clicks will not dismiss this dialog.</p>
+        <div class="modal-footer">
+          <button class="btn btn-ghost" data-close data-testid="confirm-cancel">Cancel</button>
+          <button class="btn btn-primary" data-action="confirmed" data-testid="confirm-ok">Confirm</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-backdrop" id="backdrop-destructive" data-testid="modal-destructive-backdrop">
+      <div class="modal" role="dialog" aria-modal="true" aria-labelledby="destructive-title" data-testid="modal-destructive">
+        <h2 id="destructive-title" style="color: var(--danger);">Delete your account?</h2>
+        <p>This cannot be undone. Type <code class="inline">DELETE</code> to confirm.</p>
+        <div class="form-field">
+          <input type="text" id="delete-confirm" data-testid="delete-confirm-input" placeholder="DELETE" />
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-ghost" data-close data-testid="destructive-cancel">Cancel</button>
+          <button class="btn btn-danger" id="destructive-go" data-testid="destructive-ok" disabled>Delete permanently</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="toast" id="toast" data-testid="toast" role="status"></div>
+  </main>
+
+  <script>
+    let opener = null;
+    let currentBackdrop = null;
+
+    function focusables(container) {
+      return Array.from(container.querySelectorAll(
+        'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+      ));
+    }
+
+    function openModal(name, trigger) {
+      const bd = document.getElementById(`backdrop-${name}`);
+      opener = trigger;
+      currentBackdrop = bd;
+      bd.classList.add("open");
+      const fs = focusables(bd);
+      if (fs[0]) fs[0].focus();
+      document.addEventListener("keydown", onKey);
+    }
+
+    function closeModal() {
+      if (!currentBackdrop) return;
+      currentBackdrop.classList.remove("open");
+      currentBackdrop = null;
+      document.removeEventListener("keydown", onKey);
+      if (opener) opener.focus();
+    }
+
+    function onKey(e) {
+      if (!currentBackdrop) return;
+      const modal = currentBackdrop.querySelector(".modal");
+      const isDestructive = currentBackdrop.id === "backdrop-destructive";
+      if (e.key === "Escape" && !isDestructive) { e.preventDefault(); closeModal(); return; }
+      if (e.key === "Tab") {
+        const fs = focusables(modal);
+        if (fs.length === 0) return;
+        const first = fs[0], last = fs[fs.length - 1];
+        if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+        else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+      }
+    }
+
+    document.querySelectorAll("[data-open]").forEach((btn) => {
+      btn.addEventListener("click", () => openModal(btn.dataset.open, btn));
+    });
+
+    document.querySelectorAll(".modal-backdrop").forEach((bd) => {
+      bd.addEventListener("click", (e) => {
+        if (e.target !== bd) return; // clicks on the modal content itself do nothing
+        if (bd.id === "backdrop-info") closeModal();
+      });
+    });
+
+    document.querySelectorAll("[data-close]").forEach((btn) => {
+      btn.addEventListener("click", closeModal);
+    });
+
+    document.querySelector('[data-action="confirmed"]').addEventListener("click", () => {
+      document.getElementById("last-action").textContent = "Confirmed at " + new Date().toLocaleTimeString();
+      closeModal();
+    });
+
+    const delInput = document.getElementById("delete-confirm");
+    const delGo = document.getElementById("destructive-go");
+    delInput.addEventListener("input", () => { delGo.disabled = delInput.value !== "DELETE"; });
+    delGo.addEventListener("click", () => {
+      document.getElementById("last-action").textContent = "Account deleted at " + new Date().toLocaleTimeString();
+      const toast = document.getElementById("toast");
+      toast.textContent = "Account deleted.";
+      toast.classList.add("visible");
+      setTimeout(() => toast.classList.remove("visible"), 2500);
+      delInput.value = ""; delGo.disabled = true;
+      closeModal();
+    });
+  </script>
+</body>
+</html>

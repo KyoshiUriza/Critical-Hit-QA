@@ -1,0 +1,201 @@
+(function () {
+  const state = {
+    questions: [],
+    index: 0,
+    answers: [], // { qId, chosen, correct }
+    startTime: 0,
+    timeLimitMs: 0,
+    timerId: null,
+    checked: false
+  };
+
+  const el = (id) => document.getElementById(id);
+
+  function shuffle(arr) {
+    const a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  function startQuiz() {
+    const cat = el("category-select").value;
+    const count = Math.max(1, parseInt(el("question-count").value, 10) || 10);
+    const timeMin = parseInt(el("time-limit").value, 10) || 0;
+
+    let pool = window.QUIZ_QUESTIONS || [];
+    if (cat !== "all") pool = pool.filter((q) => q.category === cat);
+    if (pool.length === 0) {
+      alert("No questions found in this category.");
+      return;
+    }
+    state.questions = shuffle(pool).slice(0, Math.min(count, pool.length));
+    state.index = 0;
+    state.answers = [];
+    state.timeLimitMs = timeMin * 60 * 1000;
+    state.startTime = Date.now();
+    state.checked = false;
+
+    el("setup-screen").classList.add("hidden");
+    el("results-screen").classList.add("hidden");
+    el("quiz-screen").classList.remove("hidden");
+
+    if (state.timeLimitMs > 0) startTimer();
+    else el("timer-label").textContent = "no limit";
+    renderQuestion();
+  }
+
+  function startTimer() {
+    if (state.timerId) clearInterval(state.timerId);
+    tickTimer();
+    state.timerId = setInterval(tickTimer, 1000);
+  }
+
+  function tickTimer() {
+    const remain = state.timeLimitMs - (Date.now() - state.startTime);
+    if (remain <= 0) {
+      clearInterval(state.timerId);
+      el("timer-label").textContent = "0:00";
+      finishQuiz(true);
+      return;
+    }
+    const s = Math.floor(remain / 1000);
+    el("timer-label").textContent = `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
+  }
+
+  function renderQuestion() {
+    const q = state.questions[state.index];
+    state.checked = false;
+    el("question-text").textContent = q.question;
+    el("category-label").textContent = `${q.category} · ${q.difficulty}`;
+    el("progress-label").textContent = `Question ${state.index + 1} of ${state.questions.length}`;
+    el("progress-bar").style.width = `${((state.index) / state.questions.length) * 100}%`;
+    el("explanation-box").classList.add("hidden");
+    el("check-btn").classList.remove("hidden");
+    el("next-btn").disabled = true;
+    el("next-btn").textContent = state.index === state.questions.length - 1 ? "Finish" : "Next →";
+
+    const list = el("choices-list");
+    list.innerHTML = "";
+    q.choices.forEach((choice, i) => {
+      const label = document.createElement("label");
+      label.className = "quiz-choice";
+      label.innerHTML = `<input type="radio" name="choice" value="${i}" /> ${choice}`;
+      label.addEventListener("click", () => selectChoice(i, label));
+      list.appendChild(label);
+    });
+  }
+
+  function selectChoice(i, label) {
+    if (state.checked) return;
+    document.querySelectorAll(".quiz-choice").forEach((c) => c.classList.remove("selected"));
+    label.classList.add("selected");
+    label.querySelector("input").checked = true;
+    el("check-btn").classList.remove("hidden");
+    el("next-btn").disabled = true;
+  }
+
+  function checkAnswer() {
+    const selected = document.querySelector('input[name="choice"]:checked');
+    if (!selected) {
+      alert("Pick an answer first.");
+      return;
+    }
+    const chosen = parseInt(selected.value, 10);
+    const q = state.questions[state.index];
+    const isCorrect = chosen === q.answer;
+    state.answers.push({ q, chosen, correct: isCorrect });
+
+    document.querySelectorAll(".quiz-choice").forEach((c, i) => {
+      c.querySelector("input").disabled = true;
+      if (i === q.answer) c.classList.add("correct");
+      else if (i === chosen) c.classList.add("wrong");
+    });
+    const box = el("explanation-box");
+    box.innerHTML = `<strong>${isCorrect ? "✓ Correct." : "✗ Incorrect."}</strong> ${q.explanation}`;
+    box.classList.remove("hidden");
+    state.checked = true;
+    el("check-btn").classList.add("hidden");
+    el("next-btn").disabled = false;
+  }
+
+  function nextQuestion() {
+    if (!state.checked) return;
+    if (state.index + 1 >= state.questions.length) {
+      finishQuiz(false);
+      return;
+    }
+    state.index += 1;
+    renderQuestion();
+  }
+
+  function finishQuiz(timedOut) {
+    if (state.timerId) clearInterval(state.timerId);
+    el("quiz-screen").classList.add("hidden");
+    el("results-screen").classList.remove("hidden");
+    const correct = state.answers.filter((a) => a.correct).length;
+    const total = state.questions.length;
+    const elapsedMs = Date.now() - state.startTime;
+    if (window.Progress) {
+      const category = document.getElementById("category-select").value;
+      window.Progress.recordQuizRun({ category, correct, total, elapsedMs });
+    }
+    el("score-display").textContent = `${correct}/${total}`;
+    const pct = total > 0 ? Math.round((correct / total) * 100) : 0;
+    let verdict = "Keep studying.";
+    if (pct >= 90) verdict = "Excellent — you know this cold.";
+    else if (pct >= 75) verdict = "Solid. Interview-ready with a bit more polish.";
+    else if (pct >= 60) verdict = "Getting there. Review the misses.";
+    el("score-summary").textContent = `${pct}% correct. ${verdict}${timedOut ? " (Time expired.)" : ""}`;
+    const elapsed = Math.floor((Date.now() - state.startTime) / 1000);
+    el("time-summary").textContent = `Elapsed: ${Math.floor(elapsed / 60)}m ${elapsed % 60}s`;
+    el("review-list").classList.add("hidden");
+    el("review-list").innerHTML = "";
+  }
+
+  function renderReview() {
+    const list = el("review-list");
+    if (!list.classList.contains("hidden")) {
+      list.classList.add("hidden");
+      return;
+    }
+    list.innerHTML = "<h3>Review</h3>";
+    state.answers.forEach((a, i) => {
+      const div = document.createElement("div");
+      div.className = "panel";
+      div.innerHTML = `
+        <div class="quiz-meta">Q${i + 1} · ${a.q.category} · ${a.q.difficulty}</div>
+        <p><strong>${a.q.question}</strong></p>
+        <p class="${a.correct ? "" : "difficulty-hard"}">
+          Your answer: ${a.q.choices[a.chosen]} ${a.correct ? "✓" : "✗"}
+        </p>
+        ${a.correct ? "" : `<p class="difficulty-easy">Correct answer: ${a.q.choices[a.q.answer]}</p>`}
+        <div class="quiz-explanation">${a.q.explanation}</div>
+      `;
+      list.appendChild(div);
+    });
+    list.classList.remove("hidden");
+  }
+
+  function quit() {
+    if (!confirm("Quit the quiz? Progress will be lost.")) return;
+    if (state.timerId) clearInterval(state.timerId);
+    el("quiz-screen").classList.add("hidden");
+    el("results-screen").classList.add("hidden");
+    el("setup-screen").classList.remove("hidden");
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    el("start-btn").addEventListener("click", startQuiz);
+    el("check-btn").addEventListener("click", checkAnswer);
+    el("next-btn").addEventListener("click", nextQuestion);
+    el("quit-btn").addEventListener("click", quit);
+    el("restart-btn").addEventListener("click", () => {
+      el("results-screen").classList.add("hidden");
+      el("setup-screen").classList.remove("hidden");
+    });
+    el("review-btn").addEventListener("click", renderReview);
+  });
+})();

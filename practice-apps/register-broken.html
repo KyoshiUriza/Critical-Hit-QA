@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Practice (Broken): Registration — QA Prep Hub</title>
+  <link rel="stylesheet" href="../css/styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="../index.html" class="brand">QA Prep Hub</a>
+      <nav class="nav">
+        <a href="../index.html">Home</a>
+        <a href="../pages/practice-apps.html">← Back to Practice Apps</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="page-header">
+      <h1>Registration Form <span style="color:var(--danger);font-size:1rem;">(Buggy build)</span></h1>
+      <p>Same feature as the clean register — but this build's validation lies to you.</p>
+    </div>
+
+    <div class="panel" style="border-color: var(--warn);">
+      <strong>Testing charter</strong> — Push every field at its boundaries. Try mismatched passwords, edge-case ages, invalid emails, and skipping the TOS. Compare each interaction against the spec.
+    </div>
+
+    <div class="two-col">
+      <div>
+        <div class="app-frame">
+          <h2 style="margin-top:0;">Create your account</h2>
+          <form id="reg-form" novalidate>
+            <div class="form-field">
+              <label for="fullname">Full name</label>
+              <input type="text" id="fullname" data-testid="reg-fullname" />
+              <div class="form-error" id="fullname-error" data-testid="fullname-error"></div>
+            </div>
+            <div class="form-field">
+              <label for="email">Email</label>
+              <input type="email" id="email" data-testid="reg-email" />
+              <div class="form-error" id="email-error" data-testid="email-error"></div>
+            </div>
+            <div class="form-field">
+              <label for="age">Age</label>
+              <input type="number" id="age" min="0" max="130" data-testid="reg-age" />
+              <div class="form-error" id="age-error" data-testid="age-error"></div>
+            </div>
+            <div class="form-field">
+              <label for="country">Country</label>
+              <select id="country" data-testid="reg-country">
+                <option value="">Select…</option>
+                <option value="US">United States</option>
+                <option value="CA">Canada</option>
+                <option value="MX">Mexico</option>
+                <option value="GB">United Kingdom</option>
+                <option value="JP">Japan</option>
+                <option value="OTHER">Other</option>
+              </select>
+              <div class="form-error" id="country-error" data-testid="country-error"></div>
+            </div>
+            <div class="form-field">
+              <label for="password">Password</label>
+              <input type="password" id="password" data-testid="reg-password" />
+              <div id="pw-strength" class="text-dim" style="font-size:0.8rem; margin-top:4px;" data-testid="pw-strength"></div>
+              <div class="form-error" id="password-error" data-testid="password-error"></div>
+            </div>
+            <div class="form-field">
+              <label for="confirm">Confirm password</label>
+              <input type="password" id="confirm" data-testid="reg-confirm" />
+              <div class="form-error" id="confirm-error" data-testid="confirm-error"></div>
+            </div>
+            <div class="form-field">
+              <label><input type="checkbox" id="tos" data-testid="reg-tos" /> I agree to the Terms of Service</label>
+              <div class="form-error" id="tos-error" data-testid="tos-error"></div>
+            </div>
+            <button type="submit" class="btn btn-primary" data-testid="reg-submit">Create account</button>
+          </form>
+          <div id="reg-result" style="margin-top:12px;"></div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3 style="margin-top:0;">Behavior spec</h3>
+        <ul class="text-dim" style="font-size:0.9rem;">
+          <li>Full name: required, ≥ 2 chars, whitespace trimmed.</li>
+          <li>Email: required, valid format (must include TLD).</li>
+          <li>Age: required, integer 13–120. Under 13 = "must be 13+".</li>
+          <li>Country: required.</li>
+          <li>Password: min 8 chars; must have upper, lower, digit, symbol.</li>
+          <li>Confirm must match password EXACTLY.</li>
+          <li>Strength meter reflects actual password entropy.</li>
+          <li>Must accept TOS.</li>
+          <li>Form disables and shows success only when everything is valid.</li>
+          <li>No double-submit.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="panel mt-16">
+      <h3 style="margin-top:0;">Answer key</h3>
+      <button class="btn btn-ghost" id="reveal-btn">Reveal known defects</button>
+      <div id="answer-key" class="hidden mt-16">
+        <ol style="line-height:1.7;">
+          <li><strong>Full name allows 1 character.</strong> Length check uses <code class="inline">&gt; 0</code> instead of <code class="inline">≥ 2</code>.</li>
+          <li><strong>Email regex too permissive.</strong> Accepts <code class="inline">a@b</code> (no dot / TLD).</li>
+          <li><strong>Age boundary off by one.</strong> Age 12 is accepted as ≥ 13 (uses <code class="inline">&gt; 12</code> without checking equality against 13 properly, or uses <code class="inline">age &gt;= 12</code>).</li>
+          <li><strong>Country validation missing.</strong> Submitting with "Select…" still succeeds.</li>
+          <li><strong>Password complexity not enforced.</strong> Only length is checked — <code class="inline">aaaaaaaa</code> (8 a's) is accepted.</li>
+          <li><strong>Password strength meter always shows "Strong".</strong> Regardless of actual password.</li>
+          <li><strong>Confirm-password comparison ignores trailing whitespace.</strong> <code class="inline">"Passw0rd!"</code> and <code class="inline">"Passw0rd! "</code> are treated as matching.</li>
+          <li><strong>TOS not enforced.</strong> Form submits successfully with the checkbox unchecked.</li>
+          <li><strong>Submit button not disabled after success.</strong> Rapid double-click submits twice (would create duplicate accounts).</li>
+        </ol>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    (function () {
+      const pw = document.getElementById("password");
+      const strength = document.getElementById("pw-strength");
+
+      // BUG 6: strength meter always says "Strong".
+      pw.addEventListener("input", () => {
+        strength.textContent = pw.value ? "Strength: Strong" : "";
+      });
+
+      document.getElementById("reg-form").addEventListener("submit", (e) => {
+        e.preventDefault();
+        clearErrors();
+
+        const name = document.getElementById("fullname").value.trim();
+        const email = document.getElementById("email").value.trim();
+        const ageStr = document.getElementById("age").value.trim();
+        const country = document.getElementById("country").value;
+        const password = pw.value;
+        const confirm = document.getElementById("confirm").value;
+        const tos = document.getElementById("tos").checked;
+
+        let ok = true;
+
+        // BUG 1: length > 0 instead of >= 2.
+        if (name.length === 0) { setError("fullname-error", "Full name is required."); ok = false; }
+
+        // BUG 2: overly permissive email regex.
+        if (!/^[^\s@]+@[^\s@]+$/.test(email)) { setError("email-error", "Enter a valid email."); ok = false; }
+
+        const age = parseInt(ageStr, 10);
+        if (!ageStr || isNaN(age)) { setError("age-error", "Age is required."); ok = false; }
+        // BUG 3: >= 12 instead of >= 13.
+        else if (age < 12) { setError("age-error", "Sorry, you must be 13 or older."); ok = false; }
+        else if (age > 120) { setError("age-error", "Please enter a realistic age."); ok = false; }
+
+        // BUG 4: country validation missing entirely.
+        // if (!country) { setError("country-error", "Choose a country."); ok = false; }
+
+        // BUG 5: only length is checked; no upper/lower/digit/symbol requirement.
+        if (password.length < 8) { setError("password-error", "Password must be at least 8 characters."); ok = false; }
+
+        // BUG 7: trims before comparing — trailing space matches.
+        if (confirm.trim() !== password.trim()) { setError("confirm-error", "Passwords do not match."); ok = false; }
+
+        // BUG 8: TOS check omitted.
+        // if (!tos) { setError("tos-error", "You must accept the Terms of Service."); ok = false; }
+
+        const result = document.getElementById("reg-result");
+        result.setAttribute("data-testid", "reg-result");
+        if (!ok) {
+          result.className = "form-error visible";
+          result.style.display = "block";
+          result.textContent = "Please correct the errors above.";
+          return;
+        }
+        result.className = "form-success";
+        result.style.display = "block";
+        result.textContent = `Account created for ${name || "(unnamed)"} (${email}). (Simulated.)`;
+        // BUG 9: form NOT disabled — rapid double-submit allowed.
+      });
+
+      function setError(id, msg) {
+        const e = document.getElementById(id);
+        e.textContent = msg;
+        e.classList.add("visible");
+      }
+      function clearErrors() {
+        document.querySelectorAll(".form-error").forEach((e) => {
+          e.textContent = "";
+          e.classList.remove("visible");
+        });
+      }
+
+      document.getElementById("reveal-btn").addEventListener("click", () => {
+        document.getElementById("answer-key").classList.toggle("hidden");
+      });
+    })();
+  </script>
+</body>
+</html>
