@@ -13,12 +13,17 @@
   <main id="main" class="container">
     <div class="page-header">
       <h1>Resources</h1>
-      <p>Cheat sheets, glossary, and links for deeper study.</p>
+      <p>Cheat sheets, glossary, and links for deeper study. Every reference here links to the primary source — use these to check what you read, not just to read it.</p>
     </div>
 
     <!-- Cheat sheets -->
     <section class="panel">
-      <h2>HTTP status code cheat sheet</h2>
+      <div class="lab-ex-head">
+        <h2 style="margin:0;">HTTP status code cheat sheet</h2>
+        <span class="text-dim">
+          <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status" target="_blank" rel="noopener noreferrer">Full list on MDN →</a>
+        </span>
+      </div>
       <div class="two-col">
         <div>
           <strong>2xx — Success</strong>
@@ -55,6 +60,11 @@
           </ul>
         </div>
       </div>
+      <p class="text-dim mt-16">
+        When a developer disputes what a code <em>means</em>, the argument ends at
+        <a href="https://www.rfc-editor.org/rfc/rfc9110.html#name-status-codes" target="_blank" rel="noopener noreferrer">RFC 9110 §15</a>,
+        which defines them normatively. The 401-vs-403 distinction in particular is worth being able to cite.
+      </p>
     </section>
 
     <section class="panel">
@@ -64,11 +74,18 @@
         <li><strong>Boundary Value Analysis</strong> — test at, just below, and just above each boundary.</li>
         <li><strong>Decision Table</strong> — enumerate combinations of conditions and expected outcomes.</li>
         <li><strong>State Transition</strong> — enumerate states and valid/invalid transitions.</li>
-        <li><strong>Pairwise / All-pairs</strong> — cover all pairs of parameter values with fewer tests than exhaustive.</li>
+        <li><strong>Pairwise / All-pairs</strong> — cover all pairs of parameter values with fewer tests than exhaustive.
+          <a href="https://www.pairwise.org/" target="_blank" rel="noopener noreferrer">pairwise.org</a> explains the maths and lists generator tools.</li>
         <li><strong>Error Guessing</strong> — apply experience/intuition to guess where defects hide.</li>
-        <li><strong>Exploratory (charter-based)</strong> — time-boxed exploration with an explicit mission.</li>
+        <li><strong>Exploratory (charter-based)</strong> — time-boxed exploration with an explicit mission.
+          James Bach's <a href="https://www.satisfice.com/download/heuristic-test-strategy-model" target="_blank" rel="noopener noreferrer">Heuristic Test Strategy Model</a> is the standard framework for structuring one.</li>
         <li><strong>Use case / scenario</strong> — walk through end-to-end user journeys.</li>
       </ul>
+      <p class="text-dim">
+        Precise definitions for all of these live in the
+        <a href="https://glossary.istqb.org/" target="_blank" rel="noopener noreferrer">ISTQB Glossary</a>.
+        Worth checking before an interview — interviewers tend to use the ISTQB wording even when they have never sat the exam.
+      </p>
     </section>
 
     <section class="panel">
@@ -100,18 +117,35 @@
           <strong>Non-functional</strong>
           <ul class="text-dim">
             <li>Performance (load, stress, spike, soak)</li>
-            <li>Security (OWASP Top 10)</li>
-            <li>Accessibility (WCAG 2.1 AA)</li>
+            <li>Security — <a href="https://owasp.org/www-project-top-ten/" target="_blank" rel="noopener noreferrer">OWASP Top 10</a></li>
+            <li>Accessibility — <a href="https://www.w3.org/TR/WCAG21/" target="_blank" rel="noopener noreferrer">WCAG 2.1 AA</a></li>
             <li>Usability</li>
             <li>Compatibility (browsers, devices, OS)</li>
             <li>Localization / Internationalization</li>
           </ul>
         </div>
       </div>
+      <p class="text-dim mt-16">
+        Two of these have tooling that makes them testable rather than theoretical.
+        The <a href="https://www.w3.org/WAI/WCAG21/quickref/" target="_blank" rel="noopener noreferrer">WCAG Quick Reference</a>
+        filters the spec down to the success criteria that apply to what you are
+        looking at, and <a href="https://www.deque.com/axe/" target="_blank" rel="noopener noreferrer">axe</a>
+        catches a meaningful slice of accessibility defects automatically — enough
+        to be worth running, not enough to stop there.
+      </p>
+      <p class="text-dim">
+        Being able to name a specific OWASP category, rather than saying "I'd test
+        for security", is a noticeable interview differentiator.
+      </p>
     </section>
 
     <section class="panel">
-      <h2>Glossary</h2>
+      <div class="lab-ex-head">
+        <h2 style="margin:0;">Glossary</h2>
+        <span class="text-dim">
+          <a href="https://glossary.istqb.org/" target="_blank" rel="noopener noreferrer">Full ISTQB glossary →</a>
+        </span>
+      </div>
       <dl class="text-dim">
         <dt><strong>Test case</strong></dt>
         <dd>A set of preconditions, inputs, steps, and expected results that verifies a specific requirement.</dd>
@@ -128,37 +162,106 @@
         <dt><strong>Shift-left / Shift-right</strong></dt>
         <dd>Testing earlier in the SDLC (shift-left) or in production (shift-right, e.g., canary, feature flags, chaos).</dd>
         <dt><strong>Mock vs. Stub vs. Fake</strong></dt>
-        <dd>Stub returns canned answers; mock verifies interactions were made; fake is a working lightweight implementation (e.g., in-memory DB).</dd>
+        <dd>Stub returns canned answers; mock verifies interactions were made; fake is a working lightweight implementation (e.g., in-memory DB).
+          These three get used interchangeably in the wild; Martin Fowler's
+          <a href="https://martinfowler.com/bliki/TestDouble.html" target="_blank" rel="noopener noreferrer">Test Double</a>
+          is the reference people actually mean when they claim there is a difference.</dd>
         <dt><strong>SUT</strong></dt>
         <dd>System Under Test.</dd>
         <dt><strong>Test double</strong></dt>
         <dd>Umbrella term for anything that replaces a real dependency (mocks, stubs, fakes, spies, dummies).</dd>
+        <dt><strong>Page Object Model</strong></dt>
+        <dd>A pattern that puts page structure behind a named API so a UI change breaks one file instead of forty.
+          <a href="https://martinfowler.com/bliki/PageObject.html" target="_blank" rel="noopener noreferrer">Fowler's original write-up</a>
+          is short and is what interviewers are checking you have read.</dd>
+        <dt><strong>Test pyramid</strong></dt>
+        <dd>Many fast unit tests, fewer integration tests, fewest end-to-end tests.
+          <a href="https://martinfowler.com/articles/practical-test-pyramid.html" target="_blank" rel="noopener noreferrer">The Practical Test Pyramid</a>
+          covers both the shape and the common objections to it.</dd>
       </dl>
     </section>
 
     <section class="panel">
       <h2>Suggested reading</h2>
-      <ul class="text-dim">
-        <li><em>Lessons Learned in Software Testing</em> — Kaner, Bach, Pettichord</li>
-        <li><em>Agile Testing</em> and <em>More Agile Testing</em> — Crispin & Gregory</li>
-        <li><em>Explore It!</em> — Elisabeth Hendrickson</li>
-        <li><em>xUnit Test Patterns</em> — Gerard Meszaros</li>
-        <li><em>Continuous Delivery</em> — Humble & Farley</li>
-        <li>ISTQB Foundation Level syllabus (free, ~150 pages) — solid vocabulary base.</li>
+      <p class="text-dim">
+        Start with the free one. The ISTQB syllabus gives you the vocabulary
+        interviewers use, and costs nothing but an afternoon.
+      </p>
+      <ul>
+        <li>
+          <a href="https://www.istqb.org/certifications/certified-tester-foundation-level" target="_blank" rel="noopener noreferrer"><strong>ISTQB Foundation Level syllabus</strong></a>
+          — free, ~150 pages. The standard vocabulary base, and the source most
+          interview questions are quietly drawn from.
+          <span class="text-dim">Free PDF</span>
+        </li>
+        <li>
+          <a href="https://www.amazon.com/dp/0471081124" data-affiliate="amazon" target="_blank" rel="nofollow noopener noreferrer"><em>Lessons Learned in Software Testing</em></a>
+          — Kaner, Bach, Pettichord.
+          <span class="text-dim">293 short lessons. The one to read if you only read one — it is skimmable and quotable in interviews.</span>
+        </li>
+        <li>
+          <a href="https://www.amazon.com/dp/1937785025" data-affiliate="amazon" target="_blank" rel="nofollow noopener noreferrer"><em>Explore It!</em></a>
+          — Elisabeth Hendrickson.
+          <span class="text-dim">Turns exploratory testing from "clicking around" into a method you can describe on demand. Directly useful for the bug hunts on this site.</span>
+        </li>
+        <li>
+          <a href="https://www.amazon.com/dp/0321534468" data-affiliate="amazon" target="_blank" rel="nofollow noopener noreferrer"><em>Agile Testing</em></a>
+          and
+          <a href="https://www.amazon.com/dp/0321967054" data-affiliate="amazon" target="_blank" rel="nofollow noopener noreferrer"><em>More Agile Testing</em></a>
+          — Crispin &amp; Gregory.
+          <span class="text-dim">Where the testing quadrants come from. Read the first before the second.</span>
+        </li>
+        <li>
+          <a href="https://www.amazon.com/dp/0131495054" data-affiliate="amazon" target="_blank" rel="nofollow noopener noreferrer"><em>xUnit Test Patterns</em></a>
+          — Gerard Meszaros.
+          <span class="text-dim">A reference, not a read-through. This is where the precise mock/stub/fake definitions live.</span>
+        </li>
+        <li>
+          <a href="https://www.amazon.com/dp/0321601912" data-affiliate="amazon" target="_blank" rel="nofollow noopener noreferrer"><em>Continuous Delivery</em></a>
+          — Humble &amp; Farley.
+          <span class="text-dim">Explains where testing sits in a deployment pipeline. Useful once you are being asked about CI, not before.</span>
+        </li>
       </ul>
+      <p class="text-dim mt-16 hidden" data-affiliate-disclosure data-testid="affiliate-disclosure"></p>
+    </section>
+
+    <section class="panel">
+      <h2>Where to keep learning</h2>
+      <p class="text-dim">Documentation and communities worth a bookmark rather than a one-off read.</p>
+      <div class="two-col">
+        <div>
+          <strong>Tool documentation</strong>
+          <ul class="text-dim">
+            <li><a href="https://playwright.dev/docs/intro" target="_blank" rel="noopener noreferrer">Playwright docs</a> — genuinely well written; the locators and assertions pages are the two that matter most.</li>
+            <li><a href="https://www.selenium.dev/documentation/" target="_blank" rel="noopener noreferrer">Selenium docs</a> — still what a large share of job postings ask for.</li>
+            <li><a href="https://developer.mozilla.org/en-US/docs/Web/HTTP" target="_blank" rel="noopener noreferrer">MDN HTTP reference</a> — for anything API testing touches.</li>
+          </ul>
+        </div>
+        <div>
+          <strong>Communities &amp; writing</strong>
+          <ul class="text-dim">
+            <li><a href="https://www.ministryoftesting.com/" target="_blank" rel="noopener noreferrer">Ministry of Testing</a> — the largest active testing community; the forum is a good place to ask beginner questions without being flamed.</li>
+            <li><a href="https://testing.googleblog.com/" target="_blank" rel="noopener noreferrer">Google Testing Blog</a> — the archive on flaky tests and test sizing is worth mining.</li>
+            <li><a href="https://martinfowler.com/testing/" target="_blank" rel="noopener noreferrer">martinfowler.com/testing</a> — the source of most of the vocabulary the industry reuses.</li>
+          </ul>
+        </div>
+      </div>
     </section>
 
     <section class="panel">
       <h2>Interview prep checklist</h2>
+      <p class="text-dim">Each item links to where you can actually practise it, rather than just read about it.</p>
       <ul>
-        <li>Know the definitions: verification vs. validation, severity vs. priority, smoke vs. sanity.</li>
-        <li>Explain the SDLC / STLC and where you fit in Scrum.</li>
-        <li>Design a test plan for a familiar feature end-to-end (login is a classic).</li>
-        <li>Walk through boundary and equivalence with a concrete example.</li>
-        <li>Know when NOT to automate.</li>
-        <li>Explain the test pyramid and page object model.</li>
-        <li>Understand HTTP basics and how you'd test a REST endpoint.</li>
-        <li>Prepare 2–3 STAR stories: critical bug found, disagreement with dev, process improvement.</li>
+        <li>Know the definitions: verification vs. validation, severity vs. priority, smoke vs. sanity. — <a href="interview-questions.html">Interview questions</a></li>
+        <li>Explain the SDLC / STLC and where you fit in Scrum. — <a href="learn.html">Learn tracks</a></li>
+        <li>Design a test plan for a familiar feature end-to-end (login is a classic). — <a href="../practice-apps/login.html">Login practice app</a></li>
+        <li>Walk through boundary and equivalence with a concrete example. — <a href="practice-tests.html?category=fundamentals">Fundamentals quiz</a></li>
+        <li>Know when NOT to automate. — <a href="learn/automation.html">Automation track</a></li>
+        <li>Explain the <a href="https://martinfowler.com/articles/practical-test-pyramid.html" target="_blank" rel="noopener noreferrer">test pyramid</a> and <a href="https://martinfowler.com/bliki/PageObject.html" target="_blank" rel="noopener noreferrer">page object model</a>.</li>
+        <li>Understand HTTP basics and how you'd test a REST endpoint. — <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP" target="_blank" rel="noopener noreferrer">MDN HTTP</a></li>
+        <li>Be able to write a locator that will not go flaky. — <a href="../practice-apps/locator-lab.html">Locator Lab</a></li>
+        <li>Prepare 2–3 STAR stories: critical bug found, disagreement with dev, process improvement. — a real find from <a href="practice-apps.html#buggy">a bug hunt</a> works as the first one.</li>
+        <li>Have a written bug report you can show. — <a href="portfolio.html">Your portfolio</a></li>
         <li>Have questions ready for them: quality culture, ratio of manual to automation, deployment cadence.</li>
       </ul>
     </section>
@@ -167,5 +270,6 @@
   <div id="site-footer"></div>
   <script src="../js/test-hooks.js"></script>
   <script src="../js/site-chrome.js"></script>
+  <script src="../js/affiliate.js"></script>
 </body>
 </html>

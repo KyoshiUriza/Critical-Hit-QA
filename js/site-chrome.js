@@ -152,7 +152,7 @@
     container.className = "container";
 
     var line1 = document.createElement("p");
-    line1.appendChild(document.createTextNode("Critical Hit QA — a local study companion. Themed on "));
+    line1.appendChild(document.createTextNode("Critical Hit QA — a free study companion. Themed on "));
     // The title itself is the link rather than a separate "read it here" —
     // the sentence already names the thing being linked, so a second one
     // would just be footer clutter.
