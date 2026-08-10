@@ -72,13 +72,13 @@
             </div>
             <button type="submit" class="btn btn-primary" data-testid="reg-submit">Create account</button>
           </form>
-          <div id="reg-result" style="margin-top:12px;"></div>
+          <div class="mt-3" id="reg-result"></div>
         </div>
       </div>
 
       <div class="panel">
         <h3>Behavior spec</h3>
-        <ul class="text-dim" style="font-size:0.9rem;">
+        <ul class="text-dim text-sm">
           <li>Full name: required, ≥ 2 chars, whitespace trimmed.</li>
           <li>Email: required, valid format (must include TLD).</li>
           <li>Age: required, integer 13–120. Under 13 = "must be 13+".</li>
@@ -93,10 +93,10 @@
       </div>
     </div>
 
-    <div class="panel mt-16">
+    <div class="panel mt-4">
       <h3>Answer key</h3>
       <button class="btn btn-ghost" id="reveal-btn">Reveal known defects</button>
-      <div id="answer-key" class="hidden mt-16">
+      <div id="answer-key" class="hidden mt-4">
         <ol style="line-height:1.7;">
           <li><strong>Full name allows 1 character.</strong> Length check uses <code class="inline">&gt; 0</code> instead of <code class="inline">≥ 2</code>.</li>
           <li><strong>Email regex too permissive.</strong> Accepts <code class="inline">a@b</code> (no dot / TLD).</li>

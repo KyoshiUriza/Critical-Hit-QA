@@ -45,22 +45,22 @@
             <p class="text-dim" style="margin:10px 0 0; font-size:0.85rem;">Accepted: .jpg, .png, .pdf, .txt · Max 5 files · Max 2 MB each</p>
           </div>
 
-          <div id="file-list" data-testid="file-list" style="margin-top:16px;"></div>
+          <div class="mt-4" id="file-list" data-testid="file-list"></div>
 
-          <div id="errors" style="margin-top:12px;"></div>
+          <div class="mt-3" id="errors"></div>
 
           <div style="display:flex; gap:8px; margin-top:16px;">
             <button class="btn btn-success" id="upload-btn" data-testid="upload-btn" disabled>Upload</button>
             <button class="btn btn-ghost" id="clear-btn" data-testid="clear-btn">Clear</button>
           </div>
 
-          <div id="upload-result" data-testid="upload-result" role="status" aria-live="polite" style="margin-top:12px;"></div>
+          <div class="mt-3" id="upload-result" data-testid="upload-result" role="status" aria-live="polite"></div>
         </div>
       </div>
 
       <div class="panel">
         <h3>Behavior spec</h3>
-        <ul class="text-dim" style="font-size:0.9rem;">
+        <ul class="text-dim text-sm">
           <li>Accepts drop OR click-to-pick.</li>
           <li>Max 5 files total in one batch.</li>
           <li>Each file ≤ 2 MB (2,097,152 bytes).</li>
@@ -72,7 +72,7 @@
           <li>Drop zone reachable and activatable via keyboard.</li>
         </ul>
         <h3>Test ideas</h3>
-        <ul class="text-dim" style="font-size:0.9rem;">
+        <ul class="text-dim text-sm">
           <li>Drop a folder — what happens?</li>
           <li>Rename <code class="inline">.exe</code> to <code class="inline">.txt</code> — accepted? MIME check?</li>
           <li>Drop 6 files at once — is the 6th rejected or does the whole batch fail?</li>

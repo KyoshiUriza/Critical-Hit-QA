@@ -23,33 +23,33 @@
     <div class="two-col">
       <div class="panel">
         <h2>Bound Catalysts</h2>
-        <p class="text-dim" style="font-size:0.88rem;">Each Catalyst binds once. The System does not need much consent.</p>
+        <p class="text-dim text-sm">Each Catalyst binds once. The System does not need much consent.</p>
         <div id="catalysts-list"></div>
       </div>
       <div class="panel">
         <h2>Signature Abilities</h2>
-        <p class="text-dim" style="font-size:0.88rem;">Latent until practice awakens them.</p>
+        <p class="text-dim text-sm">Latent until practice awakens them.</p>
         <div id="achievements-list"></div>
       </div>
     </div>
 
-    <div class="panel mt-16">
+    <div class="panel mt-4">
       <h2>The Ranks</h2>
       <p class="text-dim">The System does not hand out titles. It logs the total and lets the number decide.</p>
       <table style="width:100%; border-collapse:collapse; margin-top:12px;">
         <thead>
           <tr style="border-bottom:1px solid var(--border); text-align:left;">
-            <th style="padding:8px;">Lv.</th>
-            <th style="padding:8px;">Rank</th>
-            <th style="padding:8px;">Star-Dust</th>
-            <th style="padding:8px;">Lore</th>
+            <th class="p-2">Lv.</th>
+            <th class="p-2">Rank</th>
+            <th class="p-2">Star-Dust</th>
+            <th class="p-2">Lore</th>
           </tr>
         </thead>
         <tbody id="ranks-tbody"></tbody>
       </table>
     </div>
 
-    <div class="panel mt-16">
+    <div class="panel mt-4">
       <h2>How to earn Star-Dust</h2>
       <ul>
         <li><strong>+8</strong> per correct quiz answer · <strong>+2</strong> per incorrect (participation).</li>
@@ -94,7 +94,7 @@
       document.getElementById("catalysts-list").innerHTML = window.RPG.CATALYSTS.map((c) => `
         <div class="rpg-catalyst ${unlockedCat.has(c.id) ? "unlocked" : ""}">
           <div class="rpg-sigil">${c.name.split(" ").pop()[0]}</div>
-          <div style="flex:1;">
+          <div class="flex-1">
             <div class="rpg-name">${unlockedCat.has(c.id) ? c.name : "??? Catalyst"}</div>
             <div class="rpg-lore">${unlockedCat.has(c.id) ? "Ability: " + c.ability : c.grantedAt}</div>
             ${unlockedCat.has(c.id) ? "" : `<div class="rpg-locked-label">LOCKED</div>`}
@@ -105,7 +105,7 @@
       document.getElementById("achievements-list").innerHTML = window.RPG.ACHIEVEMENTS.map((a) => `
         <div class="rpg-achievement ${unlockedAch.has(a.id) ? "unlocked" : ""}">
           <div class="rpg-sigil">${unlockedAch.has(a.id) ? "✦" : "◦"}</div>
-          <div style="flex:1;">
+          <div class="flex-1">
             <div class="rpg-name">${a.name}</div>
             <div class="rpg-lore">${a.lore}</div>
             <div class="rpg-hint">${unlockedAch.has(a.id) ? "Unlocked." : "To unlock: " + a.hint}</div>

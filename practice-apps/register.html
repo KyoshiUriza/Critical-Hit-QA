@@ -68,13 +68,13 @@
             </div>
             <button type="submit" class="btn btn-primary" data-testid="reg-submit">Create account</button>
           </form>
-          <div id="reg-result" data-testid="reg-result" role="status" aria-live="polite" style="margin-top:12px;"></div>
+          <div class="mt-3" id="reg-result" data-testid="reg-result" role="status" aria-live="polite"></div>
         </div>
       </div>
 
       <div class="panel">
         <h3>Behavior spec</h3>
-        <ul class="text-dim" style="font-size:0.9rem;">
+        <ul class="text-dim text-sm">
           <li>Full name: required, ≥ 2 chars, whitespace trimmed.</li>
           <li>Email: required, valid format.</li>
           <li>Age: required, integer 13–120. Under 13 = "Sorry, you must be 13+".</li>
@@ -86,7 +86,7 @@
           <li>On success, form is disabled and a success message shown.</li>
         </ul>
         <h3>Test ideas</h3>
-        <ul class="text-dim" style="font-size:0.9rem;">
+        <ul class="text-dim text-sm">
           <li>Emails: <code class="inline">a@b</code>, <code class="inline">a@b.c</code>, plus-addressing, unicode domain.</li>
           <li>Age: 12, 13, 120, 121, negative, decimal, letters.</li>
           <li>Password matching: paste vs. type, trailing whitespace.</li>

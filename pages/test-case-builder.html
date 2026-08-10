@@ -77,7 +77,7 @@
             <textarea id="tc-expected" rows="2" placeholder="User lands on dashboard; welcome banner shows their email"></textarea>
           </div>
 
-          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+          <div class="flex gap-2 flex-wrap">
             <button class="btn btn-primary" id="export-md">Export as Markdown</button>
             <button class="btn btn-primary" id="export-json">Export as JSON</button>
             <button class="btn btn-ghost" id="load-example">Load example</button>
@@ -89,7 +89,7 @@
       <div class="panel">
         <h2>Preview</h2>
         <pre class="code" id="preview" style="min-height:400px; white-space:pre-wrap;">(Fill in the form and click Export...)</pre>
-        <div style="display:flex; gap:8px;">
+        <div class="flex gap-2">
           <button class="btn btn-ghost btn-sm" id="copy-preview">Copy to clipboard</button>
           <button class="btn btn-primary btn-sm" id="save-tc" data-testid="save-artifact">Save to portfolio</button>
           <button class="btn btn-ghost btn-sm" id="new-draft" data-testid="new-draft">New draft</button>

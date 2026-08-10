@@ -1,123 +1,256 @@
-:root {
-  --bg: #0f1419;
-  --bg-elev: #171f2a;
-  --bg-elev-2: #1f2937;
-  --border: #2a3444;
-  --text: #e6edf3;
-  --text-dim: #9aa7b8;
-  --accent: #4f9dff;
-  --accent-2: #62d391;
-  --danger: #ff6b6b;
-  --warn: #f2c14e;
-  --code-bg: #0b1220;
+/* ═══════════════════════════════════════════════════════════════════════
+   Option A: The IDE — token layer.
 
-  /* Derived color tokens — never hardcode these in components.
+   Neutral zinc grayscale, no blue tint in the surfaces. Elevation comes from
+   visible borders rather than heavy shadows, which is the whole thesis: a
+   precise, structural, developer-tool aesthetic.
+
+   COLOUR VALUES DIVERGE FROM THE MODERNIZATION PLAN, DELIBERATELY.
+   The plan's own contrast table was wrong in all eight rows, and eleven pairs
+   it did not list failed WCAG AA — including the light-mode primary button
+   (4.10:1) and every link on white (4.10:1). Its border tokens sat at 1.19:1
+   where 3:1 is required for control boundaries, which also defeated the
+   "elevation via borders" idea it was arguing for: at 1.2:1 the borders are
+   not visible.
+
+   The hues, the scale, and the structure are the plan's. The exact hex values
+   are re-derived so they pass. Every ratio below is measured, not estimated.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* Self-hosted, so there is no network request and no third party. The CSP
+   allows font-src 'self' only, which this satisfies and a CDN would not. */
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('../fonts/InterVariable.woff2') format('woff2');
+}
+
+:root {
+  /* ── Surfaces ──────────────────────────────────────────────────────────
+     Zinc, not slate. The old #0f1419 carried a blue cast that read as a
+     2017 admin template. */
+  --bg: #09090b;
+  --bg-elev: #121214;
+  --bg-elev-2: #18181b;
+
+  /* ── Borders ───────────────────────────────────────────────────────────
+     Three roles, because one border token cannot be both invisible enough
+     to be decorative and visible enough to bound a control.
+       --border         decorative dividers, no contrast requirement
+       --border-strong  card edges — 3:1 so a panel reads as a distinct plane
+       --border-control form controls — WCAG 1.4.11 requires 3:1 */
+  --border: #3f3f46;
+  --border-hover: #63636d;
+  --border-strong: #63636d;   /* 3.35:1 on --bg, 3.15:1 on --bg-elev */
+  --border-control: #71717a;  /* 4.12 / 3.87 / 3.67:1 on the three surfaces */
+
+  /* ── Text ──────────────────────────────────────────────────────────── */
+  --text: #f4f4f5;      /* 18.10:1 on --bg */
+  --text-dim: #a1a1aa;  /* 7.76 / 7.30 / 6.91:1 */
+
+  /* ── Accents ───────────────────────────────────────────────────────────
      The --on-* values are theme-dependent: a bright accent needs DARK text,
-     a dark accent needs LIGHT text. Getting this backwards is how we shipped
-     2.76:1 button labels in dark mode. Measured ratios below. */
-  --accent-hover: #3b8ae8;
-  --on-accent: #0b1220;      /* on --accent   #4f9dff -> 6.78:1 */
-  --on-accent-2: #0a1a10;    /* on --accent-2 #62d391 -> 9.63:1 */
-  --on-danger: #0b1220;      /* on --danger   #ff6b6b -> 6.75:1 */
-  --on-warn: #1a1200;        /* on --warn     #f2c14e -> 11.07:1 */
-  --code-fg: #e2e8f0;
-  --border-strong: #3a4657;   /* card edge where a surface must read as separate */
-  --border-control: #5d6b80;  /* form control edge — 3.42:1 on --bg, 3.07:1 on --bg-elev */
-  --code-accent: #4f9dff;    /* on --code-bg #0b1220 -> 6.78:1. Does NOT flip:
-                                the code surface stays dark in both themes. */
+     a dark accent needs LIGHT text. Getting this backwards is how 2.76:1
+     button labels shipped once already. */
+  --accent: #38bdf8;         /* sky — 9.29:1 on --bg, 8.73:1 on --bg-elev */
+  --accent-hover: #7dd3fc;   /* lighter on hover: dark surfaces brighten */
+  --on-accent: #08131c;      /* on --accent 8.75:1, on --accent-hover 11.24:1 */
+
+  --accent-2: #34d399;       /* emerald — 9.73:1 on --bg-elev */
+  --on-accent-2: #022c22;    /* 7.88:1 */
+
+  --danger: #f87171;         /* 6.76:1 on --bg-elev */
+  --on-danger: #1a0505;      /* 7.11:1 */
+
+  --warn: #fbbf24;           /* 11.21:1 on --bg-elev */
+  --on-warn: #1a1200;        /* 11.13:1 */
+
+  /* ── Code surface ──────────────────────────────────────────────────────
+     Unlike before, this now flips with the theme — the plan puts a light
+     code surface in light mode, so --code-accent has to flip too or it
+     lands at 2.8:1 on #f4f4f5. */
+  --code-bg: #000000;
+  --code-fg: #e4e4e7;        /* 16.55:1 */
+  --code-accent: #38bdf8;    /* 9.80:1 on --code-bg */
+
   --brand-donate: #ffdd00;
   --brand-donate-fg: #000000;
 
-  /* ── Radius scale ──────────────────────────────────────────────────────
-     Radius should track element size. A single 10px on everything from a
-     4px progress bar to a 480px modal flattens the hierarchy. */
+  /* ── Radius (hierarchical) ─────────────────────────────────────────────
+     Radius tracks element size. One value on everything from a 4px progress
+     fill to a 480px modal flattens the hierarchy. */
   --rad-xs: 2px;      /* hairlines, progress fills */
   --rad-sm: 4px;      /* badges, tags, code blocks */
-  --rad-md: 6px;      /* buttons, inputs, tabs — controls you click */
+  --rad-md: 6px;      /* buttons, inputs, tabs — things you click */
   --rad-lg: 12px;     /* cards, panels, modals — things that contain */
-  --rad-full: 999px;  /* pills, chips */
+  --rad-full: 9999px; /* pills, chips, avatars */
 
-  /* Deprecated alias. 9 rules still read it; delete once they are migrated. */
+  /* Deprecated alias. Still read by a few rules; delete once migrated. */
   --radius: var(--rad-lg);
 
   /* ── Elevation ─────────────────────────────────────────────────────────
-     Layered: a tight shadow for contact, a wider one for depth. Kept subtle
-     in dark mode, where black-on-near-black barely reads — dark elevation
-     comes from the border, not the shadow. */
-  --shadow-sm: 0 1px 2px rgba(0,0,0,0.30);
-  --shadow-md: 0 2px 4px rgba(0,0,0,0.28), 0 6px 12px -2px rgba(0,0,0,0.34);
-  --shadow-lg: 0 4px 8px rgba(0,0,0,0.30), 0 12px 28px -6px rgba(0,0,0,0.42);
+     Layered: a tight shadow for contact, a wider one for depth. Minimal in
+     dark mode, where black on near-black barely reads — dark elevation comes
+     from the border. */
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.5);
+  --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.5), 0 2px 4px -1px rgba(0,0,0,0.4);
+  --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.5), 0 4px 6px -2px rgba(0,0,0,0.3);
 
   /* Deprecated alias. */
   --shadow: var(--shadow-md);
 
-  /* ── Spacing (4px grid) ────────────────────────────────────────────────
-     Every padding and margin was a literal px value; four near-identical
-     containers used four different paddings. */
+  /* ── Spacing (4px baseline grid) ─────────────────────────────────────── */
   --sp-1: 4px;   --sp-2: 8px;   --sp-3: 12px;  --sp-4: 16px;
   --sp-5: 20px;  --sp-6: 24px;  --sp-8: 32px;  --sp-12: 48px;
+  --sp-16: 64px;
 
-  /* ── Type scale ────────────────────────────────────────────────────────
-     Collapses 23 ad-hoc sizes. Values stay close to what shipped so the
-     header and chip keep fitting; the win is the count, not new proportions. */
-  --fs-xs: 0.75rem;    /* was 0.72 / 0.75 / 0.78 */
-  --fs-sm: 0.82rem;    /* was 0.80 / 0.82 */
-  --fs-md: 0.88rem;    /* was 0.85 / 0.875 / 0.88 */
-  --fs-base: 0.92rem;  /* was 0.90 / 0.92 / 0.94 / 0.95 */
-  --fs-lg: 1.05rem;    /* was 1.00 / 1.05 */
-  --fs-xl: 1.15rem;    /* was 1.10 / 1.15 */
-  --fs-2xl: 1.4rem;    /* was 1.25 / 1.40 */
-  --fs-3xl: 1.8rem;    /* was 1.60 / 1.80 */
-  --fs-4xl: 2.4rem;    /* was 2.00 / 2.40 */
-  --fs-5xl: 3rem;
-  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  /* ── Type (Perfect Fourth, 1.333) ──────────────────────────────────────
+     --text-* are the canonical names from the plan. --fs-* are kept as
+     aliases because ~1300 lines of this stylesheet already reference them;
+     renaming every call site would be a large diff with no visual result and
+     real risk. Both names resolve to the same value, so there is one scale,
+     not two. */
+  --text-xs:   0.75rem;   /* 12px — badges, tiny metadata */
+  --text-sm:   0.875rem;  /* 14px — code, secondary text, table headers */
+  --text-base: 1rem;      /* 16px — body */
+  --text-lg:   1.125rem;  /* 18px — subheadings */
+  --text-xl:   1.25rem;   /* 20px — card titles */
+  --text-2xl:  1.5rem;    /* 24px — page headers */
+  --text-3xl:  2rem;      /* 32px — hero headings */
+  --text-4xl:  2.5rem;    /* 40px — large stats */
+
+  --fs-xs:   var(--text-xs);
+  --fs-sm:   var(--text-sm);
+  --fs-md:   var(--text-sm);
+  --fs-base: var(--text-base);
+  --fs-lg:   var(--text-lg);
+  --fs-xl:   var(--text-xl);
+  --fs-2xl:  var(--text-2xl);
+  --fs-3xl:  var(--text-3xl);
+  --fs-4xl:  var(--text-4xl);
+  --fs-5xl:  3rem;
+
+  --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
 
-  /* Motion tokens — pick by intent, not by taste. */
-  --dur-fast: 120ms;
-  --dur-med: 200ms;
-  --dur-slow: 320ms;
-  --ease: cubic-bezier(.2,.6,.2,1);
+  /* ── Motion ────────────────────────────────────────────────────────── */
+  --dur-fast: 150ms;
+  --dur-med: 250ms;
+  --dur-slow: 350ms;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease: var(--ease-out);
 
-  /* Focus indicator. Opaque, not translucent: a semi-transparent ring
-     composites toward the surface behind it, and the previous
-     rgba(79,157,255,0.55) measured 2.85 / 2.76 / 2.61:1 against our three
-     dark surfaces — a WCAG 2.4.11 failure the old comment claimed it passed.
-     Measured now: 8.78 / 7.87 / 6.96:1. */
-  --focus-ring-color: #7ab6ff;
+  /* Focus indicator. Opaque, never translucent: a semi-transparent ring
+     composites toward the surface behind it, and the ring this replaced
+     measured 2.85 / 2.76 / 2.61:1 — a WCAG 2.4.11 failure that its own
+     comment claimed was passing.
+
+     The double ring draws the page background first, then the accent, so the
+     indicator keeps its contrast against any surface it lands on. */
+  --focus-ring-color: #38bdf8;   /* 9.29 / 8.73 / 8.26:1 on the three surfaces */
+  --focus-ring: 0 0 0 2px var(--bg), 0 0 0 4px var(--focus-ring-color);
 }
 
+/* ═══════════════════════════════════════════════════════════════════════
+   LIGHT MODE
+   Accents invert polarity: the surfaces are bright, so the accents must be
+   dark enough to carry white labels. The plan's light values were the worst
+   offenders — its primary button and every link measured 4.10:1.
+   ═══════════════════════════════════════════════════════════════════════ */
 @media (prefers-color-scheme: light) {
   :root {
-    --bg: #f7f9fc;
+    --bg: #fafafa;
     --bg-elev: #ffffff;
-    --bg-elev-2: #eef2f7;
-    --border: #dbe2ea;
-    --text: #16202b;
-    --text-dim: #576475;
-    --code-bg: #0b1220;
-    --shadow-sm: 0 1px 2px rgba(15,25,40,0.06);
-    --shadow-md: 0 1px 3px rgba(15,25,40,0.08), 0 6px 14px -3px rgba(15,25,40,0.10);
-    --shadow-lg: 0 2px 6px rgba(15,25,40,0.08), 0 14px 32px -8px rgba(15,25,40,0.14);
-    /* #ffffff on #f7f9fc is 1.05:1 — cards are invisible without a border. */
-    --border-strong: #cbd5e1;
-    --border-control: #7c8a9e;  /* 3.33:1 on --bg, 3.51:1 on --bg-elev */
+    --bg-elev-2: #f4f4f5;
 
-    /* Semantic colors must be re-derived for light surfaces.
-       Dark-mode values fail WCAG AA on white (measured 1.7:1 – 2.8:1). */
-    --accent: #1b64c4;      /* >=5.09:1 on all three light surfaces */
-    --accent-2: #0f7a43;    /* 5.4:1 on #fff */
-    --danger: #c92a2a;      /* 5.9:1 on #fff */
-    --warn: #8a5a00;        /* 6.3:1 on #fff */
-    --accent-hover: #1857ac;
-    /* Light surfaces flip the polarity: the accents are dark, so labels go white. */
-    --on-accent: #ffffff;      /* on --accent   #1b64c4 -> 5.73:1 */
-    --on-accent-2: #ffffff;    /* on --accent-2 #0f7a43 -> 5.41:1 */
-    --on-danger: #ffffff;      /* on --danger   #c92a2a -> 5.46:1 */
-    --on-warn: #ffffff;        /* on --warn     #8a5a00 -> 5.93:1 */
-    --focus-ring-color: #1b64c4;   /* 5.43 / 5.73 / 5.09:1 on the light surfaces */
+    --border: #d4d4d8;
+    --border-hover: #a1a1aa;
+    --border-strong: #8b8b93;   /* 3.24:1 on --bg, 3.38:1 on --bg-elev */
+    --border-control: #71717a;  /* 4.63 / 4.83 / 4.40:1 */
+
+    --text: #09090b;      /* 19.06:1 on --bg */
+    --text-dim: #52525b;  /* 7.41 / 7.73 / 7.03:1 */
+
+    --accent: #0369a1;         /* 5.68:1 on --bg, 5.93:1 on --bg-elev */
+    --accent-hover: #075985;
+    --on-accent: #ffffff;      /* on --accent 5.93:1, on --accent-hover 7.56:1 */
+
+    --accent-2: #047857;       /* 5.48:1 on --bg-elev */
+    --on-accent-2: #ffffff;    /* 5.48:1 */
+
+    --danger: #dc2626;         /* 4.83:1 */
+    --on-danger: #ffffff;      /* 4.83:1 */
+
+    --warn: #b45309;           /* 5.02:1 */
+    --on-warn: #ffffff;        /* 5.02:1 */
+
+    /* The code surface flips to light here, so its accent must flip with it.
+       Keeping the dark-mode #38bdf8 would land at 2.8:1 on #f4f4f5. */
+    --code-bg: #f4f4f5;
+    --code-fg: #09090b;        /* 18.10:1 */
+    --code-accent: #0369a1;    /* 5.40:1 on --code-bg */
+
+    /* Light mode has no border-driven elevation from a dark background, so
+       the shadows do more work here. */
+    --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.08), 0 2px 4px -1px rgba(0,0,0,0.04);
+    --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.08), 0 4px 6px -2px rgba(0,0,0,0.04);
+
+    --focus-ring-color: #0369a1;   /* 5.68 / 5.93 / 5.40:1 */
+    --focus-ring: 0 0 0 2px var(--bg), 0 0 0 4px var(--focus-ring-color);
   }
 }
+
+/* ── Global heading reset ────────────────────────────────────────────────
+   Replaces the style="margin-top: 0" repeated across the HTML. */
+h1, h2, h3, h4, h5, h6 {
+  margin-top: 0;
+  margin-bottom: var(--sp-4);
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.2;
+}
+
+/* ── Layout & spacing utilities ──────────────────────────────────────────
+   A deliberately small, closed set. These exist to retire inline styles, not
+   to become a framework — anything beyond layout and spacing belongs in a
+   semantic class. */
+.flex { display: flex; }
+.flex-col { flex-direction: column; }
+.flex-wrap { flex-wrap: wrap; }
+.items-center { align-items: center; }
+.items-start { align-items: flex-start; }
+.justify-between { justify-content: space-between; }
+.justify-center { justify-content: center; }
+.gap-2 { gap: var(--sp-2); }
+.gap-3 { gap: var(--sp-3); }
+.gap-4 { gap: var(--sp-4); }
+.gap-6 { gap: var(--sp-6); }
+
+.flex-1 { flex: 1; }
+
+.m-0 { margin: 0; }
+.mt-0 { margin-top: 0; }
+.mb-0 { margin-bottom: 0; }
+.mt-2 { margin-top: var(--sp-2); }
+.mt-3 { margin-top: var(--sp-3); }
+.mt-4 { margin-top: var(--sp-4); }
+.mt-6 { margin-top: var(--sp-6); }
+.mb-2 { margin-bottom: var(--sp-2); }
+.mb-3 { margin-bottom: var(--sp-3); }
+.mb-4 { margin-bottom: var(--sp-4); }
+.mb-6 { margin-bottom: var(--sp-6); }
+.mb-8 { margin-bottom: var(--sp-8); }
+.ml-2 { margin-left: var(--sp-2); }
+
+.p-2 { padding: var(--sp-2); }
+.p-3 { padding: var(--sp-3); }
+
+.text-sm { font-size: var(--text-sm); }
+.text-xs { font-size: var(--text-xs); }
+.text-center { text-align: center; }
 
 /* Respect the user's motion preference across the whole site. */
 @media (prefers-reduced-motion: reduce) {
@@ -197,8 +330,23 @@ html, body {
 }
 
 /* Header */
+/* Already sticky before this change. What is new is the frosted treatment:
+   translucent page background plus a blur, so content scrolling underneath
+   reads as behind glass rather than clipping against a solid slab.
+
+   The plan hardcoded rgba() per theme. color-mix keeps it tied to --bg
+   instead, so it follows the token rather than drifting from it. The solid
+   declaration first is the fallback for browsers without color-mix.
+
+   The plan also specified padding: var(--sp-3) 0. Not applied: .header-inner
+   already carries min-height 60px, so adding 24px would make the header
+   *taller*, which is the opposite of what that rule was for — and that
+   min-height was measured against the 11-item nav and the RPG chip. */
 .site-header {
   background: var(--bg-elev);
+  background: color-mix(in srgb, var(--bg) 80%, transparent);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   border-bottom: 1px solid var(--border);
   position: sticky;
   top: 0;
@@ -242,7 +390,13 @@ html, body {
 .nav a {
   color: var(--text-dim);
   text-decoration: none;
-  padding: 8px 10px;
+  /* 8px horizontal, not 10px. Inter is wider than the system stack it
+     replaced, which pushed the nav from 863px to 912px and the collapse
+     breakpoint past 1280 — so a 1280x800 laptop, one of the most common
+     sizes there is, would have seen a hamburger. Reclaiming 4px per item
+     across 11 items brings it back under. A tighter nav also suits the
+     dense, utilitarian aesthetic this redesign is going for. */
+  padding: 8px 8px;
   border-radius: var(--rad-md);
   font-size: var(--fs-md);
   white-space: nowrap;
@@ -285,15 +439,23 @@ html, body {
 .nav-toggle-bars::before { top: -6px; }
 .nav-toggle-bars::after { top: 6px; }
 
-/* Measured: brand + 11 nav items + RPG chip need ~1240px, plus container
+/* Measured: brand + 11 nav items + RPG chip need ~1250px, plus container
    padding. Below that they cannot share a row, so they move into a disclosure
    panel. This number is derived, not guessed — see tests/header.spec.js.
 
-   Was 1220 when the nav had 10 items. Adding "Profile" pushed the requirement
-   to 1240, which overflowed the page horizontally between 1221 and 1239 —
-   invisible to the suite, because it sampled 1200 and 1280 and stepped over
-   the window. The boundary widths are now tested explicitly. */
-@media (max-width: 1239px) {
+   History, because it keeps moving for real reasons:
+     1220  10 nav items, system font stack
+     1240  an 11th item ("Profile") was added
+     1250  switching to Inter. Its metrics are wider than the system stack at
+           the same 14px, which took the nav from 863px to 912px and the
+           breakpoint to 1295 — collapsing the nav on a 1280x800 laptop, one
+           of the commonest sizes there is. Nav padding went 10px -> 8px to
+           reclaim 44px across 11 items and bring it back under 1280.
+
+   Each time, the boundary widths went into the test. The 1240 move was only
+   caught because the suite sampled 1200 and 1280 and stepped straight over
+   the broken window in between. */
+@media (max-width: 1250px) {
   .nav-toggle { display: flex; }
   .header-inner { flex-wrap: wrap; }
   .nav {
@@ -336,30 +498,72 @@ html, body {
 .hero-cta { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
 
 /* Buttons */
+/* Tight 6px radius and a 14px label. Height lands at ~37.6px, down from the
+   45.6px this replaced — that clears WCAG 2.5.8 (AA, 24px) but no longer
+   clears 2.5.5 (AAA, 44px). Raise the vertical padding to var(--sp-3) to get
+   45.6px back; tests/design.spec.js holds the AA floor either way. */
 .btn {
-  display: inline-block;
-  padding: 10px 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-2);
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  padding: var(--sp-2) var(--sp-4);
   border-radius: var(--rad-md);
-  font-weight: 600;
-  text-decoration: none;
   border: 1px solid transparent;
   cursor: pointer;
-  font-size: var(--fs-base);
-  font-family: inherit;
-  transition: transform 0.05s, background 0.12s, border-color 0.12s;
+  /* NOT `transition: all`, which the plan specified. `all` includes
+     box-shadow, and the focus ring is drawn with box-shadow — so the
+     indicator faded in over 150ms instead of appearing on keypress. Measured
+     at the moment focus lands it was fully transparent, which is a 2.4.11
+     failure for anyone tabbing quickly and a bad experience regardless.
+     A focus indicator has to be instant, so box-shadow is excluded here. */
+  transition: background-color var(--dur-fast) var(--ease-out),
+              border-color var(--dur-fast) var(--ease-out),
+              color var(--dur-fast) var(--ease-out),
+              transform var(--dur-fast) var(--ease-out);
+  text-decoration: none;
+  line-height: 1.4;
 }
 .btn:active { transform: translateY(1px); }
-.btn-primary { background: var(--accent); color: var(--on-accent); }
-.btn-primary:hover { background: var(--accent-hover); }
+.btn-primary {
+  background: var(--accent);
+  color: var(--on-accent);
+  /* Inset top highlight: reads as a physical key rather than a flat swatch. */
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.15), var(--shadow-sm);
+}
+.btn-primary:hover {
+  background: var(--accent-hover);
+  transform: translateY(-1px);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.15), var(--shadow-md);
+}
 .btn-ghost {
   background: transparent;
   color: var(--text);
-  border-color: var(--border);
+  border-color: var(--border-control);
 }
-.btn-ghost:hover { background: var(--bg-elev-2); }
+.btn-ghost:hover {
+  background: var(--bg-elev-2);
+  border-color: var(--border-hover);
+}
 .btn-success { background: var(--accent-2); color: var(--on-accent-2); }
 .btn-danger { background: var(--danger); color: var(--on-danger); }
-.btn-sm { padding: 6px 12px; font-size: var(--fs-md); }
+.btn-sm { padding: var(--sp-1) var(--sp-3); font-size: var(--text-xs); }
+
+/* Declared AFTER every variant on purpose. .btn-primary:hover and
+   .btn:focus-visible have equal specificity, so with the focus rule first a
+   hovered-and-focused button loses its ring entirely — outline:none has
+   already fired by then. Source order is what makes focus win. */
+.btn:focus-visible,
+.btn-primary:focus-visible,
+.btn-ghost:focus-visible,
+.btn-success:focus-visible,
+.btn-danger:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
 
 /* Feature grid */
 .feature-grid {
@@ -371,20 +575,33 @@ html, body {
 .feature-card {
   background: var(--bg-elev);
   border: 1px solid var(--border-strong);
-  border-radius: var(--radius);
-  padding: 22px;
+  border-radius: var(--rad-lg);
+  padding: var(--sp-6);
   text-decoration: none;
-  color: var(--text);
-  transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s;
+  color: inherit;
   display: block;
+  box-shadow: var(--shadow-sm);
+  transition: border-color var(--dur-fast) var(--ease-out),
+              box-shadow var(--dur-fast) var(--ease-out),
+              transform var(--dur-fast) var(--ease-out);
 }
 .feature-card:hover {
   transform: translateY(-2px);
   border-color: var(--accent);
-  box-shadow: var(--shadow);
+  box-shadow: var(--shadow-md);
 }
-.feature-card h3 { margin: 8px 0 6px; font-size: var(--fs-xl); }
-.feature-card p { margin: 0; color: var(--text-dim); font-size: var(--fs-base); }
+.feature-card h3 {
+  font-size: var(--text-lg);
+  margin-top: 0;
+  margin-bottom: var(--sp-2);
+  color: var(--text);
+}
+.feature-card p {
+  font-size: var(--text-sm);
+  color: var(--text-dim);
+  line-height: 1.5;
+  margin: 0;
+}
 .feature-icon {
   width: 40px;
   height: 40px;
@@ -442,10 +659,12 @@ html, body {
 .panel {
   background: var(--bg-elev);
   border: 1px solid var(--border-strong);
-  border-radius: var(--radius);
-  padding: 20px;
-  margin-bottom: 16px;
+  border-radius: var(--rad-lg);
+  padding: var(--sp-6);
+  margin-bottom: var(--sp-4);
   box-shadow: var(--shadow-sm);
+  transition: border-color var(--dur-fast) var(--ease-out),
+              box-shadow var(--dur-fast) var(--ease-out);
 }
 
 /* Quiz */
@@ -602,12 +821,12 @@ html, body {
 pre.code {
   background: var(--code-bg);
   color: var(--code-fg);
-  padding: 16px;
-  border-radius: var(--rad-md);
+  padding: var(--sp-4);
+  border-radius: var(--rad-sm);
   overflow-x: auto;
   font-family: var(--font-mono);
-  font-size: var(--fs-md);
-  line-height: 1.5;
+  font-size: var(--text-sm);
+  line-height: 1.6;
   border: 1px solid var(--border);
 }
 code.inline {
@@ -669,15 +888,18 @@ code.inline {
 }
 .form-field input, .form-field textarea, .form-field select {
   width: 100%;
-  padding: 10px 12px;
-  background: var(--bg);
+  padding: var(--sp-3) var(--sp-4);
+  /* --bg-elev-2 rather than --bg: inputs should read as punched into the
+     card, not as another card. */
+  background: var(--bg-elev-2);
   /* 1.4.11: a control's boundary is what identifies it, so it needs 3:1 —
-     the decorative --border only manages ~1.3:1. */
+     the decorative --border only manages ~1.2:1. */
   border: 1px solid var(--border-control);
   border-radius: var(--rad-md);
   color: var(--text);
-  font-family: inherit;
-  font-size: var(--fs-base);
+  font-family: var(--font-sans);
+  font-size: var(--text-base);
+  transition: border-color var(--dur-fast) var(--ease-out);
 }
 /* `outline: none` here beat the global :focus-visible rule on specificity
    (0,2,1 vs 0,1,0), leaving every form control in the site with a border
@@ -686,17 +908,21 @@ code.inline {
 .form-field input:focus-visible,
 .form-field textarea:focus-visible,
 .form-field select:focus-visible {
+  outline: none;
   border-color: var(--accent);
+  box-shadow: var(--focus-ring);
 }
-.form-error { color: var(--danger); font-size: var(--fs-sm); margin-top: 4px; display: none; }
+.form-error { color: var(--danger); font-size: var(--text-sm); margin-top: var(--sp-1); display: none; }
 .form-error.visible { display: block; }
 .form-success {
-  background: rgba(98,211,145,0.10);
+  /* colour-mix keeps this tied to the token instead of a hardcoded rgba of a
+     green that no longer exists — the old value was the previous palette's. */
+  background: color-mix(in srgb, var(--accent-2) 10%, transparent);
   border: 1px solid var(--accent-2);
   color: var(--accent-2);
-  padding: 10px 14px;
+  padding: var(--sp-3) var(--sp-4);
   border-radius: var(--rad-md);
-  margin-top: 12px;
+  margin-top: var(--sp-3);
 }
 
 /* Todo app */
@@ -816,8 +1042,11 @@ code.inline {
   .hero h1 { font-size: var(--fs-3xl); }
   .nav { max-height: 60vh; overflow-y: auto; }
 }
-.mt-16 { margin-top: 16px; }
-.mb-16 { margin-bottom: 16px; }
+/* .mt-16 / .mb-16 lived here and meant 16px — named after the pixel value,
+   from before there was a scale. They are gone because --sp-16 is 64px in the
+   new scale, so the same suffix meant two different things depending on
+   whether you were reading a class or a token. The 54 usages moved to
+   .mt-4 / .mb-4, which are the same 16px under the step-numbered names. */
 .text-dim { color: var(--text-dim); }
 .hidden { display: none !important; }
 

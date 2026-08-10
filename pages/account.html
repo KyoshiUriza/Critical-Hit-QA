@@ -40,12 +40,12 @@
 
     <section class="panel">
       <div class="lab-ex-head">
-        <h2 style="margin:0;">Profiles</h2>
+        <h2 class="m-0">Profiles</h2>
         <span class="text-dim" id="profile-count"></span>
       </div>
       <div id="profile-list" data-testid="profile-list"></div>
 
-      <h3 class="mt-16">Create a profile</h3>
+      <h3 class="mt-4">Create a profile</h3>
       <div class="form-field">
         <label for="new-name">Profile name</label>
         <input type="text" id="new-name" maxlength="24" placeholder="e.g. Kyoshi, or Evening study"
@@ -70,7 +70,7 @@
       <textarea id="export-out" class="hidden" data-testid="export-out" rows="4" readonly
                 aria-label="Your sync code"></textarea>
 
-      <h3 class="mt-16">Load a code on this device</h3>
+      <h3 class="mt-4">Load a code on this device</h3>
       <div class="form-field">
         <label for="import-in">Paste a sync code</label>
         <textarea id="import-in" rows="4" data-testid="import-in"
@@ -79,7 +79,7 @@
       <button class="btn btn-primary" id="preview-btn" data-testid="preview-code">Check this code</button>
       <p class="form-error hidden" id="import-error" data-testid="import-error" role="alert"></p>
 
-      <div class="panel panel-warn hidden mt-16" id="confirm-box" data-testid="confirm-box">
+      <div class="panel panel-warn hidden mt-4" id="confirm-box" data-testid="confirm-box">
         <h3>Replace the progress in <span id="target-name"></span>?</h3>
         <p id="confirm-summary" data-testid="confirm-summary"></p>
         <p class="text-dim">

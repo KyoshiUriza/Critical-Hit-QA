@@ -21,7 +21,7 @@
     <div class="category-tabs" id="plan-tabs"></div>
     <div id="plan-body"></div>
 
-    <div class="panel mt-16" style="text-align:center;">
+    <div class="panel mt-4 text-center">
       <p class="text-dim">Overall completion for this plan</p>
       <div class="quiz-score" id="plan-pct">0%</div>
       <p class="text-dim" id="plan-summary"></p>
@@ -171,7 +171,7 @@
           return `
             <div class="panel" style="border-color:${done ? "var(--accent-2)" : "var(--border)"};">
               <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
-                <h3 style="margin:0;">${day.title}</h3>
+                <h3 class="m-0">${day.title}</h3>
                 <label style="display:flex; align-items:center; gap:6px; font-size:0.9rem;">
                   <input type="checkbox" data-day="${i}" ${done ? "checked" : ""} /> Mark complete
                 </label>

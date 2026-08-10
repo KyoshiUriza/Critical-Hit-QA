@@ -95,7 +95,7 @@ DELETE FROM users WHERE email LIKE '%@test.example%';</pre>
         </tbody>
       </table>
 
-      <p class="mt-16"><strong>The orphan check</strong> — worth memorising, because it finds real data-integrity bugs:</p>
+      <p class="mt-4"><strong>The orphan check</strong> — worth memorising, because it finds real data-integrity bugs:</p>
       <pre class="code">-- Orders whose user no longer exists.
 SELECT o.id, o.user_id
 FROM orders o
@@ -168,7 +168,7 @@ WHERE rnk = 2;</pre>
       </ol>
     </section>
 
-    <p class="mt-16"><a href="../learn.html">← Back to Learn</a></p>
+    <p class="mt-4"><a href="../learn.html">← Back to Learn</a></p>
   </main>
 
   <div id="site-footer"></div>

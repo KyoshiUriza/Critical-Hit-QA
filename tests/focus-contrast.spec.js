@@ -47,17 +47,27 @@ function probeFocused() {
     `<${el.tagName.toLowerCase()}${el.id ? '#' + el.id : ''}> ` +
     `"${(el.textContent || el.getAttribute('aria-label') || '').trim().slice(0, 30)}"`;
 
-  let ring = null;
+  // Collect every candidate ring colour, then judge by the best one.
+  //
+  // A double ring — box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px var(--accent) —
+  // deliberately draws the page background first so the accent ring is
+  // separated from the element. Reading only the first colour therefore
+  // measures background against background, scores 1:1, and fails an
+  // indicator that is in fact highly visible. What matters for 2.4.11 is
+  // whether ANY layer of the indicator reaches 3:1 against the surface.
+  const candidates = [];
   if (cs.outlineStyle !== 'none' && parseFloat(cs.outlineWidth) > 0) {
-    ring = parse(cs.outlineColor);
-  } else {
-    const m = cs.boxShadow && cs.boxShadow.match(/rgba?\([^)]+\)/);
-    if (m) ring = parse(m[0]);
+    candidates.push(parse(cs.outlineColor));
   }
-  if (!ring || ring.length < 3) return `NO focus indicator — ${label}`;
+  if (cs.boxShadow && cs.boxShadow !== 'none') {
+    for (const m of cs.boxShadow.match(/rgba?\([^)]+\)/g) || []) candidates.push(parse(m));
+  }
 
-  const r = ratio(over(ring, surface), surface);
-  return r < 3 ? `${r.toFixed(2)}:1 (need 3.0) — ${label}` : null;
+  const rings = candidates.filter((c) => c && c.length >= 3);
+  if (!rings.length) return `NO focus indicator — ${label}`;
+
+  const best = Math.max(...rings.map((c) => ratio(over(c, surface), surface)));
+  return best < 3 ? `${best.toFixed(2)}:1 (need 3.0) — ${label}` : null;
 }
 
 for (const scheme of ['dark', 'light']) {

@@ -102,7 +102,7 @@
             <textarea id="br-notes" rows="2" placeholder="Might be related to the new server-side max-length validation added in PR #482."></textarea>
           </div>
 
-          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+          <div class="flex gap-2 flex-wrap">
             <button class="btn btn-primary" data-export="markdown">Export as Markdown</button>
             <button class="btn btn-primary" data-export="github">Export as GitHub Issue</button>
             <button class="btn btn-primary" data-export="jira">Export as Jira</button>
@@ -116,7 +116,7 @@
       <div class="panel">
         <h2>Preview</h2>
         <pre class="code" id="preview" style="min-height:400px; white-space:pre-wrap;">(Fill in the form and click Export...)</pre>
-        <div style="display:flex; gap:8px;">
+        <div class="flex gap-2">
           <button class="btn btn-ghost btn-sm" id="copy-preview">Copy to clipboard</button>
           <button class="btn btn-primary btn-sm" id="save-report" data-testid="save-artifact">Save to portfolio</button>
           <button class="btn btn-ghost btn-sm" id="new-draft" data-testid="new-draft">New draft</button>
@@ -131,9 +131,9 @@
       </div>
     </div>
 
-    <div class="panel mt-16">
+    <div class="panel mt-4">
       <h3>Bug report quality checklist</h3>
-      <ul class="text-dim" style="font-size:0.9rem;">
+      <ul class="text-dim text-sm">
         <li><strong>Title</strong> is specific: what happens, where, under what condition.</li>
         <li><strong>Steps</strong> are minimal, deterministic, numbered — someone else can reproduce blindly.</li>
         <li><strong>Environment</strong> covers browser, OS, and the exact build/commit.</li>

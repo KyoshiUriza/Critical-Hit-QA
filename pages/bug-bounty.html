@@ -31,7 +31,7 @@
 
     <div id="apps-container"></div>
 
-    <div class="panel mt-16" style="text-align:center;">
+    <div class="panel mt-4 text-center">
       <p class="text-dim">Overall bug hunter score</p>
       <div class="quiz-score" id="overall-score">--</div>
       <p class="text-dim" id="overall-summary"></p>
@@ -63,8 +63,8 @@
         card.innerHTML = `
           <div style="display:flex; justify-content:space-between; align-items:baseline; flex-wrap:wrap; gap:8px;">
             <div>
-              <h2 style="margin:0;">${app.name}</h2>
-              <div class="text-dim" style="font-size:0.9rem;">${found.size}/${app.defects.length} found · ${foundWeight}/${totalWeight} severity points</div>
+              <h2 class="m-0">${app.name}</h2>
+              <div class="text-dim text-sm">${found.size}/${app.defects.length} found · ${foundWeight}/${totalWeight} severity points</div>
             </div>
             <div style="display:flex; gap:8px; align-items:center;">
               <a class="btn btn-primary btn-sm" href="${app.url}" target="_blank" rel="noopener noreferrer">Open buggy app ↗</a>
@@ -72,7 +72,7 @@
               <button class="btn btn-ghost btn-sm" data-clear="${key}">Clear</button>
             </div>
           </div>
-          <div class="quiz-progress mt-16"><div class="quiz-progress-bar" style="width:${pct}%"></div></div>
+          <div class="quiz-progress mt-4"><div class="quiz-progress-bar" style="width:${pct}%"></div></div>
           <ul style="list-style:none; padding:0; margin-top:16px;">
             ${app.defects.map((d) => {
               const isFound = found.has(d.id);
@@ -80,7 +80,7 @@
                 <li class="q-item" style="margin-bottom:6px;">
                   <label style="display:flex; align-items:flex-start; gap:10px; padding:12px 14px; cursor:pointer;">
                     <input type="checkbox" data-app="${key}" data-defect="${d.id}" ${isFound ? "checked" : ""} style="margin-top:4px;" />
-                    <div style="flex:1;">
+                    <div class="flex-1">
                       <div>
                         <span class="tag difficulty-${d.severity === "critical" ? "hard" : d.severity === "high" ? "hard" : d.severity === "medium" ? "medium" : "easy"}">${d.severity.toUpperCase()}</span>
                         <strong>${isFound ? d.title : "(tick to reveal or use \"Reveal all\")"}</strong>

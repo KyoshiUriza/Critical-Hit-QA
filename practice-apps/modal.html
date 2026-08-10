@@ -36,19 +36,19 @@
         <div class="app-frame">
           <p class="text-dim">Click a button to open the corresponding modal. When it opens, try Tab/Shift+Tab, Esc, clicking the backdrop, and each action button.</p>
 
-          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+          <div class="flex gap-2 flex-wrap">
             <button class="btn btn-primary" data-open="info" data-testid="open-info">Open info modal</button>
             <button class="btn btn-primary" data-open="confirm" data-testid="open-confirm">Open confirmation</button>
             <button class="btn btn-danger" data-open="destructive" data-testid="open-destructive">Delete account</button>
           </div>
 
-          <p class="text-dim mt-16" style="font-size:0.9rem;">Last action: <code class="inline" id="last-action" data-testid="last-action">(none yet)</code></p>
+          <p class="text-dim mt-4 text-sm">Last action: <code class="inline" id="last-action" data-testid="last-action">(none yet)</code></p>
         </div>
       </div>
 
       <div class="panel">
         <h3>Behavior spec</h3>
-        <ul class="text-dim" style="font-size:0.9rem;">
+        <ul class="text-dim text-sm">
           <li>Background is inert and dimmed while a modal is open.</li>
           <li>Focus moves into the modal on open; first focusable receives focus.</li>
           <li>Tab and Shift+Tab cycle only within the modal (focus trap).</li>
@@ -59,7 +59,7 @@
           <li>Toast confirmation appears after destructive delete succeeds.</li>
         </ul>
         <h3>Test ideas</h3>
-        <ul class="text-dim" style="font-size:0.9rem;">
+        <ul class="text-dim text-sm">
           <li>Screen reader: is the modal title announced?</li>
           <li>Try Tab past the last focusable — does it wrap?</li>
           <li>Open a modal, then use browser back button — reasonable?</li>

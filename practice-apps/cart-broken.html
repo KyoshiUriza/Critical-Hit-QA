@@ -33,23 +33,23 @@
             <p class="text-dim" data-testid="empty-cart">Cart is empty.</p>
           </div>
 
-          <div class="form-field mt-16">
+          <div class="form-field mt-4">
             <label for="coupon">Coupon code</label>
-            <div style="display:flex; gap:8px;">
+            <div class="flex gap-2">
               <input type="text" id="coupon" data-testid="coupon-input" placeholder="Try SAVE10 or HALFOFF" />
               <button class="btn btn-primary" id="apply-coupon" data-testid="apply-coupon">Apply</button>
             </div>
             <div class="form-error" id="coupon-msg" data-testid="coupon-msg"></div>
           </div>
 
-          <button class="btn btn-success mt-16" id="checkout-btn" data-testid="checkout-btn">Checkout</button>
-          <div id="checkout-result" style="margin-top:12px;"></div>
+          <button class="btn btn-success mt-4" id="checkout-btn" data-testid="checkout-btn">Checkout</button>
+          <div class="mt-3" id="checkout-result"></div>
         </div>
       </div>
 
       <div class="panel">
         <h3>Behavior spec (expected)</h3>
-        <ul class="text-dim" style="font-size:0.9rem;">
+        <ul class="text-dim text-sm">
           <li>Products: Widget ($10), Gadget ($25), Gizmo ($5.99), Doohickey ($99.99).</li>
           <li>Add / +/− adjust quantity; qty must always be ≥ 1.</li>
           <li>Tax = 8% of the discounted subtotal (NOT of raw subtotal).</li>
@@ -61,10 +61,10 @@
       </div>
     </div>
 
-    <div class="panel mt-16">
+    <div class="panel mt-4">
       <h3>Answer key</h3>
       <button class="btn btn-ghost" id="reveal-btn">Reveal known defects</button>
-      <div id="answer-key" class="hidden mt-16">
+      <div id="answer-key" class="hidden mt-4">
         <ol style="line-height:1.7;">
           <li><strong>Tax computed on raw subtotal instead of discounted subtotal.</strong> Apply SAVE10 to $45 → tax should be $3.24 (8% of $40.50) but shows $3.60 (8% of $45).</li>
           <li><strong>Free-shipping threshold uses raw subtotal, not discounted.</strong> Cart at $52 raw, HALFOFF applied → discounted $26, shipping should be $5.99 but shows FREE.</li>

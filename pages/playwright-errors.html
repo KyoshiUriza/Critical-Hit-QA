@@ -102,7 +102,7 @@
 
     <section id="cli" class="panel">
       <div class="lab-ex-head">
-        <h2 style="margin:0;">CLI commands worth memorising</h2>
+        <h2 class="m-0">CLI commands worth memorising</h2>
         <span data-code-lang-toggle></span>
       </div>
       <p class="text-dim">Commands are identical in JavaScript and TypeScript projects — only the spec files differ.</p>
@@ -131,7 +131,7 @@ npx playwright show-trace trace.zip  # inspect a captured trace</pre>
 npx playwright install            # download browser binaries
 npx playwright install --with-deps chromium   # CI-friendly, one browser</pre>
 
-      <div class="panel panel-accent mt-16">
+      <div class="panel panel-accent mt-4">
         <strong>The three that earn their keep.</strong>
         <code class="inline">--ui</code> for authoring,
         <code class="inline">--debug</code> when one test misbehaves, and
@@ -151,7 +151,7 @@ npx playwright install --with-deps chromium   # CI-friendly, one browser</pre>
         <li><strong>Measure the flake rate.</strong> <code class="inline">--repeat-each=100 --workers=1</code>. "Sometimes" is not a diagnosis; 7/100 is.</li>
         <li><strong>Isolate state.</strong> Run the test alone. If it passes alone and fails in the suite, you have leakage between tests.</li>
       </ol>
-      <p class="mt-16 text-dim">Steps 1 and 2 resolve the large majority. The instinct to jump straight to raising timeouts is what turns a ten-minute fix into an afternoon.</p>
+      <p class="mt-4 text-dim">Steps 1 and 2 resolve the large majority. The instinct to jump straight to raising timeouts is what turns a ten-minute fix into an afternoon.</p>
     </section>
 
     <div class="panel app-next-steps">

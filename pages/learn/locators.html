@@ -54,7 +54,7 @@
         </tbody>
       </table>
 
-      <p class="mt-16"><strong>The one-line version:</strong> locate the element the way a user would describe it, not the way the DOM happens to be assembled.</p>
+      <p class="mt-4"><strong>The one-line version:</strong> locate the element the way a user would describe it, not the way the DOM happens to be assembled.</p>
     </section>
 
     <section id="smells" class="panel">
@@ -99,7 +99,7 @@
       <p>Most strict-mode violations are not "I need a more specific selector." They're "I need to say <em>which region</em> I mean." Chain from a stable ancestor:</p>
 
       <div class="lab-ex-head">
-        <h3 style="margin:0;">Row-scoped action</h3>
+        <h3 class="m-0">Row-scoped action</h3>
         <span data-code-lang-toggle></span>
       </div>
       <div class="code-sample">
@@ -121,7 +121,7 @@ await page
   .click();</pre>
       </div>
 
-      <p class="mt-16">The same shape solves duplicate buttons inside dialogs:</p>
+      <p class="mt-4">The same shape solves duplicate buttons inside dialogs:</p>
       <div class="code-sample">
 <pre class="code" data-lang="js">await page
   .getByRole('dialog')
@@ -133,7 +133,7 @@ await page
   .click();</pre>
       </div>
 
-      <p class="mt-16">Two more scoping tools worth knowing:</p>
+      <p class="mt-4">Two more scoping tools worth knowing:</p>
       <div class="code-sample">
 <pre class="code" data-lang="js">// filter() — narrow a set by what it contains
 await page.getByRole('listitem')
@@ -188,7 +188,7 @@ await page.getByRole('button', { name: 'Save' }).click();
 // Also right: let auto-wait do it. click() already waits for actionability.
 await page.getByRole('button', { name: 'Save' }).click();</pre>
       </div>
-      <p class="mt-16"><strong>If you ever reach for <code class="inline">{ force: true }</code>,</strong> stop. That flag skips the actionability checks — it doesn't fix the reason the element wasn't actionable. Nine times in ten it's covered by something, disabled, or mid-animation, and forcing the click hides a real bug.</p>
+      <p class="mt-4"><strong>If you ever reach for <code class="inline">{ force: true }</code>,</strong> stop. That flag skips the actionability checks — it doesn't fix the reason the element wasn't actionable. Nine times in ten it's covered by something, disabled, or mid-animation, and forcing the click hides a real bug.</p>
     </section>
 
     <section id="errors" class="panel">
@@ -217,7 +217,7 @@ await page.getByRole('button', { name: 'Save' }).click();</pre>
       </ol>
     </section>
 
-    <p class="mt-16"><a href="../learn.html">← Back to Learn</a></p>
+    <p class="mt-4"><a href="../learn.html">← Back to Learn</a></p>
   </main>
 
   <div id="site-footer"></div>

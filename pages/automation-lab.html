@@ -28,13 +28,13 @@ python -m http.server 8080
 npx serve -p 8080
 
 # Then open http://localhost:8080</pre>
-      <p class="text-dim mt-16">Update the <code class="inline">BASE_URL</code> in each example if you serve on a different port.</p>
+      <p class="text-dim mt-4">Update the <code class="inline">BASE_URL</code> in each example if you serve on a different port.</p>
     </div>
 
     <!-- ─── JS / TS ─── -->
     <section class="panel panel-accent" id="language">
       <div class="lab-ex-head">
-        <h2 style="margin:0;">JavaScript or TypeScript?</h2>
+        <h2 class="m-0">JavaScript or TypeScript?</h2>
         <span data-code-lang-toggle></span>
       </div>
       <p>
@@ -102,7 +102,7 @@ export class LoginPage {
 }</pre>
       </div>
 
-      <h3 class="mt-16">Setup differences</h3>
+      <h3 class="mt-4">Setup differences</h3>
       <div class="code-sample">
 <pre class="code" data-lang="js">npm init playwright@latest
 #   -&gt; choose JavaScript
@@ -121,7 +121,7 @@ npx playwright test
 npx tsc --noEmit</pre>
       </div>
 
-      <div class="panel mt-16">
+      <div class="panel mt-4">
         <strong>Which should you learn?</strong>
         <p class="text-dim" style="margin-bottom:0;">
           If the job description says TypeScript, learn TypeScript — but learn it
@@ -492,11 +492,11 @@ test('BUG: password must NOT be persisted', async ({ page }) =&gt; {
 });</pre>
       </div>
 
-      <div class="mt-16">
+      <div class="mt-4">
         <button class="btn btn-ghost btn-sm" onclick="document.getElementById('bug-more').classList.toggle('hidden')">Show more (cart + todo)</button>
       </div>
 
-      <div id="bug-more" class="hidden mt-16">
+      <div id="bug-more" class="hidden mt-4">
 <pre class="code">// tests/cart-broken.spec.js
 import { test, expect } from '@playwright/test';
 const URL = 'http://localhost:8080/practice-apps/cart-broken.html';
@@ -543,7 +543,7 @@ test('BUG: user input must not execute as HTML (XSS)', async ({ page }) =&gt; {
 });</pre>
       </div>
 
-      <p class="text-dim mt-16">Every one of these tests fails against the buggy build and passes against the clean build. That is exactly the pattern you want in a CI regression suite: green means the fix landed and stuck; red means someone broke a guarantee.</p>
+      <p class="text-dim mt-4">Every one of these tests fails against the buggy build and passes against the clean build. That is exactly the pattern you want in a CI regression suite: green means the fix landed and stuck; red means someone broke a guarantee.</p>
     </section>
 
     <div class="panel">

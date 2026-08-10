@@ -47,21 +47,21 @@
       </div>
     </div>
 
-    <div class="panel mt-16" id="recent-runs-panel">
+    <div class="panel mt-4" id="recent-runs-panel">
       <h2>Recent quiz runs</h2>
       <div id="recent-runs"></div>
     </div>
 
-    <div class="panel mt-16">
+    <div class="panel mt-4">
       <h2>Data controls</h2>
       <p class="text-dim">All your progress lives in this browser under <code class="inline">qaprep_progress_v1</code>. Export it to move it, or reset to start fresh.</p>
-      <div style="display:flex; gap:8px; flex-wrap:wrap;">
+      <div class="flex gap-2 flex-wrap">
         <button class="btn btn-ghost" id="export-json">Export as JSON</button>
         <button class="btn btn-ghost" id="import-btn">Import JSON…</button>
         <input type="file" id="import-file" accept="application/json,.json" class="hidden" />
         <button class="btn btn-danger" id="reset-btn">Reset all progress</button>
       </div>
-      <pre class="code hidden mt-16" id="export-out" style="white-space:pre-wrap;"></pre>
+      <pre class="code hidden mt-4" id="export-out" style="white-space:pre-wrap;"></pre>
     </div>
   </main>
 
@@ -165,8 +165,8 @@
         catEl.innerHTML = cats.map(([cat, c]) => {
           const pct = c.attempted > 0 ? Math.round(c.correct / c.attempted * 100) : 0;
           return `
-            <div style="margin-bottom:12px;">
-              <div style="display:flex; justify-content:space-between; font-size:0.9rem;">
+            <div class="mb-3">
+              <div class="flex justify-between text-sm">
                 <span><strong>${cat}</strong> <span class="text-dim">· ${c.correct}/${c.attempted} across ${c.runs} run${c.runs === 1 ? "" : "s"}</span></span>
                 <span class="${pct >= 75 ? "difficulty-easy" : pct >= 50 ? "difficulty-medium" : "difficulty-hard"}">${pct}%</span>
               </div>
@@ -183,8 +183,8 @@
         const foundCount = app.defects.filter((d) => found.has(d.id)).length;
         const pct = Math.round(foundCount / app.defects.length * 100);
         return `
-          <div style="margin-bottom:12px;">
-            <div style="display:flex; justify-content:space-between; font-size:0.9rem;">
+          <div class="mb-3">
+            <div class="flex justify-between text-sm">
               <span><strong>${app.name}</strong> <span class="text-dim">· ${foundCount}/${app.defects.length} defects</span></span>
               <span class="${pct >= 75 ? "difficulty-easy" : pct >= 50 ? "difficulty-medium" : "difficulty-hard"}">${pct}%</span>
             </div>
@@ -202,10 +202,10 @@
           <table style="width:100%; border-collapse:collapse;">
             <thead>
               <tr style="border-bottom:1px solid var(--border); text-align:left;">
-                <th style="padding:8px;">Date</th>
-                <th style="padding:8px;">Category</th>
-                <th style="padding:8px;">Score</th>
-                <th style="padding:8px;">Time</th>
+                <th class="p-2">Date</th>
+                <th class="p-2">Category</th>
+                <th class="p-2">Score</th>
+                <th class="p-2">Time</th>
               </tr>
             </thead>
             <tbody>
@@ -215,9 +215,9 @@
                 const ss = Math.floor((r.elapsedMs % 60000) / 1000);
                 return `
                   <tr style="border-bottom:1px solid var(--border);">
-                    <td style="padding:8px;">${r.at}</td>
-                    <td style="padding:8px;">${r.category}</td>
-                    <td style="padding:8px;"><strong>${r.correct}/${r.total}</strong> <span class="text-dim">(${pct}%)</span></td>
+                    <td class="p-2">${r.at}</td>
+                    <td class="p-2">${r.category}</td>
+                    <td class="p-2"><strong>${r.correct}/${r.total}</strong> <span class="text-dim">(${pct}%)</span></td>
                     <td style="padding:8px; font-family: var(--font-mono);">${mm}m ${String(ss).padStart(2, "0")}s</td>
                   </tr>
                 `;

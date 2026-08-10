@@ -153,6 +153,20 @@ function check(ok, label, detail) {
   const saved = await page.getByTestId('artifact-bug-report').count();
   check(saved === 1, 'a draft autosaves and appears in the portfolio', saved + ' found');
 
+  // The font is the one asset the deploy workflow could silently omit — it
+  // copies an explicit file list, and a missing woff2 degrades to the system
+  // stack rather than erroring, so the site would look subtly wrong forever.
+  console.log('\nSelf-hosted font:');
+  const fontRes = await ctx.request.get(BASE + '/fonts/InterVariable.woff2');
+  check(fontRes.status() === 200, 'InterVariable.woff2 is published', 'HTTP ' + fontRes.status());
+  const fontBody = fontRes.status() === 200 ? await fontRes.body() : Buffer.alloc(0);
+  check(fontBody.slice(0, 4).toString('ascii') === 'wOF2',
+        'it is a real woff2, not an HTML 404 page',
+        fontBody.slice(0, 4).toString('ascii') || 'empty');
+  await page.goto(BASE + '/index.html', { waitUntil: 'networkidle' });
+  const interUsed = await page.evaluate(() => document.fonts.check('16px Inter'));
+  check(interUsed, 'the browser actually loaded Inter', interUsed ? 'loaded' : 'fell back');
+
   // Worth checking in production specifically: affiliate decoration runs in
   // the browser, so a script that fails to deploy leaves plain links that look
   // completely normal and silently earn nothing.

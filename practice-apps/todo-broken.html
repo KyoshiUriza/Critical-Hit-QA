@@ -48,7 +48,7 @@
 
       <div class="panel">
         <h3>Behavior spec</h3>
-        <ul class="text-dim" style="font-size:0.9rem;">
+        <ul class="text-dim text-sm">
           <li>Empty or whitespace-only input cannot be added.</li>
           <li>User input must be rendered as text, never as HTML (no XSS).</li>
           <li>Filters: All / Active / Completed — Active shows only incomplete items.</li>
@@ -59,10 +59,10 @@
       </div>
     </div>
 
-    <div class="panel mt-16">
+    <div class="panel mt-4">
       <h3>Answer key</h3>
       <button class="btn btn-ghost" id="reveal-btn">Reveal known defects</button>
-      <div id="answer-key" class="hidden mt-16">
+      <div id="answer-key" class="hidden mt-4">
         <ol style="line-height:1.7;">
           <li><strong>Whitespace-only todos can be added.</strong> Entering <code class="inline">"   "</code> creates a blank item — should be rejected.</li>
           <li><strong>XSS: input rendered as HTML.</strong> Adding <code class="inline">&lt;img src=x onerror=alert(1)&gt;</code> executes the handler — user input must be textContent, not innerHTML.</li>
@@ -103,7 +103,7 @@
           return true;
         });
         list.innerHTML = shown.length === 0
-          ? `<li class="text-dim" style="padding:12px;">No items.</li>`
+          ? `<li class="text-dim p-3">No items.</li>`
           : shown.map((t) => `
             <li class="todo-item ${t.done ? "done" : ""}" data-id="${t.id}" data-testid="todo-item">
               <input type="checkbox" ${t.done ? "checked" : ""} data-action="toggle" data-testid="todo-toggle" aria-label="Toggle todo" />

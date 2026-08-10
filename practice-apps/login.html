@@ -30,8 +30,8 @@
             </div>
             <div class="form-field">
               <label for="password">Password</label>
-              <div style="display:flex; gap:8px;">
-                <input type="password" id="password" name="password" data-testid="login-password" autocomplete="current-password" style="flex:1;" />
+              <div class="flex gap-2">
+                <input class="flex-1" type="password" id="password" name="password" data-testid="login-password" autocomplete="current-password" />
                 <button type="button" class="btn btn-ghost btn-sm" id="toggle-pw" data-testid="toggle-password">Show</button>
               </div>
               <div class="form-error" id="password-error" data-testid="login-password-error"></div>
@@ -40,7 +40,7 @@
               <label><input type="checkbox" id="remember" data-testid="remember-me" /> Remember me</label>
             </div>
             <button class="btn btn-primary" type="submit" data-testid="login-submit">Sign in</button>
-            <button class="btn btn-ghost" type="button" id="reset-btn" data-testid="reset-lockout" style="margin-left:8px;">Reset lockout (test)</button>
+            <button class="btn btn-ghost ml-2" type="button" id="reset-btn" data-testid="reset-lockout">Reset lockout (test)</button>
           </form>
           <div id="result" data-testid="login-result" role="status" aria-live="polite" style="margin-top:14px;"></div>
         </div>
@@ -48,7 +48,7 @@
 
       <div class="panel">
         <h3>Behavior spec (your oracle)</h3>
-        <ul class="text-dim" style="font-size:0.9rem;">
+        <ul class="text-dim text-sm">
           <li>Email must be present, valid format.</li>
           <li>Password must be present, min 8 chars.</li>
           <li>Valid creds: <code class="inline">demo@qa.test</code> / <code class="inline">Passw0rd!</code>.</li>
@@ -58,7 +58,7 @@
           <li>Errors are shown per-field and via <code class="inline">role="alert"</code>.</li>
         </ul>
         <h3>Testable attributes</h3>
-        <p class="text-dim" style="font-size:0.9rem;">
+        <p class="text-dim text-sm">
           Every interactive element has a stable <code class="inline">data-testid</code>:
           <code class="inline">login-email</code>, <code class="inline">login-password</code>,
           <code class="inline">login-submit</code>, <code class="inline">toggle-password</code>,
