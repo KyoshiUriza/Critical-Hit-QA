@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; object-src 'none'; frame-src 'none'; base-uri 'self'; form-action 'self'" />
   <meta name="referrer" content="no-referrer" />
-  <title>The Tester's Lattice — Critical Hit QA</title>
+  <title>Character Sheet — The Tester's Lattice — Critical Hit QA</title>
   <link rel="stylesheet" href="../css/styles.css" />
 </head>
 <body data-page="tester-lattice" data-depth="1">
@@ -14,35 +14,44 @@
 
   <main id="main" class="container">
     <div class="page-header">
-      <h1>The Tester's Lattice</h1>
-      <p>Your character sheet. Rank, Star-Dust, bound Catalysts, and Signature Abilities. Everything you do on this site feeds it.</p>
+      <h1>Character Sheet</h1>
+      <p>Your skills and growth, computed from what you have actually done here — nothing on this sheet is self-assessed. The Lattice just keeps the ledger.</p>
     </div>
 
     <div class="rpg-hero" id="rank-hero"></div>
 
     <div class="two-col">
       <div class="panel">
-        <h2>Bound Catalysts</h2>
-        <p class="text-dim text-sm">Each Catalyst binds once. The System does not need much consent.</p>
-        <div id="catalysts-list"></div>
+        <h2>Knowledge</h2>
+        <p class="text-dim text-sm">From your quiz record, per category. Tiers need volume <em>and</em> accuracy — three lucky answers move nothing.</p>
+        <div id="knowledge-skills" data-testid="knowledge-skills"></div>
       </div>
       <div class="panel">
-        <h2>Signature Abilities</h2>
-        <p class="text-dim text-sm">Latent until practice awakens them.</p>
-        <div id="achievements-list"></div>
+        <h2>Craft</h2>
+        <p class="text-dim text-sm">From what you have produced: defects found, documents drafted, days showed up.</p>
+        <div id="craft-skills" data-testid="craft-skills"></div>
+
+        <h2 class="mt-6">Recent activity</h2>
+        <div id="activity-log" data-testid="activity-log"></div>
       </div>
     </div>
 
     <div class="panel mt-4">
+      <h2>Milestones</h2>
+      <p class="text-dim text-sm">Each one marks a real capability, not time served. Locked ones show exactly how to earn them.</p>
+      <div class="two-col" id="achievements-list"></div>
+    </div>
+
+    <div class="panel mt-4">
       <h2>The Ranks</h2>
-      <p class="text-dim">The System does not hand out titles. It logs the total and lets the number decide.</p>
-      <table style="width:100%; border-collapse:collapse; margin-top:12px;">
+      <p class="text-dim">Each rank corresponds to a point in a real QA journey. The System logs the total and lets the number decide.</p>
+      <table class="data-table mt-3">
         <thead>
-          <tr style="border-bottom:1px solid var(--border); text-align:left;">
+          <tr>
             <th class="p-2">Lv.</th>
             <th class="p-2">Rank</th>
             <th class="p-2">Star-Dust</th>
-            <th class="p-2">Lore</th>
+            <th class="p-2">What it means</th>
           </tr>
         </thead>
         <tbody id="ranks-tbody"></tbody>
@@ -67,63 +76,171 @@
   <script src="../js/test-hooks.js"></script>
   <script src="../js/site-chrome.js"></script>
   <script src="../js/data/defects.js"></script>
+  <script src="../js/progress-schema.js"></script>
+  <script src="../js/profiles.js"></script>
   <script src="../js/progress.js"></script>
   <script src="../js/rpg.js"></script>
   <script>
-    function render() {
+    // Everything here builds DOM with createElement/textContent, never string
+    // interpolation into innerHTML. The profile name is user input, and the
+    // sheet exists to render it — a character sheet that self-XSSes on its own
+    // character's name would be a poor exhibit for a site that teaches testing.
+    function el(tag, className, text) {
+      const node = document.createElement(tag);
+      if (className) node.className = className;
+      if (text !== undefined) node.textContent = text;
+      return node;
+    }
+
+    function renderHero() {
       const p = window.Progress.get();
       const dust = window.RPG.computeStarDust(p);
       const { current, next } = window.RPG.computeRank(dust);
-      const unlockedAch = new Set(window.RPG.unlockedAchievements(p));
-      const unlockedCat = new Set(window.RPG.unlockedCatalysts(p));
+      const hero = document.getElementById("rank-hero");
+      hero.textContent = "";
+
+      const who = window.Profiles ? window.Profiles.active().name : "Tester";
+      const nameLine = el("div", "rpg-rank-label", "◈ " + who + " · Level " + current.level);
+      nameLine.setAttribute("data-testid", "sheet-identity");
+
+      const rankName = el("h2", "rpg-rank-name", current.name);
+      const flavor = el("p", "rpg-rank-flavor", current.blurb);
+      const dustLine = el("div", "rpg-dust-line", "✦ " + dust.toLocaleString() + " Star-Dust");
 
       const pct = next ? Math.min(100, Math.round((dust - current.starDust) / (next.starDust - current.starDust) * 100)) : 100;
-      document.getElementById("rank-hero").innerHTML = `
-        <div class="rpg-rank-label">◈ Rank · Level ${current.level}</div>
-        <h2 class="rpg-rank-name">${current.name}</h2>
-        <p class="rpg-rank-flavor">"${current.blurb}"</p>
-        <div class="rpg-dust-line">✦ ${dust.toLocaleString()} Star-Dust</div>
-        <div class="rpg-progress-bar"><span style="width:${pct}%"></span></div>
-        <p class="text-dim" style="font-size:0.85rem; margin-top:6px;">
-          ${next
-            ? `${(next.starDust - dust).toLocaleString()} to <strong style="color:var(--text)">${next.name}</strong>`
-            : "Maximum rank reached. The Tester Absolute."}
-        </p>
-      `;
+      const bar = el("div", "rpg-progress-bar");
+      const fill = el("span");
+      fill.style.width = pct + "%";
+      bar.appendChild(fill);
 
-      document.getElementById("catalysts-list").innerHTML = window.RPG.CATALYSTS.map((c) => `
-        <div class="rpg-catalyst ${unlockedCat.has(c.id) ? "unlocked" : ""}">
-          <div class="rpg-sigil">${c.name.split(" ").pop()[0]}</div>
-          <div class="flex-1">
-            <div class="rpg-name">${unlockedCat.has(c.id) ? c.name : "??? Catalyst"}</div>
-            <div class="rpg-lore">${unlockedCat.has(c.id) ? "Ability: " + c.ability : c.grantedAt}</div>
-            ${unlockedCat.has(c.id) ? "" : `<div class="rpg-locked-label">LOCKED</div>`}
-          </div>
-        </div>
-      `).join("");
+      const nextLine = el("p", "text-dim text-sm mt-2");
+      if (next) {
+        nextLine.append((next.starDust - dust).toLocaleString() + " to ");
+        nextLine.appendChild(el("strong", "", next.name));
+      } else {
+        nextLine.textContent = "Maximum rank reached. The Tester Absolute.";
+      }
 
-      document.getElementById("achievements-list").innerHTML = window.RPG.ACHIEVEMENTS.map((a) => `
-        <div class="rpg-achievement ${unlockedAch.has(a.id) ? "unlocked" : ""}">
-          <div class="rpg-sigil">${unlockedAch.has(a.id) ? "✦" : "◦"}</div>
-          <div class="flex-1">
-            <div class="rpg-name">${a.name}</div>
-            <div class="rpg-lore">${a.lore}</div>
-            <div class="rpg-hint">${unlockedAch.has(a.id) ? "Unlocked." : "To unlock: " + a.hint}</div>
-          </div>
-        </div>
-      `).join("");
-
-      document.getElementById("ranks-tbody").innerHTML = window.RPG.RANKS.map((r) => `
-        <tr style="border-bottom:1px solid var(--border); ${r.level === current.level ? "background:rgba(79,157,255,0.08);" : ""}">
-          <td style="padding:8px; font-family:var(--font-mono);">${r.level}</td>
-          <td style="padding:8px; font-weight:600;">${r.name}</td>
-          <td style="padding:8px; font-family:var(--font-mono); color:var(--accent-2);">${r.starDust.toLocaleString()}</td>
-          <td style="padding:8px; color:var(--text-dim); font-style:italic; font-size:0.88rem;">${r.blurb}</td>
-        </tr>
-      `).join("");
+      hero.append(nameLine, rankName, flavor, dustLine, bar, nextLine);
     }
 
-    render();
+    function skillRow(s) {
+      const row = el("div", "skill-row");
+      row.setAttribute("data-testid", "skill-" + s.id);
+
+      const head = el("div", "skill-head");
+      head.appendChild(el("span", "skill-name", s.name));
+      const tier = el("span", "skill-tier" + (s.tier === 0 ? " skill-tier-untrained" : ""), s.tierName);
+      tier.setAttribute("data-testid", "skill-tier");
+      head.appendChild(tier);
+
+      const bar = el("div", "skill-bar");
+      // Meter semantics so assistive tech reads the level, not just a div.
+      bar.setAttribute("role", "meter");
+      bar.setAttribute("aria-label", s.name + " skill tier");
+      bar.setAttribute("aria-valuenow", String(s.tier));
+      bar.setAttribute("aria-valuemin", "0");
+      bar.setAttribute("aria-valuemax", "5");
+      bar.setAttribute("aria-valuetext", s.tierName);
+      const fill = el("span");
+      fill.style.width = s.pct + "%";
+      bar.appendChild(fill);
+
+      const detail = el("div", "skill-detail text-dim", s.detail);
+
+      row.append(head, bar, detail);
+      return row;
+    }
+
+    function renderSkills() {
+      const p = window.Progress.get();
+      const skills = window.RPG.computeSkills(p);
+      const k = document.getElementById("knowledge-skills");
+      const c = document.getElementById("craft-skills");
+      k.textContent = "";
+      c.textContent = "";
+      skills.knowledge.forEach((s) => k.appendChild(skillRow(s)));
+      skills.craft.forEach((s) => c.appendChild(skillRow(s)));
+    }
+
+    function renderActivity() {
+      const p = window.Progress.get();
+      const log = document.getElementById("activity-log");
+      log.textContent = "";
+
+      // Quiz runs carry a date; artifacts carry updatedAt. Interleave, newest
+      // first, and keep it short — this is a pulse, not an audit trail.
+      const events = [];
+      (p.quiz.runs || []).forEach((r) => {
+        if (!r.at) return;
+        events.push({ when: r.at, text: "Quiz — " + r.category + ": " + r.correct + "/" + r.total });
+      });
+      (p.artifacts || []).forEach((a) => {
+        if (!a.updatedAt) return;
+        const d = new Date(a.updatedAt);
+        const when = d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+        events.push({ when: when, text: (a.type === "bug-report" ? "Bug report" : "Test case") + " — " + a.title });
+      });
+      events.sort((a, b) => (a.when < b.when ? 1 : -1));
+
+      if (!events.length) {
+        log.appendChild(el("p", "text-dim", "Nothing yet. Your first quiz or draft starts the log."));
+        return;
+      }
+      events.slice(0, 8).forEach((e) => {
+        const row = el("div", "activity-row");
+        row.appendChild(el("span", "activity-date", e.when));
+        row.appendChild(el("span", "activity-text", e.text));
+        log.appendChild(row);
+      });
+    }
+
+    function renderAchievements() {
+      const p = window.Progress.get();
+      const unlocked = new Set(window.RPG.unlockedAchievements(p));
+      const list = document.getElementById("achievements-list");
+      list.textContent = "";
+
+      window.RPG.ACHIEVEMENTS.forEach((a) => {
+        const isOpen = unlocked.has(a.id);
+        const card = el("div", "rpg-achievement" + (isOpen ? " unlocked" : ""));
+        card.appendChild(el("div", "rpg-sigil", isOpen ? "✦" : "◦"));
+        const body = el("div", "flex-1");
+        body.appendChild(el("div", "rpg-name", a.name));
+        body.appendChild(el("div", "rpg-lore", a.lore));
+        body.appendChild(el("div", "rpg-hint", isOpen ? "Unlocked." : "To unlock: " + a.hint));
+        card.appendChild(body);
+        list.appendChild(card);
+      });
+    }
+
+    function renderRanks() {
+      const p = window.Progress.get();
+      const dust = window.RPG.computeStarDust(p);
+      const { current } = window.RPG.computeRank(dust);
+      const tbody = document.getElementById("ranks-tbody");
+      tbody.textContent = "";
+
+      window.RPG.RANKS.forEach((r) => {
+        const tr = document.createElement("tr");
+        if (r.level === current.level) tr.className = "rank-current";
+        const lv = el("td", "p-2", String(r.level));
+        lv.style.fontFamily = "var(--font-mono)";
+        const name = el("td", "p-2", r.name);
+        name.style.fontWeight = "600";
+        const dustTd = el("td", "p-2", r.starDust.toLocaleString());
+        dustTd.style.fontFamily = "var(--font-mono)";
+        const blurb = el("td", "p-2 text-dim text-sm", r.blurb);
+        tr.append(lv, name, dustTd, blurb);
+        tbody.appendChild(tr);
+      });
+    }
+
+    renderHero();
+    renderSkills();
+    renderActivity();
+    renderAchievements();
+    renderRanks();
   </script>
 </body>
 </html>

@@ -28,6 +28,7 @@ const PAGES = [
   '/pages/bug-report-builder.html',
   '/pages/resources.html',             // the most outbound links of any page
   '/pages/account.html',               // profiles + sync codes
+  '/pages/tester-lattice.html',        // character sheet
   '/practice-apps/locator-lab.html',
   '/practice-apps/sql-sandbox.html',
   '/practice-apps/login.html',

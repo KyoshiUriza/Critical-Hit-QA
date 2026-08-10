@@ -1,16 +1,23 @@
 // The Tester's Lattice — RPG progression layer over the Progress store.
 // Lore vocabulary drawn from The Resonance Lattice (The Convergence Chronicles).
+//
+// Reworked per ADR 0003: the vocabulary (Star-Dust, Ranks, the Lattice) stays,
+// but every blurb and description must carry meaning for someone who has never
+// read the book. The previous versions quoted plot — characters, factions,
+// events — which read as noise to the site's actual audience. Each rank now
+// describes the point in a real QA journey it corresponds to, so the ladder
+// doubles as a skills roadmap.
 (function () {
   const RANKS = [
-    { level:  1, name: "Unbound",              starDust:      0, blurb: "Before the binding. The Catalyst is still in its case." },
-    { level:  2, name: "Trainee",              starDust:    100, blurb: "First contact with the System. Notifications start to make sense." },
-    { level:  3, name: "Contract Tester",      starDust:    250, blurb: "The mask holds. The ticket queue does not." },
-    { level:  4, name: "Bound Awakened",       starDust:    500, blurb: "The Catalyst binds. The Toll rewrites you between heartbeats." },
-    { level:  5, name: "Field Tester",         starDust:    900, blurb: "Event Horizon at Stage 1. The lattice starts to feel like a room you know." },
+    { level:  1, name: "Unbound",              starDust:      0, blurb: "Before the binding. Your first quiz starts the record." },
+    { level:  2, name: "Trainee",              starDust:    100, blurb: "The vocabulary lands: severity, priority, smoke, regression." },
+    { level:  3, name: "Contract Tester",      starDust:    250, blurb: "You can execute a written test and file a defect a developer can act on." },
+    { level:  4, name: "Bound Awakened",       starDust:    500, blurb: "The fundamentals bind. You design tests now, not just run them." },
+    { level:  5, name: "Field Tester",         starDust:    900, blurb: "Unfamiliar UIs stop being intimidating. Exploratory sessions produce real finds." },
     { level:  6, name: "Senior Tester",        starDust:   1400, blurb: "You read intent a half-second ahead. Bugs stop hiding well." },
-    { level:  7, name: "Signature Bearer",     starDust:   2000, blurb: "A Signature Ability responds. The math finishes before your conscience starts." },
-    { level:  8, name: "Ghost of the Lattice", starDust:   2800, blurb: "Aetherically background static. Every hunter on the East Coast can see you coming." },
-    { level:  9, name: "Priority Alpha",       starDust:   4000, blurb: "D.A.C. has a designation on a pattern they cannot locate. That's you." },
+    { level:  7, name: "Signature Bearer",     starDust:   2000, blurb: "A specialty emerges — automation, SQL, API. Your signature skill answers when called." },
+    { level:  8, name: "Ghost of the Lattice", starDust:   2800, blurb: "You find what others walk straight past. Ninety percent of the seeded defects is in reach." },
+    { level:  9, name: "Priority Alpha",       starDust:   4000, blurb: "High accuracy across five categories at once. Interview panels notice patterns like you." },
     { level: 10, name: "The Tester Absolute",  starDust:   6000, blurb: "You do not chase the pattern. You break it." }
   ];
 
@@ -27,39 +34,44 @@
     perStreakDay: 5      // bonus per day of current streak (up to 30)
   };
 
+  // ids are persisted in qaprep_rpg_seen and must stay stable across renames —
+  // changing one would re-toast the achievement for everyone who has it.
+  // The lore field describes the QA skill the milestone evidences, because an
+  // achievement whose text only makes sense to readers of the book is a
+  // trophy for the wrong thing.
   const ACHIEVEMENTS = [
-    { id: "first-binding", name: "First Binding", lore: "The Catalyst binds before you can stop it.",
+    { id: "first-binding", name: "First Binding", lore: "Your first quiz run. Every record starts with a first entry.",
       condition: (p) => p.quiz.runs.length >= 1,
       hint: "Complete your first practice quiz." },
-    { id: "event-horizon", name: "Event Horizon — Stage 1", lore: "A five-meter field. You can feel the room now.",
+    { id: "event-horizon", name: "Event Horizon", lore: "Three categories attempted. Range matters as much as depth — interviews probe both.",
       condition: (p) => Object.keys(p.quiz.byCategory).length >= 3,
       hint: "Take a quiz in three different categories." },
-    { id: "reserve-cache", name: "Reserve: Cache", lore: "A latent Signature. What you stored is ready.",
+    { id: "reserve-cache", name: "Reserve: Cache", lore: "Five test cases drafted. Test design is now something you do, not something you can define.",
       condition: (p) => p.testCases >= 5,
       hint: "Draft 5 test cases." },
-    { id: "held-breath", name: "Held Breath: Pierce", lore: "The mark. The seam. The strike from range.",
+    { id: "held-breath", name: "Held Breath: Pierce", lore: "Five bug reports drafted. A clear report is the skill developers actually thank testers for.",
       condition: (p) => p.bugReports >= 5,
       hint: "Draft 5 bug reports." },
-    { id: "vigil-hold", name: "Vigil: Hold", lore: "Remii kept everyone functional at cost of her own reserves.",
+    { id: "vigil-hold", name: "Vigil: Hold", lore: "Seven straight days of practice. Consistency is the one skill nobody can cram.",
       condition: (p) => (p.streak && p.streak.days >= 7),
       hint: "Study 7 days in a row." },
-    { id: "phantom-strike", name: "Phantom Strike", lore: "The after-image. The strike you weren't there to take.",
+    { id: "phantom-strike", name: "Phantom Strike", lore: "A perfect score on a full-length quiz. At ten questions, that isn't luck.",
       condition: (p) => p.quiz.runs.some((r) => r.total >= 10 && r.correct === r.total),
       hint: "Score 100% on a 10+ question quiz." },
-    { id: "pursuit-flicker", name: "Pursuit: Flicker", lore: "Three micro-displacements. Kestrel's counter can't track it.",
+    { id: "pursuit-flicker", name: "Pursuit: Flicker", lore: "Fifteen quiz runs. Repetition is how recognition becomes recall — and recall is what interviews test.",
       condition: (p) => p.quiz.runs.length >= 15,
       hint: "Complete 15 quiz runs." },
-    { id: "the-ghost", name: "The Ghost", lore: "The System pinned it to a man who glows in the dark.",
+    { id: "the-ghost", name: "The Ghost", lore: "Ninety percent of the seeded defects found, weighted by severity. You find what others walk past.",
       condition: (p) => computeAllBountyPct(p) >= 90,
       hint: "Catch 90% of defects in Bug Bounty (severity-weighted)." },
-    { id: "priority-alpha", name: "Priority Alpha", lore: "D.A.C. formalizes a designation on a pattern they can't locate.",
+    { id: "priority-alpha", name: "Priority Alpha", lore: "85% accuracy across five categories at once. Breadth and depth at the same time is rare.",
       condition: (p) => {
         const cats = Object.values(p.quiz.byCategory);
         if (cats.length < 5) return false;
         return cats.every((c) => c.attempted >= 5 && c.correct / c.attempted >= 0.85);
       },
       hint: "Reach 85% accuracy in 5+ categories with 5+ attempts each." },
-    { id: "the-tester", name: "The Tester Absolute", lore: "You stopped chasing the pattern and started breaking it.",
+    { id: "the-tester", name: "The Tester Absolute", lore: "Six thousand Star-Dust. The ledger speaks for itself.",
       condition: (p) => {
         const s = computeStarDust(p);
         return s >= 6000;
@@ -67,18 +79,78 @@
       hint: "Reach 6000 Star-Dust." }
   ];
 
-  const CATALYSTS = [
-    { id: "nebula",  name: "Catalyst of the Nebula",  ability: "Event Horizon",   grantedAt: "Awarded on completing your first quiz.",
-      condition: (p) => p.quiz.runs.length >= 1 },
-    { id: "reserve", name: "Catalyst of the Reserve", ability: "Held Inventory",  grantedAt: "Awarded when you draft your first test case.",
-      condition: (p) => p.testCases >= 1 },
-    { id: "vigil",   name: "Catalyst of the Vigil",   ability: "Vigil: Hold",     grantedAt: "Awarded when you draft your first bug report.",
-      condition: (p) => p.bugReports >= 1 },
-    { id: "fox",     name: "Catalyst of the Fox",     ability: "Slip / Pressure Point", grantedAt: "Awarded when your bug bounty score reaches 25%.",
-      condition: (p) => computeAllBountyPct(p) >= 25 },
-    { id: "harvest", name: "Catalyst of the Harvest", ability: "Creature Affinity",   grantedAt: "Awarded when you complete a study plan day.",
-      condition: (p) => Object.values(p.studyPlan || {}).some((plan) => Object.values(plan).some(Boolean)) }
+  // ── Skills ─────────────────────────────────────────────────────────────
+  // The character sheet's core. Every skill is derived from evidence the
+  // Progress store already holds — nothing is self-assessed, because a
+  // self-assessed skill bar is decoration, and this site's premise is that
+  // claims should be checkable.
+  const TIERS = ["Untrained", "Novice", "Apprentice", "Practitioner", "Adept", "Expert"];
+
+  const KNOWLEDGE_SKILLS = [
+    { id: "fundamentals", name: "QA Fundamentals" },
+    { id: "manual",       name: "Manual Testing" },
+    { id: "automation",   name: "Test Automation" },
+    { id: "api",          name: "API Testing" },
+    { id: "agile",        name: "Agile & Process" },
+    { id: "performance",  name: "Performance" },
+    { id: "sql",          name: "SQL & Data" }
   ];
+
+  // Tier requires BOTH volume and accuracy: accuracy alone can be three lucky
+  // questions, and volume alone can be fifty coin flips. The thresholds climb
+  // together so the bar only moves when the evidence does.
+  function knowledgeTier(attempted, correct) {
+    const acc = attempted > 0 ? correct / attempted : 0;
+    if (attempted >= 50 && acc >= 0.85) return 5;
+    if (attempted >= 35 && acc >= 0.80) return 4;
+    if (attempted >= 20 && acc >= 0.70) return 3;
+    if (attempted >= 10 && acc >= 0.60) return 2;
+    if (attempted >= 1) return 1;
+    return 0;
+  }
+
+  function countTier(n, ladder) {
+    for (let i = ladder.length - 1; i >= 0; i--) {
+      if (n >= ladder[i]) return i + 1;
+    }
+    return 0;
+  }
+
+  function computeSkills(p) {
+    const knowledge = KNOWLEDGE_SKILLS.map((k) => {
+      const c = p.quiz.byCategory[k.id] || { attempted: 0, correct: 0 };
+      const tier = knowledgeTier(c.attempted, c.correct);
+      const acc = c.attempted > 0 ? Math.round(c.correct / c.attempted * 100) : 0;
+      return {
+        id: k.id, name: k.name, kind: "knowledge",
+        tier: tier, tierName: TIERS[tier], pct: Math.round(tier / 5 * 100),
+        detail: c.attempted > 0
+          ? c.correct + "/" + c.attempted + " correct (" + acc + "%)"
+          : "No attempts yet"
+      };
+    });
+
+    const bountyPct = computeAllBountyPct(p);
+    const streakDays = (p.streak && p.streak.days) || 0;
+    const craft = [
+      { id: "defect-hunting", name: "Defect Hunting",
+        tier: bountyPct >= 90 ? 5 : bountyPct >= 75 ? 4 : bountyPct >= 50 ? 3 : bountyPct >= 25 ? 2 : bountyPct > 0 ? 1 : 0,
+        detail: bountyPct > 0 ? bountyPct + "% of seeded defects found (severity-weighted)" : "No defects found yet" },
+      { id: "test-design", name: "Test Design",
+        tier: countTier(p.testCases || 0, [1, 3, 7, 12, 20]),
+        detail: (p.testCases || 0) > 0 ? (p.testCases) + " test case" + (p.testCases === 1 ? "" : "s") + " drafted" : "No test cases yet" },
+      { id: "bug-reporting", name: "Bug Reporting",
+        tier: countTier(p.bugReports || 0, [1, 3, 7, 12, 20]),
+        detail: (p.bugReports || 0) > 0 ? (p.bugReports) + " report" + (p.bugReports === 1 ? "" : "s") + " drafted" : "No bug reports yet" },
+      { id: "consistency", name: "Consistency",
+        tier: countTier(streakDays, [1, 3, 7, 14, 30]),
+        detail: streakDays > 0 ? streakDays + "-day streak" : "No streak yet" }
+    ].map((s) => ({
+      ...s, kind: "craft", tierName: TIERS[s.tier], pct: Math.round(s.tier / 5 * 100)
+    }));
+
+    return { knowledge: knowledge, craft: craft };
+  }
 
   function computeAllBountyPct(p) {
     if (!window.APP_DEFECTS) return 0;
@@ -138,12 +210,6 @@
     return ACHIEVEMENTS.filter((a) => {
       try { return a.condition(p); } catch (_) { return false; }
     }).map((a) => a.id);
-  }
-
-  function unlockedCatalysts(p) {
-    return CATALYSTS.filter((c) => {
-      try { return c.condition(p); } catch (_) { return false; }
-    }).map((c) => c.id);
   }
 
   // Toast for newly-unlocked achievements. Compares to what was unlocked last check
@@ -238,9 +304,9 @@
   }
 
   window.RPG = {
-    RANKS, ACHIEVEMENTS, CATALYSTS, XP, SEVERITY_WEIGHT,
-    computeStarDust, computeRank, unlockedAchievements, unlockedCatalysts,
-    checkAndToastUnlocks, mountHeaderChip
+    RANKS, ACHIEVEMENTS, XP, SEVERITY_WEIGHT, TIERS,
+    computeStarDust, computeRank, computeSkills, computeAllBountyPct,
+    unlockedAchievements, checkAndToastUnlocks, mountHeaderChip
   };
 
   document.addEventListener("DOMContentLoaded", () => {

@@ -1203,6 +1203,52 @@ code.inline {
 .rpg-hint { color: var(--text-dim); font-size: var(--fs-sm); margin-top: 4px; }
 .rpg-locked-label { color: var(--warn); font-size: var(--fs-xs); font-family: var(--font-mono); }
 
+/* ── Character sheet: skills ─────────────────────────────────────────────
+   Six-tier bars derived from actual evidence (see computeSkills in rpg.js).
+   The fill uses --accent on the --bg-elev-2 track: both surfaces sit on the
+   card, and the tier NAME carries the information — the bar is reinforcement,
+   which is why the track/fill pair is not required to hit a text ratio. */
+.skill-row { padding: 10px 0; border-bottom: 1px solid var(--border); }
+.skill-row:last-child { border-bottom: 0; }
+.skill-head { display: flex; justify-content: space-between; align-items: baseline; gap: var(--sp-2); }
+.skill-name { font-weight: 600; font-size: var(--text-sm); }
+.skill-tier {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--accent);
+}
+.skill-tier-untrained { color: var(--text-dim); }
+.skill-bar {
+  height: 6px;
+  background: var(--bg-elev-2);
+  border: 1px solid var(--border);
+  border-radius: var(--rad-xs);
+  overflow: hidden;
+  margin-top: 6px;
+}
+.skill-bar span {
+  display: block; height: 100%;
+  background: var(--accent);
+  border-radius: var(--rad-xs);
+  transition: width var(--dur-med) var(--ease-out);
+}
+.skill-detail { font-size: var(--text-xs); margin-top: 4px; }
+
+/* ── Character sheet: activity log ─────────────────────────────────────── */
+.activity-row {
+  display: flex; gap: var(--sp-3); align-items: baseline;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: var(--text-sm);
+}
+.activity-row:last-child { border-bottom: 0; }
+.activity-date { font-family: var(--font-mono); font-size: var(--text-xs); color: var(--text-dim); white-space: nowrap; }
+.activity-text { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* Current rank in the ladder. color-mix keeps it tied to the accent token
+   rather than a hardcoded rgba of a colour that no longer exists. */
+.rank-current { background: color-mix(in srgb, var(--accent) 10%, transparent); }
+
 .donation-cta {
   display: inline-flex; align-items: center; gap: 6px;
   background: var(--brand-donate); color: var(--brand-donate-fg);
