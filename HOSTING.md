@@ -17,9 +17,22 @@ Every push to `main` rebuilds and publishes.
 1. Go to **Settings → Pages**.
 2. Under **Build and deployment → Source**, choose **GitHub Actions**.
    (Not "Deploy from a branch" — the workflow handles it.)
-3. Push to `main`, or run the workflow manually from the **Actions** tab.
+3. Make sure the repo is **public**. Pages on the Free plan will not serve a
+   private repo, and the failure is a plain 404 with no explanation.
+4. Push to `main`, or run the workflow manually from the **Actions** tab.
 
 The first run takes 1–2 minutes. Watch it in **Actions → Deploy to GitHub Pages**.
+
+Steps 1–2 cannot be automated. The workflow sets `enablement: true` on
+`configure-pages`, which is meant to create the Pages site over the API, but
+`GITHUB_TOKEN` is not permitted to do that on a repo that has never had Pages
+enabled — so the step fails and both the upload and deploy steps skip. The
+build steps still pass, which makes the run look like a broken site rather
+than an unconfigured one. Check `has_pages` before debugging anything else:
+
+```bash
+curl -s https://api.github.com/repos/KyoshiUriza/Critical-Hit-QA | grep -E '"(has_pages|visibility)"'
+```
 
 ### What actually gets published
 
