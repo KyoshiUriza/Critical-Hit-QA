@@ -1300,6 +1300,20 @@ code.inline {
 }
 .btn-sort:hover { color: var(--accent); }
 
+/* API Lab response status. Colour is reinforcement — the number itself is the
+   signal, and it is always present as text. */
+.api-status {
+  font-family: var(--font-mono);
+  font-size: var(--text-2xl);
+  font-weight: 700;
+  padding: 2px var(--sp-3);
+  border-radius: var(--rad-md);
+  border: 1px solid var(--border-strong);
+}
+.api-status-ok     { color: var(--accent-2); border-color: var(--accent-2); }
+.api-status-client { color: var(--warn);     border-color: var(--warn); }
+.api-status-error  { color: var(--danger);   border-color: var(--danger); }
+
 /* The Gauntlet's table of contents promised five groups that had no headings
    in the page, so 17 widget titles rendered at one identical weight and read
    as a dump. The group title is a real step above its widgets. */

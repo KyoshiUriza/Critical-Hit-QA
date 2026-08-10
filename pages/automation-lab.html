@@ -384,8 +384,19 @@ test('rejects EXPIRED coupon', async ({ page }) =&gt; {
 
     <!-- ─── API example ─── -->
     <section class="panel">
-      <h2>API testing example (public sandbox)</h2>
-      <p class="text-dim">Using <code class="inline">https://jsonplaceholder.typicode.com</code> as a public sandbox.</p>
+      <h2>API testing example</h2>
+      <p class="text-dim">
+        These use <code class="inline">https://jsonplaceholder.typicode.com</code>, a public
+        sandbox, so they need a network connection and are subject to whatever
+        that host decides about rate limits.
+      </p>
+      <div class="panel panel-accent">
+        <strong>Practise the thinking offline first.</strong> The
+        <a href="../practice-apps/api-lab.html">API Lab</a> runs a REST API
+        inside the page &mdash; six graded exercises on status codes, error
+        shapes, auth and idempotency, with no network and nothing that can rate-limit
+        you. Come back here when you want the same assertions as real specs.
+      </div>
       <div class="code-tabs">
         <button class="code-tab active" data-target="api-pw">Playwright (request)</button>
         <button class="code-tab" data-target="api-py">Python (requests + pytest)</button>

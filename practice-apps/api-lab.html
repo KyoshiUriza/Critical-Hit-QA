@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; object-src 'none'; frame-src 'none'; base-uri 'self'; form-action 'self'" />
+  <meta name="referrer" content="no-referrer" />
+  <title>API Lab — Critical Hit QA</title>
+  <link rel="stylesheet" href="../css/styles.css" />
+</head>
+<body data-page="practice-app-detail" data-depth="1">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div id="site-header"></div>
+
+  <main id="main" class="container">
+    <div class="page-header">
+      <h1>API Lab</h1>
+      <p>Send requests against a REST API and read what comes back — status codes, error shapes, auth, idempotency. Six graded exercises.</p>
+    </div>
+
+    <div class="panel panel-accent">
+      <strong>No network is involved.</strong> The API runs in this page, which
+      is why the lab works offline and why the site's
+      <code class="inline">connect-src 'none'</code> policy still holds. Nothing
+      here opens a socket.
+      <br /><br />
+      Be clear about the trade: you are not practising HTTP itself — there is no
+      DNS, no TLS, no real latency. You are practising the part interviews
+      probe, which is knowing what to assert and why. When you move to a real
+      client, only the transport changes.
+    </div>
+
+    <div class="two-col">
+      <section class="app-frame">
+        <h2>Request</h2>
+        <div class="flex gap-2 flex-wrap items-center">
+          <div class="form-field m-0">
+            <label for="api-method">Method</label>
+            <select id="api-method" data-testid="api-method">
+              <option>GET</option>
+              <option>POST</option>
+              <option>PUT</option>
+              <option>DELETE</option>
+            </select>
+          </div>
+          <div class="form-field m-0 flex-1">
+            <label for="api-url">Path</label>
+            <input type="text" id="api-url" data-testid="api-url" value="/users/1" autocomplete="off" />
+          </div>
+        </div>
+
+        <div class="form-field">
+          <label for="api-body">Request body (JSON, optional)</label>
+          <textarea id="api-body" rows="5" data-testid="api-body" autocomplete="off"></textarea>
+        </div>
+
+        <label class="flex items-center gap-2">
+          <input type="checkbox" id="api-token" data-testid="api-token" />
+          <span>Send bearer token</span>
+        </label>
+
+        <div class="flex gap-2 flex-wrap mt-3">
+          <button class="btn btn-primary" id="api-send" data-testid="api-send">Send</button>
+          <button class="btn btn-ghost btn-sm" id="api-reset" data-testid="api-reset">Reset data</button>
+        </div>
+
+        <h3 class="mt-6">Presets</h3>
+        <p class="text-dim text-sm">These fill the form. You still press Send — reading the response is the exercise.</p>
+        <div class="flex gap-2 flex-wrap">
+          <button class="btn btn-ghost btn-sm" data-preset='{"method":"GET","url":"/users"}'>List users</button>
+          <button class="btn btn-ghost btn-sm" data-preset='{"method":"GET","url":"/users?active=false"}'>Filter inactive</button>
+          <button class="btn btn-ghost btn-sm" data-preset='{"method":"POST","url":"/users","body":{"name":"New Person","email":"new@test.example"}}'>Create user</button>
+          <button class="btn btn-ghost btn-sm" data-preset='{"method":"PUT","url":"/users/1","body":{"name":"Ada Renamed"}}'>Update user</button>
+          <button class="btn btn-ghost btn-sm" data-preset='{"method":"DELETE","url":"/users/2"}'>Delete user</button>
+          <button class="btn btn-ghost btn-sm" data-preset='{"method":"GET","url":"/orders","token":true}'>Orders (authed)</button>
+        </div>
+      </section>
+
+      <section class="app-frame">
+        <h2>Response</h2>
+        <div class="flex gap-3 items-center">
+          <span class="api-status" id="api-status" data-testid="api-status">—</span>
+          <span class="text-dim text-sm" id="api-time" data-testid="api-time"></span>
+        </div>
+        <h3 class="mt-4">Headers</h3>
+        <pre class="code" id="api-headers" data-testid="api-headers"></pre>
+        <h3>Body</h3>
+        <pre class="code" id="api-body-out" data-testid="api-body-out">Send a request to see the response.</pre>
+      </section>
+    </div>
+
+    <section class="app-frame">
+      <div class="lab-ex-head">
+        <div>
+          <span class="text-dim text-sm" id="ex-num"></span>
+          <h2 class="m-0">Exercise</h2>
+        </div>
+        <div class="lab-ex-nav">
+          <button class="btn btn-ghost btn-sm" id="prev-ex" data-testid="api-prev">← Previous</button>
+          <button class="btn btn-ghost btn-sm" id="next-ex" data-testid="api-next">Next →</button>
+        </div>
+      </div>
+      <p id="ex-task" data-testid="api-task"></p>
+      <p class="text-dim text-sm">Hint: <code class="inline" id="ex-hint" data-testid="api-hint"></code></p>
+      <div class="hidden mt-3" id="api-verdict" data-testid="api-verdict" role="status" aria-live="polite"></div>
+    </section>
+
+    <section class="panel">
+      <h2>The reference</h2>
+      <table class="data-table">
+        <thead><tr><th>Endpoint</th><th>Auth</th><th>Notes</th></tr></thead>
+        <tbody>
+          <tr><td><code class="inline">GET /users</code></td><td>—</td><td>Supports <code class="inline">?active=true|false</code></td></tr>
+          <tr><td><code class="inline">GET /users/:id</code></td><td>—</td><td>404 when absent</td></tr>
+          <tr><td><code class="inline">POST /users</code></td><td>—</td><td>201 + <code class="inline">Location</code>; 422 invalid; 409 duplicate email</td></tr>
+          <tr><td><code class="inline">PUT /users/:id</code></td><td>—</td><td>Idempotent — send it twice and compare state</td></tr>
+          <tr><td><code class="inline">DELETE /users/:id</code></td><td>—</td><td>204, then 404 on the repeat</td></tr>
+          <tr><td><code class="inline">GET /orders</code></td><td>Bearer</td><td>401 without a token. Contains an orphaned order</td></tr>
+          <tr><td><code class="inline">GET /orders/:id</code></td><td>Bearer</td><td>Includes the related user, or null if orphaned</td></tr>
+        </tbody>
+      </table>
+      <p class="text-dim text-sm">A path that exists for another verb returns 405, not 404 — the resource is there, the method is not allowed on it.</p>
+    </section>
+
+    <div class="panel app-next-steps">
+      <span class="text-dim">Related:</span>
+      <a class="btn btn-primary btn-sm" href="../pages/practice-tests.html?category=api">API quiz →</a>
+      <a class="btn btn-ghost btn-sm" href="../pages/interview-questions.html">Interview questions</a>
+      <a class="btn btn-ghost btn-sm" href="../pages/bug-report-builder.html">Write up a find</a>
+    </div>
+  </main>
+
+  <div id="site-footer"></div>
+
+  <script src="../js/test-hooks.js"></script>
+  <script src="../js/site-chrome.js"></script>
+  <script src="../js/data/defects.js"></script>
+  <script src="../js/profiles.js"></script>
+  <script src="../js/progress.js"></script>
+  <script src="../js/rpg.js"></script>
+  <script src="../js/mock-api.js"></script>
+  <script src="../js/data/api-exercises.js"></script>
+  <script src="../js/api-lab.js"></script>
+</body>
+</html>
