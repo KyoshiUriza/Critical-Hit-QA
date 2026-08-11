@@ -109,7 +109,14 @@ test.describe('data table (sprint-1 a11y fix)', () => {
 });
 
 test.describe('cart (sprint-1 fix)', () => {
-  test('clears the coupon message after checkout', async ({ page }) => {
+  test('clears the coupon message once the order is placed', async ({ page }) => {
+    // The guard is unchanged: the "Applied SAVE10" banner must not survive an
+    // order, or the next one looks like it still carries a discount.
+    //
+    // What changed is where the order gets placed. Checkout is now the four
+    // steps a real store has, so "Checkout" opens checkout and "Place order"
+    // is the button at the end of it. The test walks the flow rather than
+    // asserting on a button that no longer completes a purchase.
     await page.goto('/practice-apps/cart.html?reset');
     await page.getByTestId('add-widget').click();
     await page.getByTestId('coupon-input').fill('SAVE10');
@@ -117,8 +124,14 @@ test.describe('cart (sprint-1 fix)', () => {
     await expect(page.getByTestId('coupon-msg')).toContainText(/applied/i);
 
     await page.getByTestId('checkout-btn').click();
-    // Regression: the "Applied SAVE10" banner used to survive checkout, so the
-    // next order looked like it still had a discount.
+    await page.getByTestId('ship-name').fill('Alex Rivera');
+    await page.getByTestId('ship-address').fill('14 Mill Lane');
+    await page.getByTestId('ship-postcode').fill('EC1A 1BB');
+    await page.getByTestId('to-payment').click();
+    await page.getByTestId('card-number').fill('4111111111111111');
+    await page.getByTestId('place-order').click();
+
+    await expect(page.getByTestId('confirmation')).toContainText('Order placed');
     await expect(page.getByTestId('coupon-msg')).toHaveText('');
   });
 

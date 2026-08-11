@@ -16,6 +16,10 @@ const PAGES = [
   'pages/practice-apps.html',
   'pages/automation-lab.html',
   'pages/tester-lattice.html',
+  // The storefront chrome is new visual surface with its own accent, its
+  // own badges and a sale/stock colour language. New surface gets measured.
+  'practice-apps/cart.html',
+  'practice-apps/cart-broken.html',
   'practice-apps/locator-lab.html',
   'practice-apps/sql-sandbox.html',
 ];

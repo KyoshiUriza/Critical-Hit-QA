@@ -7,6 +7,7 @@
   <meta name="referrer" content="no-referrer" />
   <title>Practice (Broken): Shopping Cart — Critical Hit QA</title>
   <link rel="stylesheet" href="../css/styles.css" />
+  <link rel="stylesheet" href="../css/app-shell.css" />
 </head>
 <body data-page="practice-app-detail" data-depth="1">
   <a class="skip-link" href="#main">Skip to content</a>
@@ -14,51 +15,149 @@
 
   <main id="main" class="container">
     <div class="page-header">
-      <h1>Shopping Cart <span style="color:var(--danger);font-size:1rem;">(Buggy build)</span></h1>
-      <p>Same feature as the clean cart — this build has real calculation and validation bugs. Money bugs are the fun ones.</p>
+      <h1>Northwind Outfitters <span style="color:var(--danger);font-size:1rem;">(buggy build)</span></h1>
+      <p>Pixel-for-pixel the same storefront as the reference build. Seven rules are wrong, all of them about money, state, or a guard that is missing.</p>
     </div>
 
     <div class="panel" style="border-color: var(--warn);">
-      <strong>Testing charter</strong> — Do the math yourself. Compare shown totals against expected. Try coupon variations, quantity boundaries, and the checkout flow with an empty cart.
+      <strong>Testing charter</strong> — Work the money. Apply a discount and
+      recompute every figure yourself. Cross the free-shipping threshold from
+      both sides. Check out twice in a row and watch what the second order
+      inherits from the first. The
+      <a href="cart.html">reference build</a> is your oracle: any figure that
+      differs between the two builds for the same actions is a defect.
     </div>
 
-    <div class="two-col">
-      <div>
-        <div class="app-frame">
-          <h2>Products</h2>
-          <div class="product-grid" id="product-grid"></div>
+    <div class="app-shell"
+         data-brand="northwind"
+         data-search="Search gear"
+         data-cart
+         data-user="Alex Rivera"
+         data-nav-active="Shop"
+         data-crumbs="Home|Shop|Basket">
 
-          <h2>Cart</h2>
-          <div id="cart-summary" class="cart-summary" data-testid="cart-summary">
-            <p class="text-dim" data-testid="empty-cart">Cart is empty.</p>
+      <div class="app-body-split">
+        <aside class="app-side" aria-label="Filters">
+          <h4>Category</h4>
+          <div id="category-filters"></div>
+
+          <h4>Availability</h4>
+          <label><input type="checkbox" id="in-stock-only" data-testid="in-stock-only" /> In stock only</label>
+
+          <h4>Need help?</h4>
+          <p class="text-dim text-sm">Try coupon codes <code class="inline">SAVE10</code>, <code class="inline">HALFOFF</code>, or <code class="inline">EXPIRED</code>.</p>
+        </aside>
+
+        <div>
+          <div class="app-toolbar">
+            <div class="app-toolbar-group">
+              <strong id="result-count" data-testid="result-count"></strong>
+            </div>
+            <div class="app-toolbar-group">
+              <label for="sort-by" class="text-sm text-dim">Sort</label>
+              <select id="sort-by" data-testid="sort-by">
+                <option value="featured">Featured</option>
+                <option value="price-asc">Price: low to high</option>
+                <option value="price-desc">Price: high to low</option>
+                <option value="rating">Customer rating</option>
+              </select>
+            </div>
           </div>
+
+          <div class="prod-grid" id="product-grid" data-testid="product-grid"></div>
+        </div>
+      </div>
+
+      <div class="app-body" style="border-top:1px solid var(--border);">
+        <ol class="app-steps" id="checkout-steps" data-testid="checkout-steps"></ol>
+
+        <section id="pane-basket" data-testid="pane-basket">
+          <h2 style="font-size:var(--text-lg);">Your basket</h2>
+          <div id="cart-summary" class="cart-summary" data-testid="cart-summary"></div>
 
           <div class="form-field mt-4">
             <label for="coupon">Coupon code</label>
             <div class="flex gap-2">
-              <input type="text" id="coupon" data-testid="coupon-input" placeholder="Try SAVE10 or HALFOFF" />
+              <input type="text" id="coupon" data-testid="coupon-input" placeholder="Try SAVE10 or HALFOFF" autocomplete="off" />
               <button class="btn btn-primary" id="apply-coupon" data-testid="apply-coupon">Apply</button>
             </div>
             <div class="form-error" id="coupon-msg" data-testid="coupon-msg"></div>
           </div>
 
           <button class="btn btn-success mt-4" id="checkout-btn" data-testid="checkout-btn">Checkout</button>
-          <div class="mt-3" id="checkout-result"></div>
-        </div>
-      </div>
+          <div class="mt-3" id="checkout-result" data-testid="checkout-result" role="status" aria-live="polite"></div>
+        </section>
 
-      <div class="panel">
-        <h3>Behavior spec (expected)</h3>
-        <ul class="text-dim text-sm">
-          <li>Products: Widget ($10), Gadget ($25), Gizmo ($5.99), Doohickey ($99.99).</li>
-          <li>Add / +/− adjust quantity; qty must always be ≥ 1.</li>
-          <li>Tax = 8% of the discounted subtotal (NOT of raw subtotal).</li>
-          <li>Free shipping when discounted subtotal ≥ $50; otherwise $5.99 flat.</li>
-          <li>Coupons: <code class="inline">SAVE10</code> = 10%, <code class="inline">HALFOFF</code> = 50%, <code class="inline">EXPIRED</code> = rejected. Case-insensitive.</li>
-          <li>Money always shown to 2 decimals.</li>
-          <li>Checkout requires at least one item.</li>
-        </ul>
+        <section id="pane-delivery" data-testid="pane-delivery" hidden>
+          <h2 style="font-size:var(--text-lg);">Delivery details</h2>
+          <div class="two-col">
+            <div class="form-field">
+              <label for="ship-name">Full name</label>
+              <input type="text" id="ship-name" data-testid="ship-name" autocomplete="off" />
+            </div>
+            <div class="form-field">
+              <label for="ship-address">Address</label>
+              <input type="text" id="ship-address" data-testid="ship-address" autocomplete="off" />
+            </div>
+            <div class="form-field">
+              <label for="ship-postcode">Postcode</label>
+              <input type="text" id="ship-postcode" data-testid="ship-postcode" autocomplete="off" />
+            </div>
+            <div class="form-field">
+              <label for="ship-speed">Delivery speed</label>
+              <select id="ship-speed" data-testid="ship-speed">
+                <option value="standard">Standard — 3-5 days</option>
+                <option value="express">Express — next day</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-error" id="delivery-error" data-testid="delivery-error"></div>
+          <div class="flex gap-2 mt-3">
+            <button class="btn btn-ghost" id="back-to-basket" data-testid="back-to-basket">← Back to basket</button>
+            <button class="btn btn-primary" id="to-payment" data-testid="to-payment">Continue to payment</button>
+          </div>
+        </section>
+
+        <section id="pane-payment" data-testid="pane-payment" hidden>
+          <h2 style="font-size:var(--text-lg);">Payment</h2>
+          <div class="app-banner" data-kind="info">
+            <span>Nothing leaves this page. There is no network here — the whole site runs with <code class="inline">connect-src 'none'</code>. Do not type a real card number anywhere, including practice apps.</span>
+          </div>
+          <div class="two-col">
+            <div class="form-field">
+              <label for="card-number">Card number</label>
+              <input type="text" id="card-number" data-testid="card-number" inputmode="numeric" autocomplete="off" placeholder="4111 1111 1111 1111" />
+            </div>
+            <div class="form-field">
+              <label for="card-expiry">Expiry</label>
+              <input type="text" id="card-expiry" data-testid="card-expiry" placeholder="MM/YY" autocomplete="off" />
+            </div>
+          </div>
+          <div class="form-error" id="payment-error" data-testid="payment-error"></div>
+          <div class="flex gap-2 mt-3">
+            <button class="btn btn-ghost" id="back-to-delivery" data-testid="back-to-delivery">← Back to delivery</button>
+            <button class="btn btn-success" id="place-order" data-testid="place-order">Place order</button>
+          </div>
+        </section>
+
+        <section id="pane-done" data-testid="pane-done" hidden>
+          <div id="confirmation" data-testid="confirmation"></div>
+          <button class="btn btn-primary mt-3" id="keep-shopping" data-testid="keep-shopping">Keep shopping</button>
+        </section>
       </div>
+    </div>
+
+    <div class="panel">
+      <h3>Behavior spec — what SHOULD happen</h3>
+      <ul class="text-dim text-sm">
+        <li>Tax: 8% of subtotal <em>after</em> discount.</li>
+        <li>Shipping: free over $50 <em>after</em> discount, else $5.99 flat.</li>
+        <li>Coupons are case-insensitive. <code class="inline">EXPIRED</code> is rejected.</li>
+        <li>Every money figure is rendered to two decimal places.</li>
+        <li>An empty basket cannot enter checkout.</li>
+        <li>Decrementing to 0 removes the line.</li>
+        <li>Placing an order clears the basket, the coupon and the coupon message.</li>
+      </ul>
     </div>
 
     <div class="panel mt-4">
@@ -69,10 +168,10 @@
           <li><strong>Tax computed on raw subtotal instead of discounted subtotal.</strong> Apply SAVE10 to $45 → tax should be $3.24 (8% of $40.50) but shows $3.60 (8% of $45).</li>
           <li><strong>Free-shipping threshold uses raw subtotal, not discounted.</strong> Cart at $52 raw, HALFOFF applied → discounted $26, shipping should be $5.99 but shows FREE.</li>
           <li><strong>Coupon comparison is case-sensitive.</strong> <code class="inline">save10</code> is rejected as invalid; only uppercase works.</li>
-          <li><strong>Money not consistently rounded.</strong> Some lines display floating-point garbage like <code class="inline">$17.970000000000002</code>.</li>
-          <li><strong>Empty cart can be checked out.</strong> Clicking Checkout with 0 items still shows the success message.</li>
-          <li><strong>"−" (decrement) can push qty below 1.</strong> Item stays at qty 0 in the cart (as an active line) instead of being removed at 1→0.</li>
-          <li><strong>Coupon not cleared after checkout.</strong> Next order still shows the previous discount applied silently.</li>
+          <li><strong>Money not consistently rounded.</strong> The line total skips the formatter while every other figure uses it. Add 5&times; Gizmo: the line reads <code class="inline">$29.950000000000003</code> and the subtotal below it reads <code class="inline">$29.95</code>.</li>
+          <li><strong>Empty basket can enter checkout and be ordered.</strong> With 0 items, Checkout proceeds and the order completes.</li>
+          <li><strong>"−" (decrement) can push qty below 1.</strong> The line stays in the basket at qty 0 instead of being removed at 1→0.</li>
+          <li><strong>Coupon not cleared after an order.</strong> The next order silently reuses the previous discount.</li>
         </ol>
       </div>
     </div>
@@ -82,186 +181,25 @@
     <div class="panel app-next-steps">
       <span class="text-dim">Found something?</span>
       <a class="btn btn-primary btn-sm" href="../pages/bug-bounty.html">Log it in Bug Bounty →</a>
+      <a class="btn btn-ghost btn-sm" href="cart.html">Open the reference build</a>
       <a class="btn btn-ghost btn-sm" href="../pages/bug-report-builder.html">Write a bug report</a>
-      <a class="btn btn-ghost btn-sm" href="../pages/test-case-builder.html">Draft a test case</a>
     </div>
   </div>
 
-
   <script>
-    (function () {
-      const PRODUCTS = [
-        { id: "widget", name: "Widget", price: 10.00 },
-        { id: "gadget", name: "Gadget", price: 25.00 },
-        { id: "gizmo",  name: "Gizmo",  price: 5.99 },
-        { id: "doohickey", name: "Doohickey", price: 99.99 }
-      ];
-      const COUPONS = {
-        SAVE10: { pct: 0.10, label: "SAVE10 (10% off)" },
-        HALFOFF: { pct: 0.50, label: "HALFOFF (50% off)" }
-      };
-      const TAX_RATE = 0.08;
-      const SHIPPING = 5.99;
-      const FREE_SHIP_MIN = 50;
-
-      let cart = {};
-      let coupon = null;
-
-      function renderProducts() {
-        const grid = document.getElementById("product-grid");
-        grid.innerHTML = PRODUCTS.map((p) => `
-          <div class="product-card" data-testid="product-${p.id}">
-            <h4>${p.name}</h4>
-            <div class="price">$${p.price.toFixed(2)}</div>
-            <button class="btn btn-primary btn-sm" data-add="${p.id}" data-testid="add-${p.id}">Add to cart</button>
-          </div>
-        `).join("");
-      }
-
-      // BUG 4: not all money is passed through this — some display raw.
-      function money(n) { return "$" + n.toFixed(2); }
-
-      function renderCart() {
-        const box = document.getElementById("cart-summary");
-        const items = Object.values(cart);
-        if (items.length === 0) {
-          box.innerHTML = `<p class="text-dim" data-testid="empty-cart">Cart is empty.</p>`;
-          return;
-        }
-        let subtotal = 0;
-        const lines = items.map((it) => {
-          const line = it.product.price * it.qty;
-          subtotal += line;
-          return `
-            <div class="cart-line" data-testid="cart-line-${it.product.id}">
-              <span>${it.product.name}</span>
-              <span>
-                <button class="qty-btn" data-qty="dec" data-id="${it.product.id}" data-testid="dec-${it.product.id}">−</button>
-                <span data-testid="qty-${it.product.id}">${it.qty}</span>
-                <button class="qty-btn" data-qty="inc" data-id="${it.product.id}" data-testid="inc-${it.product.id}">+</button>
-                × ${money(it.product.price)} = <strong data-testid="line-${it.product.id}">$${line}</strong>
-              </span>
-            </div>
-          `;
-          // BUG 4: line total uses raw ${line} — no toFixed(2).
-        }).join("");
-
-        let discount = 0;
-        if (coupon) discount = subtotal * COUPONS[coupon].pct;
-        const afterDiscount = subtotal - discount;
-
-        // BUG 2: uses raw subtotal for free-ship threshold.
-        const shipping = subtotal >= FREE_SHIP_MIN ? 0 : SHIPPING;
-        // BUG 1: tax computed on RAW subtotal, not afterDiscount.
-        const tax = subtotal * TAX_RATE;
-        const total = afterDiscount + shipping + tax;
-
-        if (window.Detector) {
-          // Tax on the raw subtotal only differs once a discount exists.
-          if (discount > 0) window.Detector.trigger("tax-basis");
-          // Free shipping earned on the pre-discount figure: the order does
-          // not actually qualify, but shipping was waived anyway.
-          if (subtotal >= FREE_SHIP_MIN && afterDiscount < FREE_SHIP_MIN) {
-            window.Detector.trigger("shipping-basis");
-          }
-          // Floating-point residue reaching the rendered figure.
-          if (Math.abs(total * 100 - Math.round(total * 100)) > 0.000001) {
-            window.Detector.trigger("money-rounding");
-          }
-        }
-
-        box.innerHTML = `
-          ${lines}
-          <div class="cart-line"><span>Subtotal</span><span data-testid="subtotal">${money(subtotal)}</span></div>
-          ${coupon ? `<div class="cart-line"><span>Discount (${COUPONS[coupon].label})</span><span data-testid="discount">−${money(discount)}</span></div>` : ""}
-          <div class="cart-line"><span>Tax (8%)</span><span data-testid="tax">${money(tax)}</span></div>
-          <div class="cart-line"><span>Shipping</span><span data-testid="shipping">${shipping === 0 ? "FREE" : money(shipping)}</span></div>
-          <div class="cart-total"><span>Total</span><span data-testid="total">${money(total)}</span></div>
-        `;
-      }
-
-      document.getElementById("product-grid").addEventListener("click", (e) => {
-        const id = e.target.getAttribute("data-add");
-        if (!id) return;
-        const p = PRODUCTS.find((x) => x.id === id);
-        if (!cart[id]) cart[id] = { product: p, qty: 0 };
-        cart[id].qty += 1;
-        renderCart();
-      });
-
-      document.getElementById("cart-summary").addEventListener("click", (e) => {
-        const qty = e.target.getAttribute("data-qty");
-        const id = e.target.getAttribute("data-id");
-        if (qty && id && cart[id]) {
-          if (qty === "inc") cart[id].qty += 1;
-          else if (qty === "dec") {
-            // BUG 6: decrement can push qty to 0 or below; item is not removed.
-            cart[id].qty -= 1;
-            if (window.Detector && cart[id].qty < 1) window.Detector.trigger("negative-qty");
-          }
-          renderCart();
-        }
-      });
-
-      document.getElementById("apply-coupon").addEventListener("click", () => {
-        // BUG 3: case-sensitive — no toUpperCase().
-        const raw = document.getElementById("coupon").value.trim();
-        const msg = document.getElementById("coupon-msg");
-        if (!raw) {
-          coupon = null;
-          msg.textContent = "Coupon cleared.";
-          msg.className = "form-error visible";
-        } else if (raw === "EXPIRED") {
-          coupon = null;
-          msg.textContent = "This coupon has expired.";
-          msg.className = "form-error visible";
-        } else if (window.Detector && !COUPONS[raw] && COUPONS[raw.toUpperCase()]) {
-          // A valid code rejected purely because of letter case.
-          window.Detector.trigger("coupon-case");
-          coupon = null;
-          msg.textContent = "Invalid coupon code.";
-          msg.className = "form-error visible";
-        } else if (COUPONS[raw]) {
-          coupon = raw;
-          msg.textContent = `Applied ${COUPONS[raw].label}.`;
-          msg.className = "form-success";
-          msg.style.display = "block";
-        } else {
-          coupon = null;
-          msg.textContent = "Invalid coupon code.";
-          msg.className = "form-error visible";
-        }
-        renderCart();
-      });
-
-      document.getElementById("checkout-btn").addEventListener("click", () => {
-        const result = document.getElementById("checkout-result");
-        result.setAttribute("data-testid", "checkout-result");
-        // BUG 5: no empty-cart guard.
-        var wasEmpty = Object.keys(cart).length === 0;
-        var hadCoupon = !!coupon;
-        result.className = "form-success";
-        result.style.display = "block";
-        result.textContent = "Order placed (simulated). Thank you!";
-        cart = {};
-        // BUG 7: coupon deliberately NOT cleared here.
-        document.getElementById("coupon").value = "";
-        renderCart();
-        if (window.Detector) {
-          if (wasEmpty) window.Detector.trigger("empty-checkout");
-          // The input was cleared but the discount is still applied to the
-          // next order — the state and the UI disagree.
-          if (hadCoupon && coupon) window.Detector.trigger("coupon-persists");
-        }
-      });
-
-      document.getElementById("reveal-btn").addEventListener("click", () => {
-        document.getElementById("answer-key").classList.toggle("hidden");
-      });
-
-      renderProducts();
-      renderCart();
-    })();
+    // The only difference between this page and cart.html. Both load the same
+    // storefront; this one tells it which rules to get wrong. Keeping the
+    // builds on one implementation is what stops them drifting apart visually
+    // and turning a behaviour comparison into a layout comparison.
+    window.STORE_DEFECTS = {
+      "tax-basis": true,
+      "shipping-basis": true,
+      "coupon-case": true,
+      "money-rounding": true,
+      "empty-checkout": true,
+      "negative-qty": true,
+      "coupon-persists": true
+    };
   </script>
   <script src="../js/test-hooks.js"></script>
   <script src="../js/site-chrome.js"></script>
@@ -271,6 +209,14 @@
   <script src="../js/rpg.js"></script>
   <script src="../js/defect-detector.js"></script>
   <script src="../js/bounty-panel.js"></script>
+  <script src="../js/app-shell.js"></script>
+  <script src="../js/data/store-catalogue.js"></script>
+  <script src="../js/store.js"></script>
+  <script>
+    document.getElementById("reveal-btn").addEventListener("click", function () {
+      document.getElementById("answer-key").classList.toggle("hidden");
+    });
+  </script>
   <div id="site-footer"></div>
 </body>
 </html>

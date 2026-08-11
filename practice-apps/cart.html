@@ -7,6 +7,7 @@
   <meta name="referrer" content="no-referrer" />
   <title>Practice: Shopping Cart — Critical Hit QA</title>
   <link rel="stylesheet" href="../css/styles.css" />
+  <link rel="stylesheet" href="../css/app-shell.css" />
 </head>
 <body data-page="practice-app-detail" data-depth="1">
   <a class="skip-link" href="#main">Skip to content</a>
@@ -14,25 +15,62 @@
 
   <main id="main" class="container">
     <div class="page-header">
-      <h1>Shopping Cart</h1>
-      <p>Add products, adjust quantities, apply coupon codes, and see totals.</p>
+      <h1>Northwind Outfitters <span class="text-dim" style="font-size:1rem;">(reference build)</span></h1>
+      <p>A storefront that behaves correctly: browse and filter, basket, coupons, and a four-step checkout. This is the oracle the buggy build is compared against.</p>
     </div>
 
-    <div class="two-col">
-      <div>
-        <div class="app-frame">
-          <h2>Products</h2>
-          <div class="product-grid" id="product-grid"></div>
+    <div class="app-shell"
+         data-brand="northwind"
+         data-search="Search gear"
+         data-cart
+         data-user="Alex Rivera"
+         data-nav-active="Shop"
+         data-crumbs="Home|Shop|Basket">
 
-          <h2>Cart</h2>
-          <div id="cart-summary" class="cart-summary" data-testid="cart-summary">
-            <p class="text-dim" data-testid="empty-cart">Cart is empty.</p>
+      <div class="app-body-split">
+        <aside class="app-side" aria-label="Filters">
+          <h4>Category</h4>
+          <div id="category-filters"></div>
+
+          <h4>Availability</h4>
+          <label><input type="checkbox" id="in-stock-only" data-testid="in-stock-only" /> In stock only</label>
+
+          <h4>Need help?</h4>
+          <p class="text-dim text-sm">Try coupon codes <code class="inline">SAVE10</code>, <code class="inline">HALFOFF</code>, or <code class="inline">EXPIRED</code>.</p>
+        </aside>
+
+        <div>
+          <div class="app-toolbar">
+            <div class="app-toolbar-group">
+              <strong id="result-count" data-testid="result-count"></strong>
+            </div>
+            <div class="app-toolbar-group">
+              <label for="sort-by" class="text-sm text-dim">Sort</label>
+              <select id="sort-by" data-testid="sort-by">
+                <option value="featured">Featured</option>
+                <option value="price-asc">Price: low to high</option>
+                <option value="price-desc">Price: high to low</option>
+                <option value="rating">Customer rating</option>
+              </select>
+            </div>
           </div>
+
+          <div class="prod-grid" id="product-grid" data-testid="product-grid"></div>
+        </div>
+      </div>
+
+      <div class="app-body" style="border-top:1px solid var(--border);">
+        <ol class="app-steps" id="checkout-steps" data-testid="checkout-steps"></ol>
+
+        <!-- Basket -->
+        <section id="pane-basket" data-testid="pane-basket">
+          <h2 style="font-size:var(--text-lg);">Your basket</h2>
+          <div id="cart-summary" class="cart-summary" data-testid="cart-summary"></div>
 
           <div class="form-field mt-4">
             <label for="coupon">Coupon code</label>
             <div class="flex gap-2">
-              <input type="text" id="coupon" data-testid="coupon-input" placeholder="Try SAVE10 or HALFOFF" />
+              <input type="text" id="coupon" data-testid="coupon-input" placeholder="Try SAVE10 or HALFOFF" autocomplete="off" />
               <button class="btn btn-primary" id="apply-coupon" data-testid="apply-coupon">Apply</button>
             </div>
             <div class="form-error" id="coupon-msg" data-testid="coupon-msg"></div>
@@ -40,26 +78,98 @@
 
           <button class="btn btn-success mt-4" id="checkout-btn" data-testid="checkout-btn">Checkout</button>
           <div class="mt-3" id="checkout-result" data-testid="checkout-result" role="status" aria-live="polite"></div>
-        </div>
-      </div>
+        </section>
 
+        <!-- Delivery -->
+        <section id="pane-delivery" data-testid="pane-delivery" hidden>
+          <h2 style="font-size:var(--text-lg);">Delivery details</h2>
+          <div class="two-col">
+            <div class="form-field">
+              <label for="ship-name">Full name</label>
+              <input type="text" id="ship-name" data-testid="ship-name" autocomplete="off" />
+            </div>
+            <div class="form-field">
+              <label for="ship-address">Address</label>
+              <input type="text" id="ship-address" data-testid="ship-address" autocomplete="off" />
+            </div>
+            <div class="form-field">
+              <label for="ship-postcode">Postcode</label>
+              <input type="text" id="ship-postcode" data-testid="ship-postcode" autocomplete="off" />
+            </div>
+            <div class="form-field">
+              <label for="ship-speed">Delivery speed</label>
+              <select id="ship-speed" data-testid="ship-speed">
+                <option value="standard">Standard — 3-5 days</option>
+                <option value="express">Express — next day</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-error" id="delivery-error" data-testid="delivery-error"></div>
+          <div class="flex gap-2 mt-3">
+            <button class="btn btn-ghost" id="back-to-basket" data-testid="back-to-basket">← Back to basket</button>
+            <button class="btn btn-primary" id="to-payment" data-testid="to-payment">Continue to payment</button>
+          </div>
+        </section>
+
+        <!-- Payment -->
+        <section id="pane-payment" data-testid="pane-payment" hidden>
+          <h2 style="font-size:var(--text-lg);">Payment</h2>
+          <div class="app-banner" data-kind="info">
+            <span>Nothing leaves this page. There is no network here — the whole site runs with <code class="inline">connect-src 'none'</code>. Do not type a real card number anywhere, including practice apps.</span>
+          </div>
+          <div class="two-col">
+            <div class="form-field">
+              <label for="card-number">Card number</label>
+              <input type="text" id="card-number" data-testid="card-number" inputmode="numeric" autocomplete="off" placeholder="4111 1111 1111 1111" />
+            </div>
+            <div class="form-field">
+              <label for="card-expiry">Expiry</label>
+              <input type="text" id="card-expiry" data-testid="card-expiry" placeholder="MM/YY" autocomplete="off" />
+            </div>
+          </div>
+          <div class="form-error" id="payment-error" data-testid="payment-error"></div>
+          <div class="flex gap-2 mt-3">
+            <button class="btn btn-ghost" id="back-to-delivery" data-testid="back-to-delivery">← Back to delivery</button>
+            <button class="btn btn-success" id="place-order" data-testid="place-order">Place order</button>
+          </div>
+        </section>
+
+        <!-- Confirmation -->
+        <section id="pane-done" data-testid="pane-done" hidden>
+          <div id="confirmation" data-testid="confirmation"></div>
+          <button class="btn btn-primary mt-3" id="keep-shopping" data-testid="keep-shopping">Keep shopping</button>
+        </section>
+      </div>
+    </div>
+
+    <div class="two-col">
       <div class="panel">
         <h3>Behavior spec</h3>
         <ul class="text-dim text-sm">
-          <li>Products: Widget ($10), Gadget ($25), Gizmo ($5.99), Doohickey ($99.99).</li>
-          <li>Add to cart increments quantity; +/− adjust; qty must be ≥ 1.</li>
-          <li>Tax: 8% of subtotal after discount.</li>
-          <li>Shipping: free over $50 subtotal, else $5.99 flat.</li>
+          <li>Catalogue: 10 products across Hardware, Apparel and Packs. The four original SKUs keep their prices — Widget ($10), Gadget ($25), Gizmo ($5.99), Doohickey ($99.99).</li>
+          <li>Out-of-stock products cannot be added.</li>
+          <li>Add to basket increments quantity; +/− adjust; reaching 0 removes the line.</li>
+          <li>Tax: 8% of subtotal <em>after</em> discount.</li>
+          <li>Shipping: free over $50 <em>after</em> discount, else $5.99 flat.</li>
           <li>Coupons: <code class="inline">SAVE10</code> = 10% off, <code class="inline">HALFOFF</code> = 50% off (case-insensitive), <code class="inline">EXPIRED</code> = rejected.</li>
           <li>Only one coupon at a time. Applying replaces the previous.</li>
-          <li>Empty cart cannot check out.</li>
+          <li>An empty basket cannot enter checkout.</li>
+          <li>Checkout is four steps. Delivery requires name, address and postcode; payment requires 12–19 digits.</li>
+          <li>Placing an order clears the basket, the coupon and the coupon message.</li>
         </ul>
+      </div>
+
+      <div class="panel">
         <h3>Test ideas</h3>
         <ul class="text-dim text-sm">
-          <li>Floating-point precision (add 3× $5.99).</li>
-          <li>Very large quantity (999999).</li>
-          <li>Coupon in lowercase, with whitespace, with special chars.</li>
-          <li>Remove-last-item — does the empty message reappear?</li>
+          <li>Floating-point precision (add 3× $5.99 and read every money figure).</li>
+          <li>Very large quantity — hold the + button.</li>
+          <li>Coupon in lowercase, with whitespace, with special characters.</li>
+          <li>Remove the last item — does the empty state come back?</li>
+          <li>Filter to a category with nothing in stock, with "in stock only" ticked.</li>
+          <li>Enter checkout, go back, change the basket, go forward again.</li>
+          <li>Apply a coupon, place an order, then start a second one.</li>
+          <li>Sort by price and check the order is numeric, not lexicographic.</li>
         </ul>
       </div>
     </div>
@@ -68,166 +178,21 @@
   <div class="container">
     <div class="panel app-next-steps">
       <span class="text-dim">Found something?</span>
-      <a class="btn btn-primary btn-sm" href="../pages/bug-bounty.html">Log it in Bug Bounty →</a>
+      <a class="btn btn-primary btn-sm" href="cart-broken.html">Compare with the buggy build →</a>
       <a class="btn btn-ghost btn-sm" href="../pages/bug-report-builder.html">Write a bug report</a>
       <a class="btn btn-ghost btn-sm" href="../pages/test-case-builder.html">Draft a test case</a>
     </div>
   </div>
 
-
-  <script>
-    (function () {
-      const PRODUCTS = [
-        { id: "widget", name: "Widget", price: 10.00 },
-        { id: "gadget", name: "Gadget", price: 25.00 },
-        { id: "gizmo",  name: "Gizmo",  price: 5.99 },
-        { id: "doohickey", name: "Doohickey", price: 99.99 }
-      ];
-      const COUPONS = {
-        SAVE10: { pct: 0.10, label: "SAVE10 (10% off)" },
-        HALFOFF: { pct: 0.50, label: "HALFOFF (50% off)" }
-      };
-      const TAX_RATE = 0.08;
-      const SHIPPING = 5.99;
-      const FREE_SHIP_MIN = 50;
-
-      let cart = {}; // id -> { product, qty }
-      let coupon = null;
-
-      function renderProducts() {
-        const grid = document.getElementById("product-grid");
-        grid.innerHTML = PRODUCTS.map((p) => `
-          <div class="product-card" data-testid="product-${p.id}">
-            <h4>${p.name}</h4>
-            <div class="price">$${p.price.toFixed(2)}</div>
-            <button class="btn btn-primary btn-sm" data-add="${p.id}" data-testid="add-${p.id}">Add to cart</button>
-          </div>
-        `).join("");
-      }
-
-      function money(n) { return "$" + n.toFixed(2); }
-
-      function renderCart() {
-        const box = document.getElementById("cart-summary");
-        const items = Object.values(cart);
-        if (items.length === 0) {
-          box.innerHTML = `<p class="text-dim" data-testid="empty-cart">Cart is empty.</p>`;
-          return;
-        }
-        let subtotal = 0;
-        const lines = items.map((it) => {
-          const line = it.product.price * it.qty;
-          subtotal += line;
-          return `
-            <div class="cart-line" data-testid="cart-line-${it.product.id}">
-              <span>${it.product.name}</span>
-              <span>
-                <button class="qty-btn" data-qty="dec" data-id="${it.product.id}" data-testid="dec-${it.product.id}">−</button>
-                <span data-testid="qty-${it.product.id}">${it.qty}</span>
-                <button class="qty-btn" data-qty="inc" data-id="${it.product.id}" data-testid="inc-${it.product.id}">+</button>
-                × ${money(it.product.price)} = <strong>${money(line)}</strong>
-                <button class="btn btn-ghost btn-sm" data-remove="${it.product.id}" data-testid="remove-${it.product.id}" style="margin-left:6px;">×</button>
-              </span>
-            </div>
-          `;
-        }).join("");
-
-        let discount = 0;
-        if (coupon) discount = subtotal * COUPONS[coupon].pct;
-        const afterDiscount = subtotal - discount;
-        const shipping = afterDiscount >= FREE_SHIP_MIN ? 0 : SHIPPING;
-        const tax = afterDiscount * TAX_RATE;
-        const total = afterDiscount + shipping + tax;
-
-        box.innerHTML = `
-          ${lines}
-          <div class="cart-line"><span>Subtotal</span><span data-testid="subtotal">${money(subtotal)}</span></div>
-          ${coupon ? `<div class="cart-line"><span>Discount (${COUPONS[coupon].label})</span><span data-testid="discount">−${money(discount)}</span></div>` : ""}
-          <div class="cart-line"><span>Tax (8%)</span><span data-testid="tax">${money(tax)}</span></div>
-          <div class="cart-line"><span>Shipping</span><span data-testid="shipping">${shipping === 0 ? "FREE" : money(shipping)}</span></div>
-          <div class="cart-total"><span>Total</span><span data-testid="total">${money(total)}</span></div>
-        `;
-      }
-
-      document.getElementById("product-grid").addEventListener("click", (e) => {
-        const id = e.target.getAttribute("data-add");
-        if (!id) return;
-        const p = PRODUCTS.find((x) => x.id === id);
-        if (!cart[id]) cart[id] = { product: p, qty: 0 };
-        cart[id].qty += 1;
-        renderCart();
-      });
-
-      document.getElementById("cart-summary").addEventListener("click", (e) => {
-        const removeId = e.target.getAttribute("data-remove");
-        if (removeId) { delete cart[removeId]; renderCart(); return; }
-        const qty = e.target.getAttribute("data-qty");
-        const id = e.target.getAttribute("data-id");
-        if (qty && id && cart[id]) {
-          if (qty === "inc") cart[id].qty += 1;
-          else if (qty === "dec") {
-            cart[id].qty -= 1;
-            if (cart[id].qty <= 0) delete cart[id];
-          }
-          renderCart();
-        }
-      });
-
-      document.getElementById("apply-coupon").addEventListener("click", () => {
-        const raw = document.getElementById("coupon").value.trim().toUpperCase();
-        const msg = document.getElementById("coupon-msg");
-        if (!raw) {
-          coupon = null;
-          msg.textContent = "Coupon cleared.";
-          msg.className = "form-error visible";
-        } else if (raw === "EXPIRED") {
-          coupon = null;
-          msg.textContent = "This coupon has expired.";
-          msg.className = "form-error visible";
-        } else if (COUPONS[raw]) {
-          coupon = raw;
-          msg.textContent = `Applied ${COUPONS[raw].label}.`;
-          msg.className = "form-success";
-          msg.style.display = "block";
-        } else {
-          coupon = null;
-          msg.textContent = "Invalid coupon code.";
-          msg.className = "form-error visible";
-        }
-        renderCart();
-      });
-
-      document.getElementById("checkout-btn").addEventListener("click", () => {
-        const result = document.getElementById("checkout-result");
-        result.setAttribute("data-testid", "checkout-result");
-        if (Object.keys(cart).length === 0) {
-          result.className = "form-error visible";
-          result.textContent = "Cart is empty. Add something first.";
-          return;
-        }
-        result.className = "form-success";
-        result.style.display = "block";
-        result.textContent = "Order placed (simulated). Thank you!";
-        cart = {};
-        coupon = null;
-        document.getElementById("coupon").value = "";
-        const cm = document.getElementById("coupon-msg");
-        cm.className = "form-error";
-        cm.textContent = "";   // was left showing "Applied SAVE10" after checkout
-        cm.style.display = "";
-        renderCart();
-      });
-
-      renderProducts();
-      renderCart();
-    })();
-  </script>
   <script src="../js/test-hooks.js"></script>
   <script src="../js/site-chrome.js"></script>
   <script src="../js/data/defects.js"></script>
   <script src="../js/profiles.js"></script>
   <script src="../js/progress.js"></script>
   <script src="../js/rpg.js"></script>
+  <script src="../js/app-shell.js"></script>
+  <script src="../js/data/store-catalogue.js"></script>
+  <script src="../js/store.js"></script>
   <div id="site-footer"></div>
 </body>
 </html>

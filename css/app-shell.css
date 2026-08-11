@@ -1,0 +1,409 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   App Shell — product chrome for the practice apps
+   ═══════════════════════════════════════════════════════════════════════
+
+   The practice apps used to be widgets sitting inside a study page: a
+   heading, a panel, some inputs. Nothing a learner tests at work looks like
+   that. Real products have their own header, a brand, breadcrumbs, a
+   toolbar, a cart badge, an account menu, toasts, empty states and a
+   multi-step checkout — and the majority of real defects live in exactly
+   those parts rather than in the four inputs at the centre.
+
+   This layer gives each app that chrome. It is loaded ONLY by the practice
+   apps, so the study site's own pages are untouched.
+
+   Rules this file keeps:
+   - It only ADDS classes. No existing selector is renamed, because the
+     Playwright suite and any learner's own suite are written against them.
+     tests/testid-contract.spec.js enforces the same for test ids.
+   - Every colour comes from the existing token palette, so both themes work
+     and tests/contrast.spec.js audits this chrome like everything else.
+   - Each app sets its own accent with --app-accent, which defaults to the
+     site accent. That is what makes two apps feel like two products.
+   - No fonts, no icons, no images from anywhere. Product imagery is inline
+     SVG; the CSP forbids everything else and that constraint is a feature.
+*/
+
+.app-shell {
+  --app-accent: var(--accent);
+  --app-on-accent: var(--on-accent);
+  --app-topbar-bg: var(--bg-elev-2);
+
+  border: 1px solid var(--border-strong);
+  border-radius: var(--rad-lg);
+  overflow: hidden;
+  background: var(--bg);
+  box-shadow: var(--shadow-md);
+  margin-bottom: var(--sp-5);
+}
+
+/* A thin band above the header, the way real storefronts carry a promo or a
+   support number. Cheap, and it is most of what makes chrome read as real. */
+.app-strip {
+  background: var(--app-accent);
+  color: var(--app-on-accent);
+  font-size: var(--text-xs);
+  padding: 6px var(--sp-4);
+  display: flex;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  flex-wrap: wrap;
+}
+
+.app-topbar {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-4);
+  padding: var(--sp-3) var(--sp-4);
+  background: var(--app-topbar-bg);
+  border-bottom: 1px solid var(--border);
+}
+
+.app-brand {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  font-weight: 700;
+  font-size: var(--text-lg);
+  color: var(--text);
+  text-decoration: none;
+  white-space: nowrap;
+}
+.app-brand-mark {
+  width: 30px;
+  height: 30px;
+  border-radius: var(--rad-sm);
+  background: var(--app-accent);
+  color: var(--app-on-accent);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--text-sm);
+  font-weight: 800;
+  flex: 0 0 auto;
+}
+
+.app-nav {
+  display: flex;
+  gap: var(--sp-1);
+  flex-wrap: wrap;
+  flex: 1 1 auto;
+}
+.app-nav a,
+.app-nav button {
+  background: none;
+  border: 1px solid transparent;
+  border-radius: var(--rad-sm);
+  padding: 6px 10px;
+  font: inherit;
+  font-size: var(--text-sm);
+  color: var(--text-dim);
+  text-decoration: none;
+  cursor: pointer;
+}
+.app-nav a:hover,
+.app-nav button:hover { color: var(--text); border-color: var(--border-hover); }
+.app-nav [aria-current="page"],
+.app-nav .is-active {
+  color: var(--text);
+  border-color: var(--border-strong);
+  background: var(--bg-elev);
+  font-weight: 600;
+}
+
+.app-actions { display: flex; align-items: center; gap: var(--sp-2); margin-left: auto; }
+
+/* Search that looks like a real product's search, not a bare input. */
+.app-search {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  background: var(--bg);
+  border: 1px solid var(--border-control);
+  border-radius: var(--rad-full);
+  padding: 4px 12px;
+  min-width: 180px;
+}
+.app-search input {
+  border: 0;
+  background: none;
+  color: var(--text);
+  font: inherit;
+  font-size: var(--text-sm);
+  padding: 4px 0;
+  width: 100%;
+}
+.app-search input:focus { outline: none; }
+.app-search:focus-within { box-shadow: var(--focus-ring); }
+
+/* Icon buttons with a count, e.g. a cart or notifications. 44px so the
+   touch-target lesson taught elsewhere is not contradicted here. */
+.app-icon-btn {
+  position: relative;
+  width: 44px;
+  height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border-control);
+  border-radius: var(--rad-sm);
+  background: var(--bg);
+  color: var(--text);
+  cursor: pointer;
+  font-size: var(--text-base);
+}
+.app-icon-btn:hover { border-color: var(--border-hover); }
+.app-count {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 5px;
+  border-radius: var(--rad-full);
+  background: var(--danger);
+  color: var(--on-danger);
+  font-size: 11px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.app-count[data-count="0"] { display: none; }
+
+.app-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: var(--rad-full);
+  background: var(--accent-2);
+  color: var(--on-accent-2);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--text-sm);
+  font-weight: 700;
+}
+
+/* ── Breadcrumbs ──────────────────────────────────────────────────────── */
+.app-crumbs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+  align-items: center;
+  padding: var(--sp-2) var(--sp-4);
+  border-bottom: 1px solid var(--border);
+  font-size: var(--text-sm);
+  color: var(--text-dim);
+  background: var(--bg-elev);
+}
+.app-crumbs a { color: var(--text-dim); }
+.app-crumbs a:hover { color: var(--accent); }
+.app-crumbs [aria-current="page"] { color: var(--text); font-weight: 600; }
+.app-crumbs li + li::before { content: "›"; margin-right: var(--sp-2); opacity: 0.6; }
+.app-crumbs ol { display: flex; flex-wrap: wrap; gap: var(--sp-2); list-style: none; margin: 0; padding: 0; }
+.app-crumbs li { display: flex; gap: var(--sp-2); align-items: center; }
+
+/* ── Body: optional sidebar + content ─────────────────────────────────── */
+.app-body { padding: var(--sp-4); }
+.app-body-split {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: var(--sp-4);
+  padding: var(--sp-4);
+}
+@media (max-width: 860px) {
+  .app-body-split { grid-template-columns: 1fr; }
+}
+.app-side h4 {
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-dim);
+  margin: var(--sp-3) 0 var(--sp-2);
+}
+.app-side ul { list-style: none; margin: 0; padding: 0; }
+.app-side label { display: flex; gap: var(--sp-2); align-items: center; font-size: var(--text-sm); padding: 4px 0; }
+
+.app-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: var(--sp-3);
+  margin-bottom: var(--sp-3);
+  border-bottom: 1px solid var(--border);
+}
+.app-toolbar-group { display: flex; gap: var(--sp-2); align-items: center; flex-wrap: wrap; }
+
+/* ── Product cards ────────────────────────────────────────────────────── */
+.prod-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: var(--sp-3);
+}
+.prod-card {
+  border: 1px solid var(--border-strong);
+  border-radius: var(--rad-md);
+  background: var(--bg-elev);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+.prod-card:hover { border-color: var(--border-hover); }
+.prod-media {
+  aspect-ratio: 4 / 3;
+  background: var(--bg-elev-2);
+  display: block;
+  width: 100%;
+  border-bottom: 1px solid var(--border);
+}
+.prod-info { padding: var(--sp-3); display: flex; flex-direction: column; gap: 6px; flex: 1 1 auto; }
+.prod-title { font-size: var(--text-sm); font-weight: 600; color: var(--text); }
+.prod-meta { font-size: var(--text-xs); color: var(--text-dim); }
+.prod-price { font-size: var(--text-lg); font-weight: 700; color: var(--text); }
+.prod-was { font-size: var(--text-sm); color: var(--text-dim); text-decoration: line-through; margin-left: 6px; font-weight: 400; }
+.prod-actions { padding: 0 var(--sp-3) var(--sp-3); display: flex; gap: var(--sp-2); }
+
+.app-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: var(--rad-full);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  border: 1px solid var(--border);
+  background: var(--bg-elev-2);
+  color: var(--text-dim);
+}
+.app-badge-sale { background: var(--danger); color: var(--on-danger); border-color: var(--danger); }
+.app-badge-new { background: var(--accent-2); color: var(--on-accent-2); border-color: var(--accent-2); }
+.app-badge-low { background: var(--warn); color: var(--on-warn); border-color: var(--warn); }
+.prod-card .app-badge { position: absolute; top: var(--sp-2); left: var(--sp-2); z-index: 1; }
+
+/* Rating stars. The number goes in the text as well as the glyphs — a row of
+   stars alone is colour-and-shape information with no text alternative. */
+.rating { display: inline-flex; gap: 2px; align-items: center; font-size: var(--text-sm); }
+.rating-stars { color: var(--warn); letter-spacing: 1px; }
+
+/* ── Step indicator (checkout, wizards) ───────────────────────────────── */
+.app-steps { display: flex; flex-wrap: wrap; gap: var(--sp-2); list-style: none; margin: 0 0 var(--sp-4); padding: 0; }
+.app-step {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  font-size: var(--text-sm);
+  color: var(--text-dim);
+  padding: 6px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--rad-full);
+}
+.app-step-num {
+  width: 22px; height: 22px;
+  border-radius: var(--rad-full);
+  background: var(--bg-elev-2);
+  color: var(--text-dim);
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: var(--text-xs); font-weight: 700;
+}
+.app-step[aria-current="step"] {
+  color: var(--text);
+  border-color: var(--app-accent);
+  font-weight: 600;
+}
+.app-step[aria-current="step"] .app-step-num { background: var(--app-accent); color: var(--app-on-accent); }
+.app-step[data-done="true"] .app-step-num { background: var(--accent-2); color: var(--on-accent-2); }
+
+/* ── Feedback ─────────────────────────────────────────────────────────── */
+.app-toast {
+  position: fixed;
+  right: var(--sp-4);
+  bottom: var(--sp-4);
+  z-index: 60;
+  max-width: 340px;
+  padding: var(--sp-3) var(--sp-4);
+  border-radius: var(--rad-md);
+  border: 1px solid var(--border-strong);
+  background: var(--bg-elev-2);
+  color: var(--text);
+  box-shadow: var(--shadow-lg);
+  font-size: var(--text-sm);
+}
+.app-toast[data-kind="error"] { border-color: var(--danger); }
+.app-toast[data-kind="success"] { border-color: var(--accent-2); }
+
+.app-banner {
+  display: flex;
+  gap: var(--sp-3);
+  align-items: flex-start;
+  padding: var(--sp-3);
+  border-radius: var(--rad-md);
+  border: 1px solid var(--border-strong);
+  border-left-width: 3px;
+  background: var(--bg-elev);
+  font-size: var(--text-sm);
+  margin-bottom: var(--sp-3);
+}
+.app-banner[data-kind="error"] { border-left-color: var(--danger); }
+.app-banner[data-kind="warn"] { border-left-color: var(--warn); }
+.app-banner[data-kind="info"] { border-left-color: var(--accent); }
+
+.app-empty {
+  text-align: center;
+  padding: var(--sp-5) var(--sp-4);
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--rad-md);
+  color: var(--text-dim);
+}
+.app-empty h4 { color: var(--text); margin: 0 0 var(--sp-2); }
+
+/* Loading placeholders. Animation is suppressed under reduced-motion, and
+   the row still occupies its space so nothing jumps when content lands. */
+.skeleton {
+  background: linear-gradient(90deg, var(--bg-elev) 25%, var(--bg-elev-2) 37%, var(--bg-elev) 63%);
+  background-size: 400% 100%;
+  animation: skeleton-shimmer 1.4s ease infinite;
+  border-radius: var(--rad-sm);
+  min-height: 14px;
+}
+@keyframes skeleton-shimmer {
+  0% { background-position: 100% 50%; }
+  100% { background-position: 0 50%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .skeleton { animation: none; }
+}
+
+/* ── Line items, order summary ────────────────────────────────────────── */
+.line-item {
+  display: grid;
+  grid-template-columns: 64px 1fr auto;
+  gap: var(--sp-3);
+  align-items: center;
+  padding: var(--sp-3) 0;
+  border-bottom: 1px solid var(--border);
+}
+.line-item-media { width: 64px; height: 48px; border-radius: var(--rad-sm); border: 1px solid var(--border); }
+.qty-stepper { display: inline-flex; align-items: center; border: 1px solid var(--border-control); border-radius: var(--rad-sm); overflow: hidden; }
+.qty-stepper button {
+  width: 34px; height: 34px;
+  background: var(--bg-elev);
+  border: 0;
+  color: var(--text);
+  font: inherit;
+  cursor: pointer;
+}
+.qty-stepper button:hover { background: var(--bg-elev-2); }
+.qty-stepper output { min-width: 38px; text-align: center; font-variant-numeric: tabular-nums; }
+
+.order-summary { border: 1px solid var(--border-strong); border-radius: var(--rad-md); padding: var(--sp-4); background: var(--bg-elev); }
+.order-line { display: flex; justify-content: space-between; gap: var(--sp-3); padding: 5px 0; font-size: var(--text-sm); }
+.order-line-total {
+  border-top: 1px solid var(--border-strong);
+  margin-top: var(--sp-2);
+  padding-top: var(--sp-3);
+  font-size: var(--text-lg);
+  font-weight: 700;
+}
+.order-line .num { font-variant-numeric: tabular-nums; }

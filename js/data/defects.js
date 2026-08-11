@@ -46,7 +46,8 @@ window.APP_DEFECTS = {
       { id: "tax-basis", severity: "high", title: "Tax computed on raw subtotal, not discounted", hint: "SAVE10 on $45 → tax should be $3.24, shows $3.60" },
       { id: "shipping-basis", severity: "medium", title: "Free shipping threshold uses raw subtotal", hint: "HALFOFF on $52 → discounted $26 should ship $5.99" },
       { id: "coupon-case", severity: "medium", title: "Coupon comparison is case-sensitive", hint: "'save10' is rejected" },
-      { id: "money-rounding", severity: "low", title: "Line totals show floating-point garbage", hint: "17.970000000000002 rendered as-is" },
+      { id: "money-rounding", severity: "low", title: "Line totals show floating-point garbage",
+        hint: "Add 5x Gizmo: the line total renders 29.950000000000003 while every other figure on the page is clean. The old hint here said 3x Gizmo gives 17.970000000000002 — it does not, 5.99*3 is exactly 17.97, so the documented reproduction never worked" },
       { id: "empty-checkout", severity: "high", title: "Checkout succeeds with an empty cart", hint: "With nothing in the cart, press Checkout — the order is placed and confirmed anyway" },
       { id: "negative-qty", severity: "medium", title: "Quantity can be decremented below 1", hint: "Item stays as active line at qty 0" },
       { id: "coupon-persists", severity: "medium", title: "Coupon persists across checkouts", hint: "Second order silently reuses previous discount" }
