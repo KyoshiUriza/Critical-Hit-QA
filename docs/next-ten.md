@@ -141,6 +141,12 @@ intent, a locator that matches today, the missing edge case. Slots into the
 Code Review Gauntlet's existing both-directions grading with no new mechanism.
 
 ## 8. Two hard practice apps: Scheduler and Live Feed
+
+**Shipped.** Both, with six defects each. The Scheduler's DST maths comes from
+Intl and the platform tz database rather than a lookup table, and
+`tests/scheduler.spec.js` asserts the transitions still behave as the hints
+claim. The Live Feed's delays are fixed rather than random so every race is
+reproducible — a test asserts that too.
 **Evidence: moderate. Cost: high.**
 
 Carried from the previous roadmap, deliberately demoted below the items above
@@ -201,7 +207,7 @@ example is real and in the repo the learner can read.
 
 ## Suggested order
 
-**1 → 4 → 2 → 3 → 6 → 7 → 5 → 9 → 10 → 8.**
+**1 → 4 → 2 → 3 → 6 → 7 → 5 → 9 → 10 → 8.** — all ten shipped.
 
 One is a defect and goes first. Four is cheap and addresses a named rejection
 reason. Two and three are the strongest external signals and the largest new

@@ -275,6 +275,30 @@
       </div>
 
       <div class="app-card" style="border-color: var(--danger);">
+        <h3>Scheduler <span style="color:var(--danger); font-size:0.8rem;">BUGGY</span></h3>
+        <div class="app-meta">Timezones &middot; DST &middot; 6 known defects</div>
+        <p class="text-dim">The hardest ordinary thing in software. Real IANA zones and real transitions &mdash; the maths comes from the platform, not from a lookup table written to make the exercise work.</p>
+        <ul>
+          <li>Hint: 8 Mar 2026, 02:30, New York</li>
+          <li>Hint: book 60 minutes from 01:30 on 1 Nov 2026</li>
+          <li>Hint: what is an all-day event, exactly?</li>
+        </ul>
+        <a class="btn btn-danger btn-sm" href="../practice-apps/scheduler-broken.html">Open buggy app →</a>
+      </div>
+
+      <div class="app-card" style="border-color: var(--danger);">
+        <h3>Live Feed <span style="color:var(--danger); font-size:0.8rem;">BUGGY</span></h3>
+        <div class="app-meta">Async &middot; Races &middot; 6 known defects</div>
+        <p class="text-dim">Six defects that only exist between starting something and it finishing. Doing one action at a time and waiting finds none of them, which is exactly why they reach production.</p>
+        <ul>
+          <li>Hint: click Post twice, fast</li>
+          <li>Hint: type a query quickly and read the label</li>
+          <li>Hint: throttle the network to widen every window</li>
+        </ul>
+        <a class="btn btn-danger btn-sm" href="../practice-apps/live-feed-broken.html">Open buggy app →</a>
+      </div>
+
+      <div class="app-card" style="border-color: var(--danger);">
         <h3>Responsive Lab <span style="color:var(--danger); font-size:0.8rem;">BUGGY</span></h3>
         <div class="app-meta">Mobile · 5 known defects</div>
         <p class="text-dim">A checkout signed off on a laptop. Every defect here only exists below 480px or after a rotation — resize the device frame and look again.</p>

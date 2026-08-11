@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; object-src 'none'; frame-src 'none'; base-uri 'self'; form-action 'self'" />
+  <meta name="referrer" content="no-referrer" />
+  <title>Practice (Broken): Scheduler — Critical Hit QA</title>
+  <link rel="stylesheet" href="../css/styles.css" />
+</head>
+<body data-page="practice-app-detail" data-depth="1">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div id="site-header"></div>
+
+  <main id="main" class="container">
+    <div class="page-header">
+      <h1>Scheduler <span style="color:var(--danger);font-size:1rem;">(Buggy build)</span></h1>
+      <p>Timezones and daylight saving. The hardest ordinary thing in software, and six defects that all ship for real.</p>
+    </div>
+
+    <div class="panel" style="border-color: var(--warn);">
+      <strong>The specification</strong> — An event is scheduled at a wall-clock
+      time in a real timezone. A viewer in another zone sees the same instant
+      converted to their own local time. An all-day event is a date, not a time,
+      and shows on that date for everyone. A meeting booked for 60 minutes lasts
+      60 minutes. The agenda lists events in chronological order.
+      <br /><br />
+      <strong>Every deviation from that paragraph is a defect.</strong> Three of
+      the six only appear on two specific dates in 2026 — the preset buttons
+      take you there.
+    </div>
+
+    <div class="panel">
+      <div class="two-col">
+        <div class="form-field">
+          <label for="viewer-tz">Your timezone</label>
+          <select id="viewer-tz" data-testid="viewer-tz"></select>
+        </div>
+        <div class="form-field">
+          <label>Jump to a date worth testing</label>
+          <div id="presets" style="display:flex;flex-wrap:wrap;gap:var(--sp-2);"></div>
+        </div>
+      </div>
+      <p class="text-dim text-sm" id="tz-evidence" data-testid="tz-evidence"></p>
+    </div>
+
+    <div class="panel">
+      <h3>New event</h3>
+      <div class="two-col">
+        <div class="form-field">
+          <label for="ev-title">Title</label>
+          <input type="text" id="ev-title" data-testid="ev-title" placeholder="Sprint review" autocomplete="off" />
+        </div>
+        <div class="form-field">
+          <label for="ev-date">Date</label>
+          <input type="date" id="ev-date" data-testid="ev-date" value="2026-06-15" />
+        </div>
+        <div class="form-field">
+          <label for="ev-time">Start time</label>
+          <input type="time" id="ev-time" data-testid="ev-time" value="09:00" />
+        </div>
+        <div class="form-field">
+          <label for="ev-duration">Duration (minutes)</label>
+          <input type="number" id="ev-duration" data-testid="ev-duration" value="60" min="15" step="15" />
+        </div>
+      </div>
+      <label class="rehearse-toggle">
+        <input type="checkbox" id="ev-allday" data-testid="ev-allday" /> All-day event
+      </label>
+      <p class="text-dim text-sm" id="ev-error" data-testid="ev-error"></p>
+      <button class="btn btn-primary" id="add-event" data-testid="add-event">Add to agenda</button>
+    </div>
+
+    <div class="panel">
+      <h3>Agenda</h3>
+      <p class="text-dim text-sm">
+        A real product would show only "Shown to you". The stored instant and
+        the entered value are exposed here so you can see the disagreement
+        rather than having to infer it.
+      </p>
+      <div id="agenda"></div>
+    </div>
+
+    <section class="panel">
+      <h2>What makes this category hard</h2>
+      <ul>
+        <li><strong>Some wall-clock times do not exist.</strong> When clocks go forward, an hour is skipped. 02:30 on that date is not a time; every library resolves it to something, and none of them agree on what.</li>
+        <li><strong>Some wall-clock times happen twice.</strong> When clocks go back, an hour repeats. "01:30" is two different instants an hour apart, and picking one silently is a decision the user should have made.</li>
+        <li><strong>An offset is not a timezone.</strong> UTC-5 is an offset; America/New_York is a rule about which offset applies when. Storing the offset loses the rule, so a future event stored as -05:00 is wrong after March.</li>
+        <li><strong>A date is not an instant.</strong> All-day events, birthdays and deadlines have no time. Giving them midnight in some zone is how a birthday lands on the wrong day for half your users.</li>
+        <li><strong>Transitions differ by country.</strong> The US and the EU change on different weekends, so for two weeks a year the gap between New York and London is not what anyone's code assumes.</li>
+      </ul>
+      <div class="panel panel-accent">
+        <strong>The test data worth remembering:</strong> the two transition
+        dates in each zone you support, the day either side of them, and a date
+        far enough in the future that the rules could change. Add a user in a
+        zone with a half-hour offset — India, or Adelaide — and one in a zone
+        with no DST at all. That is five values and it finds most of this.
+      </div>
+    </section>
+
+    <div class="panel app-next-steps">
+      <span class="text-dim">Next:</span>
+      <a class="btn btn-primary btn-sm" href="live-feed-broken.html">Live Feed — async and races →</a>
+      <a class="btn btn-ghost btn-sm" href="../pages/bug-report-builder.html">Write one up</a>
+      <a class="btn btn-ghost btn-sm" href="../pages/severity-drill.html">Severity &amp; Priority Drill</a>
+    </div>
+  </main>
+
+  <script src="../js/test-hooks.js"></script>
+  <script src="../js/site-chrome.js"></script>
+  <script src="../js/data/defects.js"></script>
+  <script src="../js/profiles.js"></script>
+  <script src="../js/progress.js"></script>
+  <script src="../js/rpg.js"></script>
+  <script src="../js/defect-detector.js"></script>
+  <script src="../js/bounty-panel.js"></script>
+  <script src="../js/scheduler.js"></script>
+  <div id="site-footer"></div>
+</body>
+</html>

@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; object-src 'none'; frame-src 'none'; base-uri 'self'; form-action 'self'" />
+  <meta name="referrer" content="no-referrer" />
+  <title>Practice (Broken): Live Feed — Critical Hit QA</title>
+  <link rel="stylesheet" href="../css/styles.css" />
+</head>
+<body data-page="practice-app-detail" data-depth="1">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div id="site-header"></div>
+
+  <main id="main" class="container">
+    <div class="page-header">
+      <h1>Live Feed <span style="color:var(--danger);font-size:1rem;">(Buggy build)</span></h1>
+      <p>Six defects that only exist in the gap between starting something and it finishing. Timing is the test.</p>
+    </div>
+
+    <div class="panel" style="border-color: var(--warn);">
+      <strong>The specification</strong> — Posting sends exactly one post per
+      submission. A post that fails to save does not stay on screen claiming it
+      sent. Search results always match what is currently in the search box.
+      Refreshing does not duplicate items and does not touch what you are
+      typing. The unread count equals the number of items that arrived.
+      <br /><br />
+      <strong>Every defect here needs timing to reproduce.</strong> Click fast,
+      type fast, and do two things at once. Doing one action at a time and
+      waiting for it finds none of them — which is precisely why they reach
+      production.
+    </div>
+
+    <div class="two-col">
+      <div>
+        <div class="panel">
+          <h3>Compose</h3>
+          <div class="form-field">
+            <label for="composer">Message</label>
+            <textarea id="composer" rows="3" data-testid="composer" placeholder="Say something"></textarea>
+          </div>
+          <p class="text-dim text-sm" id="compose-error" data-testid="compose-error"></p>
+          <button class="btn btn-primary" id="send" data-testid="send">Post</button>
+          <p class="text-dim text-sm" id="save-log" data-testid="save-log"></p>
+        </div>
+
+        <div class="panel">
+          <h3>Search the feed</h3>
+          <div class="form-field">
+            <label for="search">Search</label>
+            <input type="text" id="search" data-testid="search" autocomplete="off" placeholder="Try typing quickly" />
+          </div>
+          <p class="text-dim text-sm">
+            <span id="result-count" data-testid="result-count"></span>
+            <span id="search-status" data-testid="search-status"></span>
+          </p>
+          <div id="results" data-testid="results"></div>
+        </div>
+      </div>
+
+      <div>
+        <div class="panel">
+          <h3>Feed</h3>
+          <p class="text-dim text-sm">
+            <span id="post-count" data-testid="post-count"></span> ·
+            <span id="unread" data-testid="unread"></span>
+          </p>
+          <div style="display:flex;gap:var(--sp-2);flex-wrap:wrap;">
+            <button class="btn btn-sm" id="refresh" data-testid="refresh">Refresh feed</button>
+            <button class="btn btn-sm" id="simulate" data-testid="simulate">Simulate 3 arrivals</button>
+          </div>
+          <p class="text-dim text-sm" id="refresh-status" data-testid="refresh-status"></p>
+          <div id="feed"></div>
+        </div>
+      </div>
+    </div>
+
+    <section class="panel">
+      <h2>How to test something that only breaks when it overlaps</h2>
+      <ol>
+        <li><strong>Do two things at once, on purpose.</strong> Click submit twice. Refresh while typing. Type a query while the last one is still in flight. Almost every defect here needs exactly one overlap.</li>
+        <li><strong>Throttle the network.</strong> DevTools → Network → Slow 3G widens every window from milliseconds to seconds, which turns a race you cannot hit into one you cannot miss. This is the highest-value trick in the category.</li>
+        <li><strong>Watch the panel, not the page.</strong> Two POSTs in the Network tab is proof of a double submit; the feed showing one item is not proof it did not happen.</li>
+        <li><strong>Reload before you believe it.</strong> An optimistic UI shows you what it hopes happened. A reload shows you what was stored, and the gap between them is a whole category of defect.</li>
+        <li><strong>Say how often it reproduces.</strong> "One time in five, when I click twice inside about a second" is a report a developer can work from. "Sometimes duplicates" is not.</li>
+      </ol>
+      <div class="panel panel-accent">
+        <strong>Names worth using in the report.</strong> Calling a defect a
+        <em>race condition</em>, a <em>stale response</em>, a <em>lost update</em>
+        or a <em>missing idempotency guard</em> tells a developer where to look.
+        The fixes are well known — disable the control while in flight, tag each
+        request and ignore responses that are not the newest, merge by id rather
+        than appending, and check whether a field is dirty before overwriting
+        it. Naming the fix in the report is not overstepping; it is the
+        difference between a ticket and a conversation.
+      </div>
+    </section>
+
+    <div class="panel app-next-steps">
+      <span class="text-dim">Next:</span>
+      <a class="btn btn-primary btn-sm" href="scheduler-broken.html">Scheduler — timezones and DST →</a>
+      <a class="btn btn-ghost btn-sm" href="devtools-lab.html">DevTools Lab</a>
+      <a class="btn btn-ghost btn-sm" href="../pages/bug-report-builder.html">Write one up</a>
+    </div>
+  </main>
+
+  <script src="../js/test-hooks.js"></script>
+  <script src="../js/site-chrome.js"></script>
+  <script src="../js/data/defects.js"></script>
+  <script src="../js/profiles.js"></script>
+  <script src="../js/progress.js"></script>
+  <script src="../js/rpg.js"></script>
+  <script src="../js/defect-detector.js"></script>
+  <script src="../js/bounty-panel.js"></script>
+  <script src="../js/live-feed.js"></script>
+  <div id="site-footer"></div>
+</body>
+</html>

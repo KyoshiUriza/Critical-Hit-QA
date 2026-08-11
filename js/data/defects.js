@@ -67,15 +67,6 @@ window.APP_DEFECTS = {
       { id: "double-submit", severity: "medium", title: "Submit button not disabled after success", hint: "Rapid double-click submits twice" }
     ]
   },
-  // The accessibility challenge had a 13-item answer key in prose and no
-  // catalogue entry, so Bug Bounty, the auto-detector and the character sheet
-  // all knew nothing about it — a learner could work it and record nothing.
-  //
-  // NOTE ON DETECTION: these are static markup defects, present on load rather
-  // than behaviours you trigger, so js/defect-detector.js has nothing to hook.
-  // That is a real difference between accessibility work and functional
-  // testing, and worth knowing: you find these by inspecting and by using a
-  // keyboard, not by driving the app until something misbehaves.
   responsive: {
     name: "Responsive Lab",
     url: "../practice-apps/responsive-broken.html",
@@ -99,6 +90,58 @@ window.APP_DEFECTS = {
         hint: "Type a name and address, then rotate. The re-render rebuilds the inputs from empty state instead of preserving what you entered" }
     ]
   },
+  scheduler: {
+    name: "Scheduler",
+    url: "../practice-apps/scheduler-broken.html",
+    defects: [
+      // Every one of these is produced by the platform's own tz database via
+      // Intl, not by a lookup table written to make the exercise work. A
+      // learner who checks these dates against any other tool gets the same
+      // answers, which is the only version of this worth shipping.
+      { id: "naive-local-store", severity: "critical", title: "Events are stored as a bare wall clock with no timezone",
+        hint: "The spec says a viewer elsewhere sees the same instant converted. Change your timezone with events on the agenda: nothing moves. Tokyo and Los Angeles are shown the same number" },
+      { id: "dst-spring-gap", severity: "high", title: "A time that does not exist is silently accepted",
+        hint: "8 Mar 2026 at 02:30 in America/New_York. Clocks jump 02:00 to 03:00, so that time never happens. The app takes it and resolves it to a different time without saying so" },
+      { id: "dst-fall-duplicate", severity: "high", title: "The repeated hour is resolved without asking",
+        hint: "1 Nov 2026 at 01:30 in America/New_York happens twice, an hour apart. The app picks one silently — and it is a coin flip whether it is the one the user meant" },
+      { id: "duration-across-dst", severity: "high", title: "Duration is computed on the wall clock, not on elapsed time",
+        hint: "Book 60 minutes from 01:30 on 1 Nov 2026. Compare the booked duration against the actual elapsed time between the two instants" },
+      { id: "allday-shift", severity: "high", title: "All-day events land on the wrong date west of UTC",
+        hint: "Add an all-day event, then switch to America/Los_Angeles. A date with no time was given midnight in UTC, so it renders a day early" },
+      { id: "sort-lexicographic", severity: "medium", title: "The agenda sorts on the formatted time string",
+        hint: "Add events at 09:00 and 10:00 and read the order. \"10:00 am\" sorts before \"9:00 am\" when you compare display strings instead of instants" }
+    ]
+  },
+  "live-feed": {
+    name: "Live Feed",
+    url: "../practice-apps/live-feed-broken.html",
+    defects: [
+      // Timing defects, so all six are auto-detected: each has an exact moment
+      // where the product contradicts itself on screen, and none of them can
+      // be triggered by doing one thing at a time and waiting.
+      { id: "double-submit", severity: "critical", title: "Nothing prevents a second submit while the first is in flight",
+        hint: "Click Post twice quickly. The control is never disabled and there is no idempotency guard, so the message is posted twice" },
+      { id: "optimistic-no-rollback", severity: "critical", title: "A failed post stays on screen labelled as sent",
+        hint: "Post three times and read the save log against the row. One save is rejected and the post still says Sent — reload and it is gone" },
+      { id: "stale-response", severity: "high", title: "A slower earlier search overwrites the newer results",
+        hint: "Type a query quickly. The shorter query takes longer to answer, so it lands last and wins. The result count names a query you are no longer searching for" },
+      { id: "duplicate-append", severity: "high", title: "Refresh appends items instead of merging them by id",
+        hint: "Press Refresh feed twice without waiting. The same posts arrive again and are pushed onto the list rather than matched against what is already there" },
+      { id: "lost-update", severity: "high", title: "A background refresh discards what you are typing",
+        hint: "Start typing in the composer, then press Refresh feed. Nothing checks whether the field is dirty before replacing it" },
+      { id: "counter-race", severity: "medium", title: "The unread counter loses increments under concurrent arrivals",
+        hint: "Press Simulate 3 arrivals and read the count. Each arrival reads the old value and writes back value plus one, so simultaneous arrivals collapse into one" }
+    ]
+  },
+  // The accessibility challenge had a 13-item answer key in prose and no
+  // catalogue entry, so Bug Bounty, the auto-detector and the character sheet
+  // all knew nothing about it — a learner could work it and record nothing.
+  //
+  // NOTE ON DETECTION: these are static markup defects, present on load rather
+  // than behaviours you trigger, so js/defect-detector.js has nothing to hook.
+  // That is a real difference between accessibility work and functional
+  // testing, and worth knowing: you find these by inspecting and by using a
+  // keyboard, not by driving the app until something misbehaves.
   a11y: {
     name: "Accessibility Challenge",
     url: "../practice-apps/a11y-challenge.html",
