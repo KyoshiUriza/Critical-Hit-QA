@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; object-src 'none'; frame-src 'none'; base-uri 'self'; form-action 'self'" />
+  <meta name="referrer" content="no-referrer" />
+  <title>Accessibility Testing — Learn — Critical Hit QA</title>
+  <link rel="stylesheet" href="../../css/styles.css" />
+</head>
+<body data-page="learn-a11y" data-depth="2">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div id="site-header"></div>
+
+  <main id="main" class="container">
+    <div class="page-header">
+      <h1>Accessibility Testing</h1>
+      <p>No longer optional, and no longer only an ethical argument — since 2025 it is a legal requirement across the EU, and it is the one testing skill where automated tools cover the minority of the problem.</p>
+    </div>
+
+    <div class="section-toc">
+      <h4>◈ On this page</h4>
+      <ul>
+        <li><a href="#why">Why this is now a hiring requirement</a></li>
+        <li><a href="#automated">What tools catch — and the number that matters</a></li>
+        <li><a href="#keyboard">The keyboard pass (10 minutes, finds the most)</a></li>
+        <li><a href="#screenreader">The screen reader pass</a></li>
+        <li><a href="#contrast">Contrast, computed properly</a></li>
+        <li><a href="#reporting">Writing an accessibility bug report</a></li>
+        <li><a href="#interview">What interviewers ask</a></li>
+        <li><a href="#practice">Practice</a></li>
+      </ul>
+    </div>
+
+    <section id="why" class="panel">
+      <h2>Why this is now a hiring requirement</h2>
+      <p>
+        The European Accessibility Act took effect in June 2025, extending
+        obligations from public-sector bodies to a wide range of private
+        products and services. In the US, ADA-based litigation over websites has
+        run into the thousands of filings a year for several years running.
+      </p>
+      <p>
+        The practical consequence for you: accessibility has moved from
+        "something the design team cares about" to <strong>mandatory test
+        coverage with a compliance deadline</strong>. Teams that had no
+        accessibility testing now need it, and the people who can do it are
+        thin on the ground. That is unusually good news for someone entering the
+        field — it is a scarce skill you can demonstrate without permission from
+        an employer.
+      </p>
+      <div class="panel panel-accent">
+        <strong>The standard you will be asked about is WCAG 2.1 Level AA.</strong>
+        Not AAA — that is aspirational and rarely required. Not 2.0 — superseded.
+        If a job description says "WCAG compliance" and nothing else, AA is what
+        they mean, and asking which level and version is a good question to ask
+        them.
+      </div>
+    </section>
+
+    <section id="automated" class="panel">
+      <h2>What tools catch — and the number that matters</h2>
+      <p>
+        Automated accessibility tools — axe, Lighthouse, WAVE, Pa11y — are fast,
+        free, and worth running on every page. They also detect roughly
+        <strong>a third</strong> of WCAG issues. Deque, who build axe, publish
+        this themselves rather than hiding it.
+      </p>
+      <p>Knowing which third is the whole skill. Roughly:</p>
+      <table class="data-table">
+        <thead><tr><th>A tool reliably catches</th><th>A tool cannot judge</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>Missing <code class="inline">alt</code> attributes</td>
+            <td>Whether the alt text <em>describes the image</em></td>
+          </tr>
+          <tr>
+            <td>Text contrast below the ratio</td>
+            <td>Whether meaning is carried by colour alone</td>
+          </tr>
+          <tr>
+            <td>Form inputs with no programmatic label</td>
+            <td>Whether the label makes sense to a human</td>
+          </tr>
+          <tr>
+            <td>Missing document language, duplicate ids</td>
+            <td>Whether focus order matches the visual order</td>
+          </tr>
+          <tr>
+            <td>ARIA attributes that are invalid</td>
+            <td>Whether ARIA was needed, or is actively lying</td>
+          </tr>
+          <tr>
+            <td>Empty buttons and links</td>
+            <td>Whether a custom widget is operable by keyboard</td>
+          </tr>
+        </tbody>
+      </table>
+      <p class="text-dim mt-4">
+        The right-hand column is where the serious defects live, and every one of
+        them needs a person. "We run axe in CI" is a good answer to half the
+        question; the interviewer is waiting to hear what you do about the other
+        half.
+      </p>
+      <div class="panel panel-warn">
+        <strong>The failure mode to name in an interview:</strong> a page that
+        passes an automated scan and is unusable. An image labelled
+        <code class="inline">alt="image"</code> passes. A div with
+        <code class="inline">role="button"</code> and no key handler passes. A
+        perfect scan with a broken keyboard path is common, and it is exactly
+        why the automated number is a floor rather than a result.
+      </div>
+    </section>
+
+    <section id="keyboard" class="panel">
+      <h2>The keyboard pass — ten minutes, finds the most</h2>
+      <p>
+        If you do one accessibility check, do this one. Put the mouse down and
+        drive the page with <code class="inline">Tab</code>,
+        <code class="inline">Shift+Tab</code>, <code class="inline">Enter</code>,
+        <code class="inline">Space</code>, the arrow keys and
+        <code class="inline">Esc</code>.
+      </p>
+      <ol>
+        <li><strong>Can you reach everything interactive?</strong> Anything you can click with a mouse and cannot reach with Tab is a failure of WCAG 2.1.1. Custom controls built from divs are the usual culprit.</li>
+        <li><strong>Can you see where you are?</strong> Every focused element needs a visible indicator (2.4.7). <code class="inline">outline: none</code> with nothing put back is the single most common accessibility defect on the web.</li>
+        <li><strong>Does focus order match the visual order?</strong> If Tab jumps from the top of the page to the footer and back, something is reordered in CSS or has a positive <code class="inline">tabindex</code>.</li>
+        <li><strong>Can you get out of everything?</strong> Open a modal, a date picker, a custom dropdown — can you leave with Esc, and does focus return sensibly? A focus trap you cannot escape (2.1.2) is severe: a keyboard user is stuck on the page.</li>
+        <li><strong>Does Enter and Space do what they should?</strong> A real button responds to both. A div pretending to be one usually responds to neither.</li>
+        <li><strong>Is there a way to skip the navigation?</strong> Tab once from the top of a page — a skip link should appear (2.4.1). This site has one; press Tab now and watch.</li>
+      </ol>
+      <p class="text-dim">
+        None of this needs a tool, an extension, or permission. It is the
+        highest-value ten minutes in testing, and most candidates have never
+        done it once.
+      </p>
+    </section>
+
+    <section id="screenreader" class="panel">
+      <h2>The screen reader pass</h2>
+      <p>
+        You do not need to be a proficient screen reader user to find defects
+        with one. You need to listen for the gap between what is announced and
+        what is on screen.
+      </p>
+      <p><strong>What is already on your machine:</strong></p>
+      <ul>
+        <li><strong>Windows</strong> — Narrator (Ctrl+Win+Enter), or NVDA, which is free and what most testers use.</li>
+        <li><strong>macOS</strong> — VoiceOver (Cmd+F5).</li>
+        <li><strong>iOS / Android</strong> — VoiceOver / TalkBack, in accessibility settings.</li>
+      </ul>
+      <p class="mt-4"><strong>The four things to listen for:</strong></p>
+      <ol>
+        <li><strong>Does every control announce a purpose?</strong> "Button" on its own is a defect — a button whose only content is an icon needs an accessible name.</li>
+        <li><strong>Is the page navigable by heading?</strong> Screen reader users jump by heading rather than reading top to bottom. Skipped levels and headings used for styling break that.</li>
+        <li><strong>Are errors announced?</strong> A validation message that appears silently does not exist for a screen reader user. It needs <code class="inline">role="alert"</code> or a live region.</li>
+        <li><strong>Do images say something useful?</strong> Decorative images should be silent (<code class="inline">alt=""</code>). Informative ones should describe the information, not the picture.</li>
+      </ol>
+      <div class="panel panel-accent">
+        <strong>The most useful hour you can spend:</strong> turn on a screen
+        reader, close your eyes, and try to complete a purchase on a site you
+        did not build. You will not forget what you learn, and it is a far
+        better interview answer than any definition of WCAG.
+      </div>
+    </section>
+
+    <section id="contrast" class="panel">
+      <h2>Contrast, computed properly</h2>
+      <p>The thresholds are worth memorising because they come up constantly:</p>
+      <table class="data-table">
+        <thead><tr><th>What</th><th>AA ratio</th><th>Criterion</th></tr></thead>
+        <tbody>
+          <tr><td>Body text</td><td><strong>4.5:1</strong></td><td>1.4.3</td></tr>
+          <tr><td>Large text (18.66px bold, or 24px)</td><td><strong>3:1</strong></td><td>1.4.3</td></tr>
+          <tr><td>UI component boundaries and states</td><td><strong>3:1</strong></td><td>1.4.11</td></tr>
+          <tr><td>Focus indicators</td><td><strong>3:1</strong> against adjacent colours</td><td>2.4.11</td></tr>
+        </tbody>
+      </table>
+      <p class="mt-4">Two traps that catch people who think they have this covered:</p>
+      <ul>
+        <li>
+          <strong>Translucent colours composite.</strong> A focus ring at
+          <code class="inline">rgba(79,157,255,0.55)</code> is not the ratio of
+          that blue — it is the ratio of that blue <em>blended with whatever is
+          behind it</em>. This site shipped exactly that defect: a ring whose own
+          code comment claimed it passed, measuring 2.85:1 in reality. It is
+          fixed, and the story is in the stylesheet.
+        </li>
+        <li>
+          <strong>Disabled controls are exempt, and that is often misused.</strong>
+          WCAG excludes disabled elements from 1.4.3. That does not make an
+          unreadable disabled button good design, and if users cannot tell
+          whether a control is disabled or merely low-contrast, you have a
+          usability defect even without a WCAG one.
+        </li>
+      </ul>
+      <div class="panel">
+        <strong>This site computes its own.</strong> Its test suite measures
+        every colour pair against the real sRGB luminance formula, including
+        alpha compositing for translucent rings —
+        <code class="inline">tests/contrast.spec.js</code> and
+        <code class="inline">tests/focus-contrast.spec.js</code> in the
+        <a href="https://github.com/KyoshiUriza/Critical-Hit-QA" target="_blank" rel="noopener noreferrer">repository</a>.
+        They are short, readable, and a working example of automating the part
+        of accessibility that genuinely can be automated.
+      </div>
+    </section>
+
+    <section id="reporting" class="panel">
+      <h2>Writing an accessibility bug report</h2>
+      <p>
+        An accessibility report that says "this is not accessible" gets
+        deprioritised. One that names the criterion, the user, and the
+        consequence gets fixed.
+      </p>
+      <div class="two-col">
+        <div class="panel panel-danger">
+          <strong>Weak</strong>
+          <p class="text-dim m-0">"The subscribe button doesn't work with the keyboard. Should be fixed."</p>
+        </div>
+        <div class="panel panel-accent">
+          <strong>Actionable</strong>
+          <p class="text-dim m-0">
+            "Subscribe cannot be activated by keyboard — WCAG 2.1.1 (A). It is a
+            <code class="inline">&lt;div&gt;</code> with a click handler, no
+            <code class="inline">role</code>, no <code class="inline">tabindex</code>
+            and no key handler, so Tab skips it and Enter does nothing. Any
+            keyboard or screen-reader user is unable to subscribe at all. Fix:
+            use a <code class="inline">&lt;button&gt;</code>."
+          </p>
+        </div>
+      </div>
+      <p class="mt-4">Four things to include every time:</p>
+      <ol>
+        <li><strong>The criterion and level</strong> — "2.1.1 Keyboard (Level A)". It converts an opinion into a standard, and Level A failures are hard to argue down.</li>
+        <li><strong>Who is blocked</strong> — keyboard-only, screen reader, low vision, colour blind, motor impairment. Naming the user makes the impact concrete.</li>
+        <li><strong>Whether there is a workaround.</strong> "Blocked entirely" and "awkward but possible" are different severities, and conflating them costs you credibility.</li>
+        <li><strong>The fix, if it is obvious.</strong> Very often it is one semantic element. Saying so gets it done in the same sprint.</li>
+      </ol>
+      <p class="text-dim">
+        On severity: a Level A failure that blocks a task should not be filed as
+        Low because "only a few users hit it". That reasoning does not survive
+        contact with a legal team, and increasingly does not survive contact
+        with a regulator.
+      </p>
+    </section>
+
+    <section id="interview" class="panel">
+      <h2>What interviewers ask</h2>
+      <ul>
+        <li><strong>"How would you test a page for accessibility?"</strong> The answer they want is a <em>process</em>: automated scan first for the cheap wins, then a keyboard pass, then a screen reader pass on the critical paths, then contrast on the design system. Leading with "I'd run Lighthouse" and stopping is the common weak answer.</li>
+        <li><strong>"What percentage does an automated tool catch?"</strong> Around a third. Knowing this specific number, and that Deque publish it, signals you have read past the marketing.</li>
+        <li><strong>"What's the difference between AA and AAA?"</strong> AA is the compliance target almost everyone uses; AAA is stricter (7:1 contrast, sign language for video) and rarely required wholesale.</li>
+        <li><strong>"When would you use ARIA?"</strong> As little as possible. The first rule of ARIA is not to use ARIA — a native <code class="inline">&lt;button&gt;</code> beats <code class="inline">role="button"</code> every time. Bad ARIA is worse than none, because it lies to assistive technology confidently.</li>
+        <li><strong>"Give an example of something a tool cannot catch."</strong> Have one ready. Focus order not matching visual order, or alt text that exists and describes nothing, are both good.</li>
+      </ul>
+    </section>
+
+    <section id="practice" class="panel panel-accent">
+      <h2>Practice — earn Star-Dust</h2>
+      <ol>
+        <li>Work the <a href="../../practice-apps/a11y-challenge.html">Accessibility Challenge</a> with the keyboard only, before you inspect anything. Thirteen defects are seeded and now catalogued — see how many the keyboard alone reveals.</li>
+        <li>Repeat it with a screen reader on. Different defects surface.</li>
+        <li>Run an automated scan over the same page and compare: which of the thirteen did it find? That comparison is the lesson.</li>
+        <li>Write one of them up in the <a href="../bug-report-builder.html">Bug Report Builder</a> using the four-part structure above, citing the criterion.</li>
+        <li>Take the <a href="../practice-tests.html?category=manual">Manual quiz</a> — accessibility questions are in there.</li>
+      </ol>
+    </section>
+
+    <div class="panel app-next-steps">
+      <span class="text-dim">Related:</span>
+      <a class="btn btn-primary btn-sm" href="../../practice-apps/a11y-challenge.html">Accessibility Challenge →</a>
+      <a class="btn btn-ghost btn-sm" href="../../practice-apps/devtools-lab.html">DevTools Lab</a>
+      <a class="btn btn-ghost btn-sm" href="manual.html">Manual Testing track</a>
+      <a class="btn btn-ghost btn-sm" href="../learn.html">All tracks</a>
+    </div>
+  </main>
+
+  <div id="site-footer"></div>
+
+  <script src="../../js/test-hooks.js"></script>
+  <script src="../../js/site-chrome.js"></script>
+  <script src="../../js/data/defects.js"></script>
+  <script src="../../js/profiles.js"></script>
+  <script src="../../js/progress.js"></script>
+  <script src="../../js/rpg.js"></script>
+</body>
+</html>

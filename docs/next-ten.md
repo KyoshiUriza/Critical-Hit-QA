@@ -53,6 +53,10 @@ the seeded a11y defects survive untouched.
 enhancement, which is why it is first.**
 
 ## 2. Accessibility track — now a legal requirement, not a nice-to-have
+
+**Shipped.** `pages/learn/accessibility.html`, linked from the Learn hub, with
+`tests/accessibility-track.spec.js` deriving the seeded-defect count from
+`defects.js` so the prose cannot drift from the app.
 **Evidence: strong external. Cost: medium.**
 
 The EU Accessibility Act took effect in 2025, and accessibility is described in
