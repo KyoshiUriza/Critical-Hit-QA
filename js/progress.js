@@ -22,6 +22,48 @@
     localStorage.setItem(key(), JSON.stringify(data));
   }
 
+  // Defect ids for one app, or null if the catalog cannot answer for it.
+  // Null means "do not touch" — never "nothing is valid".
+  function validIdsFor(appKey) {
+    const catalog = window.APP_DEFECTS;
+    if (!catalog || !catalog[appKey]) return null;
+    return (catalog[appKey].defects || []).map((d) => d.id);
+  }
+
+  // Stored finds outlive the catalog they were recorded against.
+  // "pw-length" was seeded on the login app, found by real users, and then
+  // removed because a minimum-length rule is not a defect on a sign-in form.
+  // Their saved progress still claimed it, so the dashboard read "9 of 8
+  // found" — a score higher than the maximum possible score.
+  //
+  // progress-schema.js already validated ids this way, but only on the IMPORT
+  // path. Nothing validated them on ordinary load, which is how every real
+  // user got there. Doing it here means every consumer — the bounty panel,
+  // the Bug Bounty page, the character sheet, Star-Dust — is structurally
+  // unable to count a find that does not exist, rather than each of them
+  // clamping the number afterwards and hiding the next version of this.
+  //
+  // Skipped entirely when APP_DEFECTS is absent: several practice apps load
+  // progress.js without it, and reading "catalog missing" as "nothing is
+  // valid" would delete every find the user has. Unknown app keys are left
+  // alone for the same reason.
+  function reconcileBounty(data) {
+    if (!window.APP_DEFECTS) return false;
+    let changed = false;
+    Object.keys(data.bugBounty).forEach((appKey) => {
+      const valid = validIdsFor(appKey);
+      if (!valid) return;
+      const before = data.bugBounty[appKey];
+      if (!Array.isArray(before)) return;
+      const kept = before.filter((id) => valid.indexOf(id) !== -1);
+      if (kept.length !== before.length) {
+        data.bugBounty[appKey] = kept;
+        changed = true;
+      }
+    });
+    return changed;
+  }
+
   function ensure(data) {
     if (!data.quiz) data.quiz = { runs: [], byCategory: {} };
     if (!data.bugBounty) data.bugBounty = {}; // { appKey: [defectId] }
@@ -33,6 +75,10 @@
     // a counter — close the tab and the authoring was gone. Artifacts hold the
     // actual drafts.
     if (!Array.isArray(data.artifacts)) data.artifacts = [];
+
+    // Written back rather than filtered on every read, so the stale id
+    // actually goes away instead of being hidden forever.
+    if (reconcileBounty(data)) save(data);
     return data;
   }
 
@@ -83,7 +129,14 @@
 
     setBugBountyFinds(appKey, defectIds) {
       const data = ensure(load());
-      data.bugBounty[appKey] = Array.from(new Set(defectIds));
+      // Filtered on write as well as on read. The detector already refuses
+      // unknown ids, but this is the only door every caller goes through, and
+      // an id that never enters storage cannot inflate a count later.
+      const valid = validIdsFor(appKey);
+      const unique = Array.from(new Set(defectIds));
+      data.bugBounty[appKey] = valid
+        ? unique.filter((id) => valid.indexOf(id) !== -1)
+        : unique;
       updateStreak(data);
       save(data);
     },
