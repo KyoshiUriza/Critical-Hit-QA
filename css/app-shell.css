@@ -513,3 +513,11 @@
   margin-bottom: var(--sp-5);
   background: none;
 }
+
+/* Drop target for restoring a backup. The dashed .app-empty box is reused as
+   the resting state; this is only the "a file is over me" feedback. */
+.app-empty[data-dragging="true"] {
+  border-color: var(--accent);
+  border-style: solid;
+  background: var(--bg-elev);
+}

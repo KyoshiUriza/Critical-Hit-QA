@@ -7,6 +7,7 @@
   <meta name="referrer" content="no-referrer" />
   <title>Progress — Critical Hit QA</title>
   <link rel="stylesheet" href="../css/styles.css" />
+  <link rel="stylesheet" href="../css/app-shell.css" />
 </head>
 <body data-page="progress" data-depth="1">
   <a class="skip-link" href="#main">Skip to content</a>
@@ -53,15 +54,27 @@
     </div>
 
     <div class="panel mt-4">
-      <h2>Data controls</h2>
-      <p class="text-dim">All your progress lives in this browser under <code class="inline">qaprep_progress_v1</code>. Export it to move it, or reset to start fresh.</p>
+      <h2>Backup &amp; move to another device</h2>
+      <p class="text-dim">
+        Progress lives in this browser only — nothing is sent anywhere and
+        there is no account. To use it on another device, download the file
+        here and restore it there. Clearing site data without a backup loses
+        everything.
+      </p>
       <div class="flex gap-2 flex-wrap">
-        <button class="btn btn-ghost" id="export-json">Export as JSON</button>
-        <button class="btn btn-ghost" id="import-btn">Import JSON…</button>
-        <input type="file" id="import-file" accept="application/json,.json" class="hidden" />
+        <button class="btn btn-primary" id="export-json" data-testid="download-backup">Download backup</button>
+        <button class="btn btn-ghost" id="import-btn" data-testid="choose-backup">Restore from a file…</button>
+        <input type="file" id="import-file" accept="application/json,.json" class="hidden" data-testid="backup-file" />
         <button class="btn btn-danger" id="reset-btn">Reset all progress</button>
       </div>
-      <pre class="code hidden mt-4" id="export-out" style="white-space:pre-wrap;"></pre>
+
+      <div class="app-empty mt-4" id="drop-zone" data-testid="drop-zone">
+        <h4>Or drop a backup file here</h4>
+        <p class="m-0">It restores into the profile you are currently using.</p>
+      </div>
+
+      <p class="form-success hidden mt-3" id="backup-ok" data-testid="backup-ok" role="status"></p>
+      <p class="form-error hidden mt-3" id="backup-error" data-testid="backup-error" role="alert"></p>
     </div>
   </main>
 
@@ -71,6 +84,7 @@
   <script src="../js/site-chrome.js"></script>
   <script src="../js/data/defects.js"></script>
   <script src="../js/profiles.js"></script>
+  <script src="../js/backup.js"></script>
   <script src="../js/progress.js"></script>
   <script src="../js/rpg.js"></script>
   <script src="../js/progress-schema.js"></script>
@@ -229,36 +243,41 @@
       }
     }
 
+    // Transport and destination live in js/backup.js; validation lives in
+    // js/progress-schema.js. This page only wires buttons to them, so the
+    // Account page and this one cannot drift apart again.
+    const say = (ok, message) => {
+      const okBox = document.getElementById("backup-ok");
+      const errBox = document.getElementById("backup-error");
+      okBox.classList.toggle("hidden", !ok);
+      errBox.classList.toggle("hidden", ok);
+      (ok ? okBox : errBox).textContent = message;
+    };
+
     document.getElementById("export-json").addEventListener("click", () => {
-      const out = document.getElementById("export-out");
-      out.textContent = JSON.stringify(window.Progress.get(), null, 2);
-      out.classList.remove("hidden");
+      const name = window.Backup.download();
+      say(true, "Saved " + name + ". Move that file to your other device and restore it there.");
     });
 
     document.getElementById("import-btn").addEventListener("click", () => {
       document.getElementById("import-file").click();
     });
-    // Import validation lives in js/progress-schema.js so that this file
-    // import and the sync codes on the Account page cannot drift apart.
-    // Two validators for the same data is one validator and one liability.
+
+    const restored = (err, result) => {
+      if (err) { say(false, err.message); return; }
+      say(true, "Restored into “" + result.profile + "” — " + result.artifacts + " saved draft(s).");
+      render();
+    };
 
     document.getElementById("import-file").addEventListener("change", (e) => {
-      const file = e.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = () => {
-        try {
-          const parsed = JSON.parse(reader.result);
-          const clean = window.ProgressSchema.sanitize(parsed);
-          localStorage.setItem("qaprep_progress_v1", JSON.stringify(clean));
-          alert("Progress imported (validated).");
-          render();
-        } catch (err) {
-          alert("Could not parse or validate that file: " + err.message);
-        }
-      };
-      reader.readAsText(file);
+      window.Backup.readFile(e.target.files[0]).then(
+        (r) => restored(null, r),
+        (err) => restored(err)
+      );
+      e.target.value = "";   // so re-picking the same file fires change again
     });
+
+    window.Backup.wireDropZone(document.getElementById("drop-zone"), restored);
 
     document.getElementById("reset-btn").addEventListener("click", () => {
       if (!confirm("Delete all your progress? This cannot be undone.")) return;

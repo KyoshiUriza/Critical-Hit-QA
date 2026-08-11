@@ -70,16 +70,39 @@ Sign in with GitHub; the progress blob is written to a private Gist **owned by
 the user**. There is no user table anywhere, because the data lives in the
 account the user already controls and can delete without asking us.
 
-- **Effort:** ~3–5 days including UI, conflict handling and tests.
-- **Breaks:** `connect-src 'none'` on the Account page only (`api.github.com`).
+- **Effort:** ~3–5 days including UI, conflict handling and tests, plus about
+  half a day for the relay described below.
+- **Breaks:** `connect-src 'none'` on the Account page only.
 - **PII held by this project:** none. GitHub holds the identity.
 - **Fits the audience:** testers and developers overwhelmingly have GitHub.
-- **Open question that must be settled first:** the device-flow token endpoint
-  is on `github.com`, not the API host, and I do **not** know that it sends
-  CORS headers for browser callers. Historically it has not, which is why
-  browser apps proxy that one call. If that is still true, this option needs a
-  tiny serverless proxy and stops being backend-free — which is most of its
-  appeal. **Verify this before committing to B.**
+
+#### The CORS question, now researched
+
+The ADR originally flagged this as unknown. It has been checked, and the
+answer is split:
+
+| Endpoint | Used for | CORS from a browser |
+| --- | --- | --- |
+| `api.github.com` | reading and writing the Gist | **Yes** — responds `Access-Control-Allow-Origin: *` |
+| `github.com/login/oauth/access_token` | exchanging the device code for a token | **No** — no CORS headers, and OPTIONS is not supported |
+
+So the data half of this design works directly from the browser, and only the
+token exchange does not. Confirmed separately: **the device flow needs no
+client secret** — only a client id.
+
+That combination is better than it first looks. The relay this option needs is
+therefore:
+
+- **stateless** — it forwards two calls and remembers nothing;
+- **secret-free** — there is no client secret to hold or rotate, so a
+  compromise of the relay leaks no credential of ours;
+- **storage-free** — no user data passes through it beyond a short-lived
+  device code, and none is retained.
+
+Compare that with option D, whose backend must *store every user's blob
+forever* and be defended against becoming free file hosting. A stateless relay
+that holds nothing is a materially smaller thing to operate than a datastore,
+even though both are "a backend".
 
 ### C — Third-party BaaS with email accounts (Supabase, Firebase, Auth0)
 
@@ -116,13 +139,16 @@ free tier, say). Any device with the passphrase pulls it back.
 nothing, and it makes the capability the site already has actually findable.
 Whatever happens next, the manual path stays as the offline fallback.
 
-**Then, if automatic sync is genuinely wanted, pursue B — but verify the CORS
-question first.** Spend an hour confirming whether the device-flow token
-exchange is reachable from a browser. If it is, B is clearly the best fit for
-this site: optional, no user table, no PII, no secrets in CI, data in the
-user's own account. If it is not, B costs a permanently-operated proxy, and at
-that point D is the more honest choice because it at least holds nothing
-readable.
+**Then pursue B.** The CORS question has been researched and the answer does
+not disqualify it. B costs one stateless, secret-free relay for a single call;
+every byte of user data still goes directly from the browser to a Gist the
+user owns and can delete without asking us.
+
+The ADR's first draft said that needing a proxy would make D "the more honest
+choice". Having checked what each backend actually has to do, that was wrong:
+D's backend must hold every user's data indefinitely and be defended against
+abuse, while B's holds nothing at all. **Stateless and storage-free beats
+stateful, even when both technically require a service.**
 
 **C is not recommended.** It is the most work, the most liability, and it
 contradicts material the site publishes.
