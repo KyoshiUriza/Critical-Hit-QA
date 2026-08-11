@@ -125,6 +125,9 @@ reasoned answer with the trade-off stated. Interviewers probe this constantly;
 the site asserts the distinction in three places and never drills it.
 
 ## 7. Evaluate-the-AI-test exercise
+
+**Shipped.** Three `source:"ai"` exercises in the Code Review Gauntlet, badged
+as generated, reusing the existing both-directions grading. No new mechanism.
 **Evidence: strong external. Cost: low.**
 
 Carried from the previous roadmap. The interview bank now covers AI topics

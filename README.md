@@ -17,7 +17,7 @@ A self-contained static web app for Software QA interview prep. No build step, n
 
 **Learn & drill**
 - **Learn tracks** — manual testing, automation testing, codeless (AccelQ), code-based frameworks (Playwright, Selenium), **locators & flaky tests**, and **SQL for QA**.
-- **Locator Lab** — type a selector, get it graded live against a sandbox DOM: does it match, does it match the *right* element, and will it survive the next deploy. Six exercises covering strict-mode violations, generated classes and ids, positional selectors, absolute XPath, and stateful text.
+- **Locator Lab** — type a selector, get it graded live against a sandbox DOM: does it match, does it match the *right* element, and will it survive the next deploy. Nine exercises covering strict-mode violations, generated classes and ids, positional selectors, absolute XPath, stateful text, and elements with no good locator at all.
 - **SQL Sandbox** — a hand-rolled SQL engine (no dependencies) running real `SELECT` / `JOIN` / `GROUP BY` / `HAVING` / `DELETE` against an in-memory dataset seeded with an orphaned row and a NULL-vs-empty-string pair. Eight exercises, graded on the result so any correct approach passes.
 - **Playwright Errors & CLI** — the ten errors you'll actually hit, their real causes, and a debugging order of operations.
 - **Quizzes** — timed multiple-choice with instant explanations, filterable by category, deep-linkable via `?category=`.

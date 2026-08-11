@@ -797,6 +797,25 @@ html, body {
   margin-right: 6px;
   margin-top: 4px;
 }
+/* .tag was only ever styled inside .q-item, so the same class rendered as
+   unstyled text everywhere else it was used — the Gauntlet's difficulty chip
+   among them. This is the base; the scoped rule above still wins inside
+   question items, so nothing there changes. */
+.tag {
+  display: inline-block;
+  background: var(--bg-elev-2);
+  color: var(--text-dim);
+  padding: 2px 8px;
+  border-radius: var(--rad-sm);
+  font-size: var(--fs-xs);
+  border: 1px solid var(--border);
+}
+.tag-ai {
+  color: var(--on-accent);
+  background: var(--accent);
+  border-color: var(--accent);
+  letter-spacing: 0.04em;
+}
 .difficulty-easy { color: var(--accent-2); }
 .difficulty-medium { color: var(--warn); }
 .difficulty-hard { color: var(--danger); }

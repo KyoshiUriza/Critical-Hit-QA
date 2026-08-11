@@ -52,6 +52,12 @@
     byId("ex-difficulty").textContent = ex.difficulty.toUpperCase();
     byId("ex-difficulty").className = "tag difficulty-" +
       (ex.difficulty === "hard" ? "hard" : ex.difficulty === "medium" ? "medium" : "easy");
+    // Reviewing generated tests is now routine work with its own failure
+    // modes, so the badge says so rather than leaving the learner to guess
+    // why this snippet reads more polished than the human ones.
+    var src = byId("ex-source");
+    src.className = ex.source === "ai" ? "tag tag-ai" : "tag hidden";
+
     byId("ex-brief").textContent = ex.brief;
     byId("ex-code").textContent = ex.code;
 

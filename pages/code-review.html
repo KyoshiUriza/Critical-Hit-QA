@@ -31,6 +31,14 @@
         comments discounted, and interviewers are watching for exactly that.
         Ticking every box will score badly on purpose.
       </p>
+      <p>
+        Three of the snippets are badged <span class="tag tag-ai">AI-GENERATED</span>.
+        Reviewing generated tests is routine work now, and it fails differently:
+        the syntax is clean, the comments are confident, and the test asserts
+        what the page happens to do today instead of what the ticket asked for.
+        A reviewer scanning for sloppiness finds none and approves it. Those
+        three are where the interview signal is moving.
+      </p>
       <p class="text-dim m-0">
         Snippets are Playwright in JavaScript, but the defects — sleeps, shared
         state, brittle locators, assertions that cannot fail — are the same in
@@ -45,6 +53,7 @@
           <h2 class="m-0" id="ex-title"></h2>
         </div>
         <div class="lab-ex-nav">
+          <span class="tag hidden" id="ex-source" data-testid="ex-source">AI-GENERATED</span>
           <span class="tag" id="ex-difficulty"></span>
           <button class="btn btn-ghost btn-sm" id="prev-btn" data-testid="cr-prev">← Previous</button>
           <button class="btn btn-ghost btn-sm" id="next-btn" data-testid="cr-next">Next →</button>

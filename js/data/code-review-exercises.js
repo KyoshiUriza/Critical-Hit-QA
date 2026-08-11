@@ -300,5 +300,173 @@ test('search returns matching results', async ({ page }) => {
   await expect(results.first()).toBeVisible();
   await expect(results.first()).toContainText(/widget/i);
 });`
+  },
+
+  /*
+   * The three below carry source:"ai" and are framed as output from an
+   * assistant rather than from a colleague. That framing matters: reviewing
+   * generated tests is now routine work, and its failure modes are not a
+   * human's. Generated code is syntactically clean, confidently commented,
+   * and wrong about INTENT — it asserts what the page does today rather than
+   * what the ticket asked for. A reviewer scanning for sloppiness finds none
+   * and approves it.
+   */
+  {
+    id: "ai-implementation",
+    source: "ai",
+    title: "Generated from a ticket — asserts the implementation",
+    difficulty: "medium",
+    brief: "An assistant generated this from ticket QA-812: \"Adding an item to the basket increments the basket count shown in the header.\" It passes. Review it.",
+    code: `// Verifies the basket badge updates when an item is added.
+test('add to basket updates the badge', async ({ page }) => {
+  await page.goto('/products/nw-114');
+  await page.click('.btn.btn-primary.add-to-cart');
+
+  await page.waitForSelector('.cart-badge.is-active');
+  await expect(page.locator('.cart-badge')).toHaveClass(/is-active/);
+
+  const count = await page.evaluate(() => window.__CART_STATE__.count);
+  expect(count).toBe(1);
+});`,
+    issues: [
+      { id: "ai-class-not-value", present: true, label: "It asserts a CSS class, not the number the ticket describes",
+        why: "The ticket says the count shown in the header increments. This checks that the badge carries an is-active class. A badge rendering 0, or an empty string, or NaN passes every assertion here. Generated tests reach for whatever is easiest to assert against the current DOM, and a class name is easier than a value." },
+      { id: "ai-internal-state", present: true, label: "It reads window.__CART_STATE__ — internal state a user never sees",
+        why: "The most valuable thing to catch here. The test now passes whenever the state object is right and the UI is broken, which is precisely the bug the ticket exists to prevent. Assert what the user can see; if that turns out to be hard, the difficulty is itself worth reporting." },
+      { id: "ai-styling-locator", present: true, label: ".btn.btn-primary.add-to-cart couples the test to styling",
+        why: "Two of those three classes are visual. Changing the button from primary to secondary is a design decision that should never break a test, and it will. The behavioural part of that selector is add-to-cart on its own." },
+      { id: "ai-redundant-wait", present: true, label: "waitForSelector before an auto-waiting assertion is redundant",
+        why: "The expect on the next line already waits and retries. The explicit wait adds nothing but a second place to time out, with a worse error message when it does. Generated code includes these defensively because they appear throughout older material." },
+      { id: "ai-fixed-slug", present: false, label: "Hard-coding /products/nw-114 makes the test brittle",
+        why: "Decoy. A fixed, seeded product is the right call — it makes the test deterministic. Discovering a product at runtime adds a dependency on catalogue state, which is how you get a basket test that fails for reasons having nothing to do with the basket." },
+      { id: "ai-no-gwt", present: false, label: "The test name should follow a Given/When/Then convention",
+        why: "Decoy. 'add to basket updates the badge' says what is being verified in plain language, which is what a name is for. Naming conventions are worth agreeing as a team and are not a review finding." }
+    ],
+    fixed: `test('add to basket increments the header count', async ({ page }) => {
+  await page.goto('/products/nw-114');
+
+  const badge = page.getByTestId('cart-count');
+  await expect(badge).toHaveText('0');
+
+  await page.getByRole('button', { name: 'Add to basket' }).click();
+
+  // The value the ticket describes, seen the way the user sees it.
+  await expect(badge).toHaveText('1');
+});`
+  },
+  {
+    id: "ai-locator-today",
+    source: "ai",
+    title: "Generated tests that pass because of today's data",
+    difficulty: "hard",
+    brief: "An assistant was given ticket QA-455: \"The alerts panel shows the three most recent alerts, newest first.\" This is what it produced, and it is green in CI.",
+    code: `// Confirms the alerts panel renders the three most recent alerts.
+test('shows the three most recent alerts', async ({ page }) => {
+  await page.goto('/alerts');
+
+  const rows = page.locator('div > div > .row');
+  await expect(rows).toHaveCount(3);
+
+  await expect(rows.nth(0)).toContainText('Disk usage above 90%');
+  await expect(rows.nth(1)).toContainText('Backup completed');
+  await expect(rows.nth(2)).toContainText('Certificate expires in 14 days');
+});`,
+    issues: [
+      { id: "ai-order-untested", present: true, label: "Nothing verifies the ordering the ticket is actually about",
+        why: "The ticket says newest first. The test hard-codes three strings that happen to sit in that order in today's seed data. Reverse the sort in production and this still passes, because it never learned what newest means. The requirement most likely to regress is the one left uncovered." },
+      { id: "ai-structural-locator", present: true, label: "div > div > .row is a structural locator",
+        why: "It encodes the current nesting depth. Wrapping the panel in one more container — a scroll region, a theme provider, an error boundary — breaks a test that has nothing to do with any of them. Generated locators drift toward structure because structure is what is visible in the DOM they were shown." },
+      { id: "ai-data-coupled", present: true, label: "It asserts seeded content that will change",
+        why: "Those three strings are true of the fixture today. When somebody adds an alert to the seed data, every assertion shifts by a row and the failure reads like an ordering bug rather than a data change. Assert the rule, not the current contents." },
+      { id: "ai-no-boundary", present: true, label: "Only the exactly-three case is covered",
+        why: "What happens with zero alerts, with one, with fifty? Truncation is the panel's entire job, so the boundaries are the interesting cases — and the generated 'comprehensive' test covers only the state the developer happened to be looking at." },
+      { id: "ai-count-strict", present: false, label: "toHaveCount(3) is too strict — it should allow at least three",
+        why: "Decoy, and an actively harmful suggestion. The requirement is exactly three; loosening this would let the defect the test exists to catch sail through. Relaxing an assertion to stop a failure is how a suite quietly stops finding anything." },
+      { id: "ai-needs-timeout", present: false, label: "The assertions need a longer explicit timeout, since alerts load asynchronously",
+        why: "Decoy. Web-first assertions already retry until the default timeout. If they genuinely need longer, that is a performance finding to raise — not a number to raise in the test." }
+    ],
+    fixed: `test('shows the three most recent alerts, newest first', async ({ page }) => {
+  // Seeded through the API, so the test knows what "newest" means.
+  await seedAlerts(page, [
+    { text: 'Oldest', at: '2026-01-01T00:00:00Z' },
+    { text: 'Middle', at: '2026-02-01T00:00:00Z' },
+    { text: 'Newer',  at: '2026-03-01T00:00:00Z' },
+    { text: 'Newest', at: '2026-04-01T00:00:00Z' },
+  ]);
+
+  await page.goto('/alerts');
+  const rows = page.getByTestId('alert-row');
+
+  await expect(rows).toHaveCount(3);
+  await expect(rows).toHaveText(['Newest', 'Newer', 'Middle']);
+  await expect(page.getByText('Oldest')).toBeHidden();
+});`
+  },
+  {
+    id: "ai-coverage-illusion",
+    source: "ai",
+    title: "Four tests that are one test",
+    difficulty: "medium",
+    brief: "Asked for \"comprehensive coverage of the discount code field\", an assistant produced these four. The PR description says coverage is complete. Review it.",
+    code: `test.beforeEach(async ({ page }) => await page.goto('/checkout'));
+
+test('applies a valid discount code', async ({ page }) => {
+  await page.getByLabel('Discount code').fill('TRAIL10');
+  await page.getByRole('button', { name: 'Apply' }).click();
+  await expect(page.getByRole('status')).toHaveText('Discount applied');
+});
+
+test('applies a valid discount code in lowercase', async ({ page }) => {
+  await page.getByLabel('Discount code').fill('trail10');
+  await page.getByRole('button', { name: 'Apply' }).click();
+  await expect(page.getByRole('status')).toHaveText('Discount applied');
+});
+
+test('applies a valid discount code with spaces', async ({ page }) => {
+  await page.getByLabel('Discount code').fill('  TRAIL10  ');
+  await page.getByRole('button', { name: 'Apply' }).click();
+  await expect(page.getByRole('status')).toHaveText('Discount applied');
+});
+
+test('rejects an invalid discount code', async ({ page }) => {
+  await page.getByLabel('Discount code').fill('NOPE');
+  await page.getByRole('button', { name: 'Apply' }).click();
+  await expect(page.getByRole('status')).toHaveText('That code is not recognised');
+});`,
+    issues: [
+      { id: "ai-one-partition", present: true, label: "Three of the four tests are the same equivalence class",
+        why: "Uppercase, lowercase and padded are all 'a valid code, normalised' — one code path exercised three times. Four tests reads as thorough on a PR summary and buys roughly two tests' worth of confidence. This is how a generated suite inflates a coverage number without raising it." },
+      { id: "ai-no-total-check", present: true, label: "Nothing checks that the discount reached the total",
+        why: "Every assertion is on the confirmation message. A build that says 'Discount applied' and charges full price passes all four. The message is the easiest thing to assert and the least valuable — the money is the requirement." },
+      { id: "ai-missing-rules", present: true, label: "The business rules are untested",
+        why: "Expired codes, already-redeemed codes, minimum-spend thresholds, two codes stacked, a code valid only on some items. That is where discount defects actually live, and none of it is visible in the DOM — which is exactly why a generated suite working from the page cannot invent it. Someone who has read the ticket can." },
+      { id: "ai-copy-coupled", present: true, label: "Assertions are coupled to exact user-facing copy",
+        why: "toHaveText matches the whole string, so a full stop added by a content editor fails four tests at once. A real cost, though a smaller one than the others — a partial match, or a status role plus a stable attribute, survives copy edits." },
+      { id: "ai-beforeeach", present: false, label: "The shared beforeEach hides setup and should be inlined",
+        why: "Decoy. A beforeEach that puts every test at the same starting point is good practice and the opposite of a defect. Setup worth questioning is setup that differs per test, or that leaves state behind for the next one." },
+      { id: "ai-parameterise", present: false, label: "These should be one parameterised test over a table of inputs",
+        why: "Decoy — a nit, not a defect. Parameterising would be tidier and would not add a single case. Raise it as a suggestion clearly labelled as one; raising style at the same volume as the missing business rules is how a review loses its signal." }
+    ],
+    fixed: `const NORMALISES = ['TRAIL10', 'trail10', '  TRAIL10  '];
+
+test.beforeEach(async ({ page }) => await page.goto('/checkout'));
+
+for (const code of NORMALISES) {
+  test(\`normalises \${JSON.stringify(code)}\`, async ({ page }) => {
+    await applyCode(page, code);
+    // The money, not the message.
+    await expect(page.getByTestId('order-total')).toHaveText('$115.20');
+  });
+}
+
+test('an expired code is refused and the total is unchanged', async ({ page }) => {
+  await applyCode(page, 'SPRING24');
+  await expect(page.getByRole('status')).toContainText(/expired/i);
+  await expect(page.getByTestId('order-total')).toHaveText('$128.00');
+});
+
+test('a code below its minimum spend is refused', async ({ page }) => { /* ... */ });
+test('a code already redeemed by this account is refused', async ({ page }) => { /* ... */ });
+test('a second code cannot be stacked on an applied one', async ({ page }) => { /* ... */ });`
   }
 ];

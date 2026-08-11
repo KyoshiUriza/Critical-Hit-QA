@@ -185,3 +185,78 @@ test.describe('Code Review Gauntlet', () => {
     await expect(page.getByTestId('cr-save-wrap')).toBeHidden();
   });
 });
+
+// ── Evaluate-the-AI-test ────────────────────────────────────────────────
+// Reviewing generated tests is routine work now, and its failure modes are
+// not a human's: clean syntax, confident comments, wrong about intent. These
+// guard the framing and the substance of that set specifically.
+const { test: aiTest, expect: aiExpect } = require('@playwright/test');
+
+aiTest.describe('AI-generated review exercises', () => {
+  aiTest('the set exists and is badged so the learner knows what they are reading', async ({ page }) => {
+    await page.goto('/pages/code-review.html?reset');
+    const ai = await page.evaluate(() =>
+      window.CODE_REVIEW_EXERCISES.map((e, i) => ({ i, id: e.id, ai: e.source === 'ai' })).filter((e) => e.ai)
+    );
+    aiExpect(ai.length, 'no AI-sourced exercises').toBeGreaterThanOrEqual(3);
+
+    // Human exercises must NOT show the badge, or it stops carrying meaning.
+    await aiExpect(page.getByTestId('ex-source')).toBeHidden();
+
+    for (let n = 0; n < ai[0].i; n++) await page.getByTestId('cr-next').click();
+    await aiExpect(page.getByTestId('ex-source')).toBeVisible();
+    await aiExpect(page.getByTestId('ex-source')).toHaveText('AI-GENERATED');
+  });
+
+  aiTest('each one names an intent failure, not just a style failure', async ({ page }) => {
+    // The whole point is that generated tests are tidy and still wrong. An
+    // exercise whose only real findings are sleeps and selectors would teach
+    // the same lesson as the human set and waste the framing.
+    await page.goto('/pages/code-review.html?reset');
+    const problems = await page.evaluate(() => {
+      const INTENT = /ticket|requirement|intent|business rule|equivalence|ordering|internal state|user (never )?sees|actually about|untested/i;
+      const out = [];
+      window.CODE_REVIEW_EXERCISES.filter((e) => e.source === 'ai').forEach((e) => {
+        const real = e.issues.filter((i) => i.present);
+        if (real.length < 3) out.push(e.id + ': too few real defects to be worth the framing');
+        if (!real.some((i) => INTENT.test(i.label + ' ' + i.why))) {
+          out.push(e.id + ': no finding about intent — this is just a style exercise');
+        }
+        if (!e.brief || !/assistant|generated/i.test(e.brief)) {
+          out.push(e.id + ': the brief does not say where the code came from');
+        }
+        if (!e.fixed) out.push(e.id + ': no corrected version');
+      });
+      return out;
+    });
+    aiExpect(problems).toEqual([]);
+  });
+
+  aiTest('the decoys stay decoys — ticking everything still loses', async ({ page }) => {
+    await page.goto('/pages/code-review.html?reset');
+    const bad = await page.evaluate(() =>
+      window.CODE_REVIEW_EXERCISES.filter((e) => e.source === 'ai')
+        .filter((e) => e.issues.filter((i) => !i.present).length < 2)
+        .map((e) => e.id)
+    );
+    aiExpect(bad, 'AI exercises need decoys too, or the answer is "flag it all"').toEqual([]);
+  });
+
+  aiTest('an AI exercise grades in both directions like any other', async ({ page }) => {
+    await page.goto('/pages/code-review.html?reset');
+    const target = await page.evaluate(() =>
+      window.CODE_REVIEW_EXERCISES.findIndex((e) => e.source === 'ai')
+    );
+    for (let n = 0; n < target; n++) await page.getByTestId('cr-next').click();
+
+    const ids = await page.evaluate((i) => ({
+      real: window.CODE_REVIEW_EXERCISES[i].issues.filter((x) => x.present).map((x) => x.id),
+      decoy: window.CODE_REVIEW_EXERCISES[i].issues.filter((x) => !x.present).map((x) => x.id),
+    }), target);
+
+    for (const id of ids.real) await page.locator(`[data-issue-box="${id}"]`).check();
+    await page.getByTestId('cr-grade').click();
+    await aiExpect(page.getByTestId('cr-verdict'))
+      .toContainText(`${ids.real.length} of ${ids.real.length} defects found`);
+  });
+});

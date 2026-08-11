@@ -144,3 +144,64 @@ test.describe('JS / TS code toggle', () => {
     await expect(ts).toContainText('readonly page: Page');
   });
 });
+
+// Exercise counts are quoted in prose across the site and have drifted twice
+// (Locator Lab said six after growing to nine). Derived, not restated.
+test.describe('quoted exercise counts', () => {
+  const WORDS = { 6: 'six', 7: 'seven', 8: 'eight', 9: 'nine', 10: 'ten', 11: 'eleven', 12: 'twelve' };
+
+  test('every page that quotes a lab size quotes the real one', async ({ page }) => {
+    await page.goto('/practice-apps/locator-lab.html?reset');
+    const locators = await page.evaluate(() => window.LOCATOR_EXERCISES.length);
+    await page.goto('/practice-apps/api-lab.html?reset');
+    const api = await page.evaluate(() => window.API_EXERCISES.length);
+    await page.goto('/pages/code-review.html?reset');
+    const review = await page.evaluate(() => window.CODE_REVIEW_EXERCISES.length);
+
+    const wrong = [];
+    const check = (text, where, n) => {
+      const word = WORDS[n];
+      // Any number-word or digit followed by "exercises" must be the real one.
+      for (const m of text.matchAll(/(\w+)\s+exercises/gi)) {
+        const said = m[1].toLowerCase();
+        if (!/^\d+$/.test(said) && !Object.values(WORDS).includes(said)) continue;
+        if (said !== String(n) && said !== word) {
+          wrong.push(`${where}: says "${m[0]}", should be ${n}`);
+        }
+      }
+    };
+
+    await page.goto('/pages/learn/locators.html?reset');
+    check(await page.locator('main').textContent(), 'learn/locators.html', locators);
+
+    await page.goto('/practice-apps/locator-lab.html?reset');
+    check(await page.locator('main').textContent(), 'locator-lab.html', locators);
+
+    await page.goto('/practice-apps/api-lab.html?reset');
+    check(await page.locator('main').textContent(), 'api-lab.html', api);
+
+    await page.goto('/pages/code-review.html?reset');
+    check(await page.locator('main').textContent(), 'code-review.html', review);
+
+    expect(wrong).toEqual([]);
+  });
+
+  test('the practice apps page quotes each lab correctly', async ({ page }) => {
+    await page.goto('/practice-apps/locator-lab.html?reset');
+    const locators = await page.evaluate(() => window.LOCATOR_EXERCISES.length);
+    await page.goto('/practice-apps/api-lab.html?reset');
+    const api = await page.evaluate(() => window.API_EXERCISES.length);
+
+    await page.goto('/pages/practice-apps.html?reset');
+    const cards = await page.locator('.app-card').evaluateAll((els) =>
+      els.map((e) => ({
+        href: (e.querySelector('a[href]') || {}).getAttribute
+          ? e.querySelector('a[href]').getAttribute('href') : '',
+        meta: (e.querySelector('.app-meta') || {}).textContent || '',
+      }))
+    );
+    const find = (name) => cards.find((c) => c.href.includes(name));
+    expect(find('locator-lab').meta).toContain(`${locators} exercises`);
+    expect(find('api-lab').meta).toContain(`${api} exercises`);
+  });
+});
