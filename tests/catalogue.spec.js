@@ -86,9 +86,13 @@ test.describe('practice app catalogue', () => {
 
     for (const file of ['README.md', 'docs/buy-me-a-coffee-blurb.md']) {
       const text = fs.readFileSync(path.join(ROOT, file), 'utf8');
-      const claims = [...text.matchAll(/(\d+)\s+(?:real\s+|seeded\s+|total\s+)?defects?/gi)]
-        .map((m) => Number(m[1]))
-        .filter((n) => n > 5);   // ignore per-app figures and prose numbers
+      // Two shapes, because README had said "seeded defects (43 total)" —
+      // the number AFTER the word, which the original pattern never saw. It
+      // sat wrong for three commits while this guard reported green.
+      const claims = [
+        ...[...text.matchAll(/(\d+)\s+(?:real\s+|seeded\s+|total\s+)?defects?/gi)].map((m) => Number(m[1])),
+        ...[...text.matchAll(/defects?\s*\((\d+)\s+total\)/gi)].map((m) => Number(m[1])),
+      ].filter((n) => n > 5);   // ignore per-app figures and prose numbers
       for (const claim of claims) {
         expect(claim, `${file} claims ${claim} defects, catalogue has ${total}`).toBe(total);
       }

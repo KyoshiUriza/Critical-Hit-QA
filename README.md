@@ -10,13 +10,13 @@ A self-contained static web app for Software QA interview prep. No build step, n
 ## What's inside
 
 **The core loop**
-- **Practice Apps** — 18 working mini-apps: 13 clean, 5 with intentionally seeded defects (43 total).
+- **Practice Apps** — 21 working mini-apps: 13 clean, 8 seeded with 60 real defects.
 - **Bug Bounty** — tick off the defects you found; scored against the seeded catalog, weighted by severity.
 - **Bug Report Builder** — turn a find into a real report. Exports Markdown / GitHub Issue / Jira / JSON. A defect ticked in Bug Bounty carries straight through with its app, environment and title prefilled.
 - **My Portfolio** — every draft you've written, autosaved as you type. Export the lot as one Markdown document to hand to an interviewer.
 
 **Learn & drill**
-- **Learn tracks** — manual testing, automation testing, codeless (AccelQ), code-based frameworks (Playwright, Selenium), **locators & flaky tests**, and **SQL for QA**.
+- **Learn tracks** — manual testing, automation testing, codeless (AccelQ), code-based frameworks (Playwright, Selenium), **locators & flaky tests**, **SQL for QA**, **accessibility**, **mobile & responsive**, **test data & environments**, **your first 90 days**, and **suite health**.
 - **Locator Lab** — type a selector, get it graded live against a sandbox DOM: does it match, does it match the *right* element, and will it survive the next deploy. Nine exercises covering strict-mode violations, generated classes and ids, positional selectors, absolute XPath, stateful text, and elements with no good locator at all.
 - **SQL Sandbox** — a hand-rolled SQL engine (no dependencies) running real `SELECT` / `JOIN` / `GROUP BY` / `HAVING` / `DELETE` against an in-memory dataset seeded with an orphaned row and a NULL-vs-empty-string pair. Eight exercises, graded on the result so any correct approach passes.
 - **Playwright Errors & CLI** — the ten errors you'll actually hit, their real causes, and a debugging order of operations.
@@ -130,7 +130,7 @@ QA Website Project/
 │   ├── test-case-builder.html  bug-report-builder.html
 │   ├── portfolio.html              # saved artifacts + export
 │   └── progress.html  tester-lattice.html  study-plan.html
-├── practice-apps/                  # 8 clean + 4 buggy
+├── practice-apps/                  # 13 clean + 8 buggy
 ├── tests/                          # smoke, regression, contrast, focus-contrast,
 │                                   #   header, labs
 ├── design-audit/                   # reference screenshots (gitignored)
