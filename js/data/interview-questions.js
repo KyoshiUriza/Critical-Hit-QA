@@ -668,5 +668,189 @@ If you are early in your career, a bug you found in a practice app is a legitima
 6. **Delete tests.** The unpopular one. Duplicate coverage and tests for removed features cost time forever and buy nothing. Be careful with the "never failed" argument, though — a test that has never failed may be guarding something nobody has broken yet, which is the job. Judge it on what it would catch, not on its history.
 
 **Then protect it.** Track suite duration as a metric and treat a regression in runtime like any other regression. Otherwise you will be here again in six months.`
+  },
+  // ── API Testing (was the thinnest category at 3) ──────────────────────
+  {
+    category: "API Testing",
+    difficulty: "medium",
+    question: "How would you test an endpoint that you cannot put into a known state?",
+    answer: `This is the realistic version of most API testing questions, and the answer that lands is about **control**, not cleverness.
+
+**First, try to get control back.** Ask whether there is a seeding endpoint, a test tenant, or a fixture the team already uses. A surprising amount of "we can't control it" is really "nobody has asked."
+
+**If the state is genuinely shared:**
+
+1. **Create what you need, then assert on it.** POST a record with a unique marker — a uuid or timestamp in a name field — and assert against that record only. Never assert on "the first item in the list."
+2. **Assert on invariants, not values.** You may not know the total, but you know it should not decrease after a create. You may not know the balance, but debits and credits should still sum.
+3. **Assert relative to a snapshot.** Read the count, act, read again, assert on the delta. This survives other people's data.
+4. **Clean up in teardown**, so your own runs do not become the noise.
+
+**Say the trade-off out loud:** relative assertions are weaker than absolute ones. You are trading precision for the ability to run at all, and that is a decision worth stating in the test name or a comment rather than hiding.
+
+**The red flag to avoid:** answering "I would just use mocks." Mocking the system under test removes the thing you were trying to verify.`
+  },
+  {
+    category: "API Testing",
+    difficulty: "medium",
+    question: "A GET endpoint returns 200 with an empty array when the resource does not exist. Is that a defect?",
+    answer: `**It depends on what "the resource" is — and the interviewer is checking whether you notice the distinction.**
+
+**Not a defect** if the endpoint is a *collection*: \`GET /users?role=admin\` with no admins is a successful query with an empty result. 200 plus \`[]\` is correct. Returning 404 there would be wrong, because the collection exists and you asked it a valid question.
+
+**A defect** if the endpoint is a *single resource*: \`GET /users/9999\` for a user that does not exist should be 404. Returning 200 with an empty body forces every client to write \`if (response.data.length === 0)\` instead of checking the status, and that logic will be written inconsistently across every consumer.
+
+**The follow-up you should raise unprompted:** what does it do for a user that exists but you are not allowed to see? 404 and 403 are both defensible — 404 hides existence, 403 confirms it — but the API must pick one deliberately, because the difference is a user-enumeration vector.
+
+Answering "it depends" and then giving the two cases is the whole point. Answering "yes it's a bug" without qualification is the trap.`
+  },
+  {
+    category: "API Testing",
+    difficulty: "hard",
+    question: "How do you test an endpoint that is eventually consistent?",
+    answer: `**First, name it.** If a POST returns 202 Accepted, the work has not happened yet. Asserting immediately afterwards is testing the queue, not the feature — and it produces exactly the flake that gets blamed on "the environment."
+
+**How to test it properly:**
+
+1. **Poll with a timeout, not a sleep.** Retry the read until it reflects the write or a deadline passes. \`expect.poll()\` in Playwright, or an explicit retry loop. A fixed sleep is both slower than needed and shorter than needed.
+2. **Assert the intermediate state too.** A good system tells you the work is pending — a status field, a job id. Asserting \`status: "processing"\` immediately and \`status: "complete"\` eventually tests more than waiting for the end.
+3. **Test the deadline itself.** "It completes eventually" is not a requirement. Ask what the SLA is. If nobody knows, that is your finding — an unbounded eventual consistency is an outage nobody has agreed to yet.
+4. **Test what a reader sees mid-flight.** Stale data is often acceptable; *inconsistent* data usually is not. If an order shows as paid while its items show as unpaid, that is a real defect.
+
+**The senior signal:** distinguishing "slow" from "wrong". Eventual consistency means the system converges. If it converges to the wrong value, or never converges, no amount of waiting fixes it — and your test should fail rather than wait longer.`
+  },
+  // ── Agile & Process (was 3) ───────────────────────────────────────────
+  {
+    category: "Agile & Process",
+    difficulty: "medium",
+    question: "The team wants to skip regression testing to hit a deadline. What do you do?",
+    answer: `**Do not say "no, we can't ship." You will be overruled and excluded from the next conversation.**
+
+The job is to convert a yes/no argument into a risk decision the business can actually make.
+
+**1. Reframe the question.** Not "should we skip regression" but "which regression are we skipping, and what could that miss?" Skipping everything and skipping the payment suite are different decisions.
+
+**2. Offer a tiered answer.** "The full suite is 4 hours. I can give you the critical path in 40 minutes — checkout, auth, and the two areas this change touched. That covers the failure modes that would take the site down. It would not catch a regression in reporting."
+
+**3. Make the residual risk concrete and specific.** "If we skip this, the realistic worst case is X, and we would find out when a customer tells us." Vague warnings get discounted; a named scenario does not.
+
+**4. Put the decision where it belongs.** You provide the risk assessment; the product owner or release manager accepts the risk. Say so plainly: "I can run the reduced set. I want it recorded that the full suite did not run."
+
+**5. Ask what the deadline is actually for.** Occasionally it turns out to be soft, and nobody had asked.
+
+**What this answer demonstrates:** that you understand testing is a risk-information activity, not a gate you personally guard. That is the difference between a tester the team routes around and one they consult.`
+  },
+  {
+    category: "Agile & Process",
+    difficulty: "medium",
+    question: "How do you handle a developer who says 'that's not a bug, that's how it works'?",
+    answer: `**Assume they are right until you have checked.** Roughly a third of the time they are, and leading with certainty is how testers lose credibility they then need for the real disputes.
+
+**The sequence that works:**
+
+1. **Find the oracle.** What says it should behave differently — the AC, a design, a spec, a previous build, a documented standard? "The story says X and it does Y" ends most of these conversations in one message.
+2. **If there is no oracle, say so.** "There's nothing in the story either way — which means we're both guessing, and a user will guess too." That converts a disagreement into a shared gap.
+3. **Move it to impact.** Not "this is wrong" but "here's what a user experiences." A screen recording of the confusing path is more persuasive than any argument about intent.
+4. **Escalate to the decision-maker, not up the hierarchy.** The PO decides what the product should do. Bringing them in is not tattling; it is routing the question to the person who owns it.
+5. **Accept the outcome and record it.** If it is intended, the ticket becomes documentation — close it as "working as designed" with the reasoning captured, so the next tester does not re-raise it.
+
+**The trap:** treating this as a status contest. Interviewers are listening for whether you will be exhausting to work with.`
+  },
+  {
+    category: "Agile & Process",
+    difficulty: "hard",
+    question: "Your team has no test strategy and management wants '80% coverage'. How do you respond?",
+    answer: `**Two separate problems, and conflating them is the mistake.**
+
+**On the number:** code coverage measures which lines executed, not whether anything was verified. A suite of tests with no assertions can hit 100%. It tells you where you have definitely *not* looked, which is genuinely useful, and nothing about whether what you looked at is correct.
+
+Say that plainly, but do not stop there — "your metric is bad" without an alternative is not an answer.
+
+**Offer what the number is a proxy for.** Management asking for 80% usually means one of: *we keep shipping regressions*, *we don't know what's tested*, or *an auditor asked*. Find out which, because each has a different fix:
+
+- Regressions escaping → measure escaped-defect rate and cover the paths that actually broke.
+- No visibility → a coverage map by feature and risk, not by line.
+- Audit → agree the specific evidence required, which is rarely a percentage.
+
+**On the missing strategy**, propose something small enough to be accepted: one page naming the risk areas, what gets automated versus explored, entry and exit criteria, and who decides on release. A strategy nobody reads is worth less than a page everyone has agreed to.
+
+**The senior signal:** treating a bad metric request as a symptom to diagnose rather than an order to comply with or a fight to win.`
+  },
+  // ── Performance & Non-functional (was 3) ──────────────────────────────
+  {
+    category: "Performance & Non-functional",
+    difficulty: "medium",
+    question: "How would you test that an application handles a slow network?",
+    answer: `**Throttle deliberately rather than hoping.** Every browser can do it: DevTools network conditions, or in Playwright \`page.route()\` with a delay, or CDP's \`Network.emulateNetworkConditions\`. Mobile testing tools offer the same.
+
+**What you are actually looking for:**
+
+1. **Does it tell the user anything?** A spinner within a few hundred milliseconds. Silence reads as "broken" and produces double-submits.
+2. **Are actions disabled while in flight?** The classic defect: slow network, user clicks Pay twice, two charges. This is the highest-severity finding in the category and it only appears under latency.
+3. **What happens on timeout?** Is there one at all? An unbounded request looks identical to a hung app.
+4. **Is partial state handled?** If three requests populate a page and one is slow, does the page render half-built and shift under the user, or wait coherently?
+5. **Does it recover?** Restore the connection — does the app retry, or sit there until reloaded?
+
+**Also test the opposite:** an instant response. Some loading states flash so briefly they look like a glitch, and some code only works because a request happened to be slow.
+
+**The distinction worth stating:** this is not load testing. You are testing one user on a bad connection, which is a functional concern. Load testing asks a different question about many users at once.`
+  },
+  {
+    category: "Performance & Non-functional",
+    difficulty: "hard",
+    question: "A page took 800ms yesterday and 2.4s today. How do you investigate?",
+    answer: `**Establish it is real before investigating.** One measurement is not a trend — check whether it reproduces, and on what percentile. If p50 moved, everyone feels it; if only p99 moved, something specific is slow.
+
+**Then bisect the stack, cheapest first:**
+
+1. **Is it the network or the server?** Waterfall in DevTools. Time to first byte tells you which half of the problem you are in — that one measurement halves the search space.
+2. **If TTFB is up:** the backend or its dependencies. Look for a new query, a lost index, a cache that stopped hitting, or a downstream call added to the path. The classic is an N+1 introduced by an innocent-looking loop.
+3. **If TTFB is fine but render is slow:** payload size, a new blocking script, a font, an image that lost its dimensions and is now causing layout thrash.
+4. **What changed?** Correlate against deploys, feature-flag flips, config changes and data growth. "Nothing changed" is almost always false — data volume changes without anyone deploying.
+5. **Does it reproduce in a controlled environment?** If not, it may be data-dependent: a specific account with far more records than the test fixture.
+
+**Report it like a tester, not a bystander.** Percentiles before and after, the waterfall, the correlating change, and the user impact. "The page is slow" gets triaged low; "p95 checkout went 800ms → 2.4s after Tuesday's deploy, TTFB accounts for 1.4s of it" gets fixed.`
+  },
+  // ── AI in Testing: the 2026 additions ─────────────────────────────────
+  {
+    category: "AI in Testing",
+    difficulty: "medium",
+    question: "What is Playwright MCP, and how would you use it responsibly?",
+    answer: `**What it is:** MCP (Model Context Protocol) is a standard way to give a language model tools. Playwright MCP exposes a live browser session as those tools — so a model can navigate, click, read the accessibility tree, and report what it sees, rather than guessing at markup it has never rendered.
+
+**Why it matters for testing:** the model is working from the *actual page state* instead of hallucinating selectors. That makes generated locators dramatically better, and makes exploratory-style prompting ("find the checkout flow and describe what breaks") genuinely possible.
+
+**Where it earns its keep:**
+- Drafting first-pass specs against a real page
+- Reproducing a vague bug report by exploring rather than being told exact steps
+- Reading the accessibility tree to suggest role-based locators
+
+**Where to be careful, and this is what a good answer includes:**
+
+1. **It drives a real browser.** Point it at production and it can click real buttons and submit real data. Test environments only, with data you are willing to lose.
+2. **Everything it sees enters the model's context.** Real customer records on screen are a disclosure the moment they are read.
+3. **Generated tests still need review.** A test written from the implementation can encode the bug — the oracle problem does not go away because the tooling improved.
+4. **Prompt injection is live.** Page content becomes model input, so a hostile page can attempt to steer the agent. Treat page text as untrusted data, never as instructions.
+
+**The interview signal:** knowing what it is *and* naming the failure modes. Enthusiasm without the caveats reads as inexperience.`
+  },
+  {
+    category: "AI in Testing",
+    difficulty: "hard",
+    question: "Your company wants to replace half the QA team with AI test generation. How do you respond?",
+    answer: `**Do not argue from job preservation.** It is the least persuasive position in the room and everyone can hear it.
+
+**Argue from what the tools actually do and do not do.**
+
+**What generation genuinely helps with:** boilerplate, first-pass cases from a written spec, page objects, test data, filling gaps in an existing suite. Real time saved, and worth adopting.
+
+**What it does not do:**
+- **Decide what is worth testing.** Risk assessment needs context about users, money, and consequence that is nowhere in the code.
+- **Provide an oracle.** Generate tests from an implementation and they encode current behaviour, bugs included. They will pass forever and catch nothing.
+- **Notice the thing nobody specified.** Most serious defects are gaps between what was written and what was meant. A model given only what was written cannot see the gap.
+- **Own the decision.** Someone accountable has to say "this is ready." That is a human role for reasons that are legal as much as technical.
+
+**Then make it concrete, because abstractions lose to spreadsheets.** Offer a trial: generate a suite for a real feature, review it honestly, and count how many of the last quarter's escaped defects it would have caught. That number is the argument. It is usually low, and if it is high you have learned something important too.
+
+**Position yourself correctly:** the person who adopts the tooling fastest and can say precisely where it stops is far safer than the person defending the old way — and considerably more useful.`
   }
 ];
