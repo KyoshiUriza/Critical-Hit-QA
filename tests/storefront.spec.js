@@ -399,3 +399,57 @@ test.describe('Tasklane', () => {
     await expect(todos).toHaveCount(1);
   });
 });
+
+// ── Every app is its own product ──────────────────────────────────────
+test.describe('the apps do not converge into one product', () => {
+  const BRANDED = {
+    '/practice-apps/cart.html': ['Northwind Outfitters', '#2f7d5a'],
+    '/practice-apps/login.html': ['Northwind Outfitters', '#2f7d5a'],
+    '/practice-apps/todo.html': ['Tasklane', '#5b5bd6'],
+    '/practice-apps/bank.html': ['Meridian Bank', '#1f5f9e'],
+    '/practice-apps/scheduler-broken.html': ['Cadence Calendar', '#8a4b1f'],
+    '/practice-apps/live-feed-broken.html': ['Pulse Ops Feed', '#8f2f52'],
+  };
+
+  for (const [url, [name, accent]] of Object.entries(BRANDED)) {
+    test(`${url} presents as ${name}`, async ({ page }) => {
+      await page.goto(url + '?reset');
+      await expect(page.getByTestId('app-brand')).toContainText(name);
+      const got = await page.locator('.app-shell').first().evaluate((el) =>
+        getComputedStyle(el).getPropertyValue('--app-accent').trim());
+      expect(got).toBe(accent);
+    });
+  }
+
+  test('every brand accent clears 4.5:1 against its own foreground', async ({ page }) => {
+    // The strip and brand mark paint accent-coloured backgrounds with text on
+    // top. The contrast sweep covers the pages that are in it; this covers
+    // every brand in the registry, including ones no page uses yet.
+    await page.goto('/practice-apps/cart.html?reset');
+    const bad = await page.evaluate(() => {
+      const lum = (hex) => {
+        const c = [1, 3, 5].map((i) => parseInt(hex.substr(i, 2), 16) / 255)
+          .map((s) => (s <= 0.03928 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4)));
+        return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2];
+      };
+      const ratio = (a, b) => {
+        const x = lum(a), y = lum(b);
+        return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05);
+      };
+      return Object.entries(window.AppShell.BRANDS)
+        .map(([k, b]) => [k, ratio(b.accent, b.onAccent)])
+        .filter(([, r]) => r < 4.5)
+        .map(([k, r]) => `${k}: ${r.toFixed(2)}:1`);
+    });
+    expect(bad).toEqual([]);
+  });
+
+  test('the shell never swallows the site chrome', async ({ page }) => {
+    for (const url of Object.keys(BRANDED)) {
+      await page.goto(url + '?reset');
+      await expect(page.locator('.site-header'), url).toBeVisible();
+      await expect(page.locator('.site-footer'), url).toBeVisible();
+      await expect(page.locator('.skip-link'), url).toHaveAttribute('href', '#main');
+    }
+  });
+});

@@ -7,6 +7,7 @@
   <meta name="referrer" content="no-referrer" />
   <title>Practice (Broken): Scheduler — Critical Hit QA</title>
   <link rel="stylesheet" href="../css/styles.css" />
+  <link rel="stylesheet" href="../css/app-shell.css" />
 </head>
 <body data-page="practice-app-detail" data-depth="1">
   <a class="skip-link" href="#main">Skip to content</a>
@@ -14,7 +15,7 @@
 
   <main id="main" class="container">
     <div class="page-header">
-      <h1>Scheduler <span style="color:var(--danger);font-size:1rem;">(Buggy build)</span></h1>
+      <h1>Cadence Calendar <span style="color:var(--danger);font-size:1rem;">(buggy build)</span></h1>
       <p>Timezones and daylight saving. The hardest ordinary thing in software, and six defects that all ship for real.</p>
     </div>
 
@@ -30,6 +31,9 @@
       take you there.
     </div>
 
+    <div class="app-shell" data-brand="cadence" data-user="Alex Rivera"
+         data-crumbs="Cadence|Team|Agenda">
+      <div class="app-body">
     <div class="panel">
       <div class="two-col">
         <div class="form-field">
@@ -80,6 +84,8 @@
       </p>
       <div id="agenda"></div>
     </div>
+      </div>
+    </div>
 
     <section class="panel">
       <h2>What makes this category hard</h2>
@@ -113,6 +119,7 @@
   <script src="../js/profiles.js"></script>
   <script src="../js/progress.js"></script>
   <script src="../js/rpg.js"></script>
+  <script src="../js/app-shell.js"></script>
   <script src="../js/defect-detector.js"></script>
   <script src="../js/bounty-panel.js"></script>
   <script src="../js/scheduler.js"></script>

@@ -504,3 +504,12 @@
   border-color: var(--border-strong);
   font-weight: 600;
 }
+
+/* Sections already inside a shell should not draw a second card border —
+   the shell is the card. */
+.app-shell .app-body > .app-frame {
+  border: 0;
+  padding: 0;
+  margin-bottom: var(--sp-5);
+  background: none;
+}

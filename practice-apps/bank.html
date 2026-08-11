@@ -7,6 +7,7 @@
   <meta name="referrer" content="no-referrer" />
   <title>Meridian Bank — Critical Hit QA</title>
   <link rel="stylesheet" href="../css/styles.css" />
+  <link rel="stylesheet" href="../css/app-shell.css" />
 </head>
 <!-- A generic retail-banking app, not a copy of any real bank. The value is in
      the interaction patterns — money arithmetic, transfers, statement
@@ -32,6 +33,9 @@
       statement, that is a critical find.
     </div>
 
+    <div class="app-shell" data-brand="meridian" data-user="Alex Rivera"
+         data-nav-active="Accounts" data-crumbs="Meridian|Accounts|Current account">
+      <div class="app-body">
     <section class="app-frame">
       <h2>Accounts</h2>
       <div class="two-col" id="accounts" data-testid="accounts"></div>
@@ -106,6 +110,8 @@
       </table>
       <p class="text-dim" id="statement-empty" data-testid="statement-empty" hidden>No transactions match those filters.</p>
     </section>
+      </div>
+    </div>
 
     <div class="panel app-next-steps">
       <span class="text-dim">Related:</span>
@@ -123,6 +129,7 @@
   <script src="../js/profiles.js"></script>
   <script src="../js/progress.js"></script>
   <script src="../js/rpg.js"></script>
+  <script src="../js/app-shell.js"></script>
   <script>
     // ── Money is stored in integer pence, never floats. ───────────────────
     // 0.1 + 0.2 !== 0.3 in binary floating point, and a bank that adds

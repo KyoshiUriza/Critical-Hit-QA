@@ -7,6 +7,7 @@
   <meta name="referrer" content="no-referrer" />
   <title>Practice (Broken): Live Feed — Critical Hit QA</title>
   <link rel="stylesheet" href="../css/styles.css" />
+  <link rel="stylesheet" href="../css/app-shell.css" />
 </head>
 <body data-page="practice-app-detail" data-depth="1">
   <a class="skip-link" href="#main">Skip to content</a>
@@ -14,7 +15,7 @@
 
   <main id="main" class="container">
     <div class="page-header">
-      <h1>Live Feed <span style="color:var(--danger);font-size:1rem;">(Buggy build)</span></h1>
+      <h1>Pulse Ops Feed <span style="color:var(--danger);font-size:1rem;">(buggy build)</span></h1>
       <p>Six defects that only exist in the gap between starting something and it finishing. Timing is the test.</p>
     </div>
 
@@ -31,6 +32,9 @@
       production.
     </div>
 
+    <div class="app-shell" data-brand="pulse" data-user="Alex Rivera"
+         data-crumbs="Pulse|Channels|#ops">
+      <div class="app-body">
     <div class="two-col">
       <div>
         <div class="panel">
@@ -74,6 +78,8 @@
         </div>
       </div>
     </div>
+      </div>
+    </div>
 
     <section class="panel">
       <h2>How to test something that only breaks when it overlaps</h2>
@@ -110,6 +116,7 @@
   <script src="../js/profiles.js"></script>
   <script src="../js/progress.js"></script>
   <script src="../js/rpg.js"></script>
+  <script src="../js/app-shell.js"></script>
   <script src="../js/defect-detector.js"></script>
   <script src="../js/bounty-panel.js"></script>
   <script src="../js/live-feed.js"></script>

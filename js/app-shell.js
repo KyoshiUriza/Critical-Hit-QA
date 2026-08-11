@@ -39,6 +39,24 @@
       stripRight: "Upgrade to Team",
       nav: ["Boards", "My tasks", "Reports", "Settings"]
     },
+    cadence: {
+      name: "Cadence Calendar",
+      mark: "CA",
+      accent: "#8a4b1f",
+      onAccent: "#ffffff",
+      strip: "Times shown in your selected timezone",
+      stripRight: "Team plan · 12 seats",
+      nav: ["Calendar", "Agenda", "People", "Settings"]
+    },
+    pulse: {
+      name: "Pulse Ops Feed",
+      mark: "PL",
+      accent: "#8f2f52",
+      onAccent: "#ffffff",
+      strip: "Live · connected to production alerts",
+      stripRight: "Muted: 0 channels",
+      nav: ["Feed", "Alerts", "Search", "Settings"]
+    },
     meridian: {
       name: "Meridian Bank",
       mark: "MB",
