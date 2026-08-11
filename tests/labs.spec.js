@@ -10,7 +10,10 @@ test.describe('Locator Lab', () => {
     await page.getByTestId('locator-input').fill('[data-testid="signup-submit"]');
     await page.getByTestId('locator-check').click();
     await expect(page.getByTestId('locator-result')).toContainText('Solid');
-    await expect(page.getByTestId('lab-score')).toContainText('1 of 6');
+    // Derived, not hardcoded: the exercise count grows, and pinning "of 6"
+    // is the same brittleness this lab exists to teach against.
+    const total = await page.evaluate(() => window.LOCATOR_EXERCISES.length);
+    await expect(page.getByTestId('lab-score')).toContainText(`1 of ${total}`);
   });
 
   test('flags a correct-but-brittle selector rather than passing it', async ({ page }) => {
@@ -22,7 +25,8 @@ test.describe('Locator Lab', () => {
     await expect(result).toContainText('Works now, breaks later');
     await expect(result).toContainText(/generated class/i);
     // A brittle answer must NOT count as solved.
-    await expect(page.getByTestId('lab-score')).toContainText('0 of 6');
+    const total = await page.evaluate(() => window.LOCATOR_EXERCISES.length);
+    await expect(page.getByTestId('lab-score')).toContainText(`0 of ${total}`);
   });
 
   test('reports a strict-mode violation when several elements match', async ({ page }) => {

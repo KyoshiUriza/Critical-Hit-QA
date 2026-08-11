@@ -36,10 +36,18 @@
 
     <div class="panel panel-warn">
       <strong>How this works.</strong> Each exercise names one element in the sandbox below.
-      Type a CSS selector (or an XPath starting with <code class="inline">/</code>) and the lab
-      evaluates it against the real DOM: how many elements it matches, whether it hit the
-      right one, and whether it leans on anything that tends to break. Playwright's own
-      locator API is shown once you land it.
+      The lab evaluates what you type against the real DOM: how many elements it matches,
+      whether it hit the right one, and whether it leans on anything that tends to break.
+      <br /><br />
+      <strong>Three syntaxes are accepted</strong> — a CSS selector, an XPath starting with
+      <code class="inline">/</code>, or a Playwright locator such as
+      <code class="inline">getByRole('button', { name: 'Save' })</code>, including chaining
+      and <code class="inline">.filter({ hasText })</code>. The priority list on the right
+      recommends roles first, so the grader accepts them first.
+      <br /><br />
+      <strong>The last three exercises have no <code class="inline">data-testid</code> anywhere.</strong>
+      That is deliberate: most applications you are handed will not have them, and an exercise
+      where the escape hatch is always available never tests judgement.
     </div>
 
     <div class="two-col locator-lab-layout">
@@ -91,7 +99,7 @@
         <div class="panel">
           <h3>Your run</h3>
           <div class="quiz-progress"><div class="quiz-progress-bar" id="lab-progress" style="width:0%"></div></div>
-          <p class="text-dim" id="lab-score" data-testid="lab-score">0 of 6 solved</p>
+          <p class="text-dim" id="lab-score" data-testid="lab-score">0 solved</p>
           <ul id="lab-checklist" class="lab-checklist"></ul>
         </div>
 
@@ -186,6 +194,70 @@
           <button class="btn btn-primary btn-sm" id="lab-open-modal">Open modal</button>
         </div>
       </section>
+
+      <!-- ══════════════════════════════════════════════════════════════
+           HARD REGION — deliberately contains NO data-testid anywhere,
+           and no stable ids. This is what most applications you are handed
+           actually look like: the escape hatch does not exist, and the only
+           durable handles are roles, labels and relationships.
+
+           Class names below are the generated kind on purpose. If a learner
+           reaches for them the grader flags them, which is the lesson.
+           ══════════════════════════════════════════════════════════════ -->
+      <section class="lab-block lab-hard" aria-label="Team members">
+        <h3>Team members <span class="lab-hard-flag">no test ids</span></h3>
+
+        <table class="data-table css-1f8a2b">
+          <thead>
+            <tr><th>Name</th><th>Role</th><th>Access</th><th></th></tr>
+          </thead>
+          <tbody>
+            <tr class="css-9d0e11">
+              <td>Priya Raman</td><td>Engineer</td><td>Admin</td>
+              <td><button class="css-3b7f21 btn btn-ghost btn-sm">Revoke</button></td>
+            </tr>
+            <tr class="css-9d0e11">
+              <td>Marcus Hale</td><td>Analyst</td><td>Read only</td>
+              <td><button class="css-3b7f21 btn btn-ghost btn-sm">Revoke</button></td>
+            </tr>
+            <tr class="css-9d0e11">
+              <td>Dana Whitfield</td><td>Engineer</td><td>Admin</td>
+              <td><button class="css-3b7f21 btn btn-ghost btn-sm">Revoke</button></td>
+            </tr>
+          </tbody>
+        </table>
+
+        <!-- Two inputs, no ids, no names, no placeholders. The label is the
+             only thing that identifies either of them. -->
+        <div class="lab-hard-form">
+          <label>Invite by email
+            <input type="email" class="css-4c8e93" />
+          </label>
+          <label>Invite by username
+            <input type="text" class="css-4c8e93" />
+          </label>
+          <button class="css-77aa10 btn btn-primary btn-sm">Send invite</button>
+        </div>
+
+        <!-- Three identical link texts. Only the surrounding card names them. -->
+        <div class="lab-hard-cards">
+          <article class="css-cd41f0" aria-label="Billing">
+            <h4>Billing</h4>
+            <p class="text-dim text-sm">Invoices and payment methods.</p>
+            <a href="#lab-hard" class="css-a91b3c">Read more</a>
+          </article>
+          <article class="css-cd41f0" aria-label="Security">
+            <h4>Security</h4>
+            <p class="text-dim text-sm">Sessions, devices and 2FA.</p>
+            <a href="#lab-hard" class="css-a91b3c">Read more</a>
+          </article>
+          <article class="css-cd41f0" aria-label="Notifications">
+            <h4>Notifications</h4>
+            <p class="text-dim text-sm">Email and in-app alerts.</p>
+            <a href="#lab-hard" class="css-a91b3c">Read more</a>
+          </article>
+        </div>
+      </section>
     </div>
 
     <!-- Modal contains a Confirm identical to the one on the page behind it. -->
@@ -216,6 +288,7 @@
   <script src="../js/profiles.js"></script>
   <script src="../js/progress.js"></script>
   <script src="../js/rpg.js"></script>
+  <script src="../js/locator-parse.js"></script>
   <script src="../js/data/locator-exercises.js"></script>
   <script src="../js/code-lang.js"></script>
   <script src="../js/locator-lab.js"></script>

@@ -62,10 +62,20 @@
     try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state.solved)); } catch (_) {}
   }
 
-  // Accepts CSS or XPath. Returns { ok, nodes, error }.
+  // Accepts CSS, XPath, or Playwright locator syntax.
+  // Returns { ok, nodes, error, positional }.
+  //
+  // Playwright syntax is accepted because the lab recommends getByRole and
+  // prints it as the model answer. Grading a syntax you refuse to accept
+  // teaches the wrong lesson twice: once by rejecting a correct answer, and
+  // once by implying CSS is what the job wants.
   function queryAll(sel) {
     var trimmed = sel.trim();
     if (!trimmed) return { ok: false, nodes: [], error: "Type a selector first." };
+
+    if (window.LocatorParse && window.LocatorParse.looksLikePlaywright(trimmed)) {
+      return window.LocatorParse.run(trimmed);
+    }
 
     var isXPath = trimmed.charAt(0) === "/" || trimmed.indexOf("//") === 0;
     if (isXPath) {
@@ -86,7 +96,7 @@
     }
   }
 
-  function smellsFor(sel, exercise) {
+  function smellsFor(sel, exercise, positional) {
     var found = [];
     GLOBAL_SMELLS.forEach(function (s) {
       if (s.test.test(sel)) found.push({ label: s.label, why: s.why });
@@ -94,6 +104,14 @@
     (exercise.traps || []).forEach(function (t) {
       if (t.pattern.test(sel)) found.push({ label: "Brittle for this element", why: t.why });
     });
+    // .first()/.last()/.nth() resolve fine and are positional by another name,
+    // so they are caught here rather than by the CSS-shaped regexes above.
+    if (positional) {
+      found.push({
+        label: "Positional narrowing",
+        why: "first(), last() and nth() pick by document order, not identity. They silence a strict-mode violation instead of resolving it — when a second match appears, you are asserting against whichever the DOM happened to order first."
+      });
+    }
     return found;
   }
 
@@ -117,7 +135,18 @@
     var want = targetNode(exercise);
     var matches = res.nodes;
     var hitsTarget = want && matches.indexOf(want) > -1;
-    var smells = smellsFor(input, exercise);
+    var smells = smellsFor(input, exercise, res.positional);
+
+    // Exercises in the no-test-id regions exist precisely because the escape
+    // hatch is missing. Say so rather than letting the attempt fail as if the
+    // syntax were wrong.
+    if (exercise.noTestId && /getByTestId|data-testid/i.test(input)) {
+      renderVerdict(box, "fail",
+        "There are no data-testid attributes anywhere in this section — that is the exercise. " +
+        "Most real applications you are handed will not have them either. Reach for a role, a " +
+        "label, or a scoped relationship instead.", smells);
+      return;
+    }
 
     if (matches.length === 0) {
       renderVerdict(box, "fail", "Matches nothing. Check the sandbox markup below — the element exists.", smells);

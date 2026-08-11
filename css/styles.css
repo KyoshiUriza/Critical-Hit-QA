@@ -1300,6 +1300,30 @@ code.inline {
 }
 .btn-sort:hover { color: var(--accent); }
 
+/* Locator Lab: the no-test-id region. Marked visually so nobody wastes a
+   session hunting for an attribute that was never there. */
+.lab-hard { border-left: 3px solid var(--warn); }
+.lab-hard-flag {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--on-warn);
+  background: var(--warn);
+  padding: 1px var(--sp-2);
+  border-radius: var(--rad-full);
+  vertical-align: middle;
+  margin-left: var(--sp-2);
+}
+.lab-hard-form { display: flex; gap: var(--sp-3); flex-wrap: wrap; align-items: flex-end; margin-top: var(--sp-4); }
+.lab-hard-form label { display: flex; flex-direction: column; gap: 4px; font-size: var(--text-sm); }
+.lab-hard-cards { display: flex; gap: var(--sp-3); flex-wrap: wrap; margin-top: var(--sp-4); }
+.lab-hard-cards article {
+  flex: 1 1 180px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--rad-md);
+  padding: var(--sp-3);
+}
+.lab-hard-cards h4 { margin: 0 0 var(--sp-1); font-size: var(--text-base); }
+
 /* API Lab response status. Colour is reinforcement — the number itself is the
    signal, and it is always present as text. */
 .api-status {

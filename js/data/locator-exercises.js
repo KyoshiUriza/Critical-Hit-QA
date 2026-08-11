@@ -116,5 +116,70 @@ window.LOCATOR_EXERCISES = [
       js: "await expect(page.getByTestId('sub-status')).toHaveText('Active');",
       ts: "await expect(page.getByTestId('sub-status')).toHaveText('Active');"
     }
+  },
+
+  // ── Hard region: no data-testid exists anywhere in this section. ──────
+  // These are the exercises the lab was missing. Every earlier target had a
+  // testid available, so the "ideal" answer was always the same shortcut and
+  // the grading never tested judgement. Real applications rarely hand you one.
+  {
+    id: "team-row-action",
+    title: "Revoke access for one person",
+    brief: "Three rows, three identical Revoke buttons, no test ids and no stable ids. Target the Revoke button on Dana Whitfield's row only.",
+    target: ".lab-hard tbody tr:nth-child(3) button",
+    difficulty: "hard",
+    noTestId: true,
+    teaches: "Scoping by content is what makes a row action durable. The row is identified by the data it contains, which is the one thing that does not move.",
+    traps: [
+      { pattern: /nth-child|nth-of-type|\.nth\(|\.last\(|\.first\(/i,
+        why: "Row order is not identity. Sort the table, add a member, or let the API return a different order and this points at somebody else — while still passing." },
+      { pattern: /css-[0-9a-f]{4,}/i,
+        why: "Those class names are bundler output. They change on a build you had nothing to do with." }
+    ],
+    idealHint: "getByRole('row', { name: /Dana Whitfield/ }).getByRole('button', { name: 'Revoke' }) — find the row by its content, then the action within it.",
+    playwright: {
+      js: "await page.getByRole('row', { name: /Dana Whitfield/ })\n  .getByRole('button', { name: 'Revoke' })\n  .click();",
+      ts: "await page.getByRole('row', { name: /Dana Whitfield/ })\n  .getByRole('button', { name: 'Revoke' })\n  .click();"
+    }
+  },
+  {
+    id: "label-only-input",
+    title: "The input with nothing on it",
+    brief: "Target the 'Invite by username' field. It has no id, no name, no placeholder and no test id — only its label.",
+    target: ".lab-hard-form label:nth-of-type(2) input",
+    difficulty: "hard",
+    noTestId: true,
+    teaches: "A label is user-visible copy: if it changes, a human decided it should. That makes it a better handle than any attribute a developer might rename silently.",
+    traps: [
+      { pattern: /input\[type=['\"]?text/i,
+        why: "Typing by input type is not identity either — the moment a second text input appears in this form, this matches two things." },
+      { pattern: /nth-of-type|nth-child/i,
+        why: "Positional again. Reorder the two fields and this quietly targets the email input instead." }
+    ],
+    idealHint: "getByLabel('Invite by username') — the label is the only durable handle here, which is exactly why the priority order puts it second.",
+    playwright: {
+      js: "await page.getByLabel('Invite by username').fill('kyoshi');",
+      ts: "await page.getByLabel('Invite by username').fill('kyoshi');"
+    }
+  },
+  {
+    id: "ambiguous-link",
+    title: "One of three identical links",
+    brief: "Three cards each contain a link reading 'Read more'. Target the one inside the Security card.",
+    target: ".lab-hard-cards article[aria-label='Security'] a",
+    difficulty: "hard",
+    noTestId: true,
+    teaches: "When the text is genuinely ambiguous, the fix is a scope, not a more specific string. Find the container by its accessible name, then the link inside it.",
+    traps: [
+      { pattern: /\.first\(|\.last\(|\.nth\(|nth-child|nth-of-type/i,
+        why: "Picking by position silences the ambiguity instead of resolving it. Reorder the cards and the test still passes — against the wrong link." },
+      { pattern: /css-[0-9a-f]{4,}/i,
+        why: "Generated class. It identifies the styling, not the card." }
+    ],
+    idealHint: "getByRole('article', { name: 'Security' }).getByRole('link', { name: 'Read more' }) — the card is an <article>, so its role is article, not region. A named <section> would be region.",
+    playwright: {
+      js: "await page.getByRole('article', { name: 'Security' })\n  .getByRole('link', { name: 'Read more' })\n  .click();",
+      ts: "await page.getByRole('article', { name: 'Security' })\n  .getByRole('link', { name: 'Read more' })\n  .click();"
+    }
   }
 ];
