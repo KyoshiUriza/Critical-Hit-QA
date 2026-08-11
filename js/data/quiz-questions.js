@@ -711,5 +711,88 @@ window.QUIZ_QUESTIONS = [
     ],
     answer: 1,
     explanation: "One of the classic testing principles. Even a single text field has effectively infinite inputs. Testing samples the risk intelligently — which is why WHAT you choose to test matters more than how much."
+  },
+
+  // ── Test data & environments ─────────────────────────────────────────
+  // The most common cause of the flakiness the automation track tells you to
+  // eliminate, and the gap the site had in the middle of that material.
+  // Taught in pages/learn/test-data.html.
+  {
+    category: "fundamentals",
+    difficulty: "medium",
+    question: "A test passes when you run it alone and fails when you run the whole suite. What does that point at first?",
+    choices: [
+      "A bug in the product that only appears under load",
+      "Shared state between tests — data, an account, or ordering",
+      "The assertion timeout being too short",
+      "A problem with the test runner itself"
+    ],
+    answer: 1,
+    explanation: "Passes alone, fails in the suite is the single most useful diagnostic in automation, and it points almost every time at shared state: two tests using the same account, the same unique value, or one test depending on data another created. It costs two minutes to run and it tells you whether to read the test's own code at all."
+  },
+  {
+    category: "fundamentals",
+    difficulty: "medium",
+    question: "Two parallel workers both register new@test.example. The second fails with \"email already exists\". What is the defect?",
+    choices: [
+      "The application should allow duplicate emails",
+      "The tests should not run in parallel",
+      "The test data is not unique per test",
+      "The registration validation is too strict"
+    ],
+    answer: 2,
+    explanation: "The application is behaving correctly — rejecting a duplicate is the requirement. The test is wrong: any field the product treats as unique needs a value unique per test. A timestamp is not enough at speed, because two workers can land in the same millisecond; a UUID is. Turning off parallelism 'fixes' it by hiding a data-design problem."
+  },
+  {
+    category: "automation",
+    difficulty: "medium",
+    question: "Your test needs a logged-in user with three saved addresses. What is usually the best way to get one?",
+    choices: [
+      "Drive the signup and address forms through the UI in a beforeEach",
+      "Create the user and addresses through the API, then exercise the UI",
+      "Use a shared seeded account that every test reuses",
+      "Restore a database snapshot before each test"
+    ],
+    answer: 1,
+    explanation: "Set up through the API, assert through the UI. Driving signup through the form means every test that needs a user fails when signup breaks — and only one of them was about signup. A shared account collides under parallelism, and a snapshot per test is far too slow. Reserve UI setup for the one test whose subject IS the setup."
+  },
+  {
+    category: "automation",
+    difficulty: "hard",
+    question: "A pipeline fails about one run in five, on different tests each time, against shared staging. What should you do first?",
+    choices: [
+      "Add retries so the pipeline goes green",
+      "Quarantine the tests that fail most often",
+      "Give each run its own ephemeral environment and data",
+      "Increase every assertion timeout"
+    ],
+    answer: 2,
+    explanation: "Different tests failing each time points at the environment, not at the tests. Shared staging means deploys mid-run, manual testers touching the same records, and rate-limited third-party sandboxes. Retries and longer timeouts make the symptom disappear while you are still shipping against an environment that lies — and they are the right tool only once you know what is failing."
+  },
+  {
+    category: "fundamentals",
+    difficulty: "medium",
+    question: "Your team wants to restore a production database into staging so test data is realistic. What is the necessary condition?",
+    choices: [
+      "Personal data is masked or synthesised before it lands, consistently across tables",
+      "Staging access is limited to the QA team",
+      "The restore happens outside business hours",
+      "The data is deleted again within 30 days"
+    ],
+    answer: 0,
+    explanation: "Masking has to happen before the data arrives — a copy that lands unmasked has already been disclosed to everyone with staging access, and restricting access afterwards does not undo it. It also has to be consistent, mapping the same customer to the same fake identity everywhere, or the referential integrity you copied the data for is gone. And watch the leftovers: real addresses in a test database have caused real email to real customers more than once."
+  },
+  {
+    category: "automation",
+    difficulty: "medium",
+    question: "Which of these makes a test suite genuinely safe to run in parallel?",
+    choices: [
+      "Setting workers to 1 in the config",
+      "Sorting tests alphabetically so ordering is predictable",
+      "No shared mutable data, unique values per test, and no ordering assumptions",
+      "Adding a retry to every test"
+    ],
+    answer: 2,
+    explanation: "Parallel safety is a data-design property, not a runner setting. Workers=1 is the opposite — it gives up parallelism to hide the coupling. Predictable ordering just makes order dependence reliable instead of removing it, which is how a suite stays green for months and then breaks the day someone shards it differently."
   }
 ];

@@ -102,6 +102,10 @@ defect that is *only* visible in storage, which this session's work made
 findable — that is the seed of the exercise.
 
 ## 5. Test data and environment thinking
+
+**Shipped.** `pages/learn/test-data.html` plus six quiz questions across
+fundamentals and automation. A test ties the two together so the track's
+practice link cannot point at an empty category.
 **Evidence: moderate external, strong first-principles. Cost: low.**
 
 Nothing on the site addresses where test data comes from, why a shared

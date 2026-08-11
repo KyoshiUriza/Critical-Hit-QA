@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; object-src 'none'; frame-src 'none'; base-uri 'self'; form-action 'self'" />
+  <meta name="referrer" content="no-referrer" />
+  <title>Test Data &amp; Environments — Learn — Critical Hit QA</title>
+  <link rel="stylesheet" href="../../css/styles.css" />
+</head>
+<body data-page="learn-test-data" data-depth="2">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div id="site-header"></div>
+
+  <main id="main" class="container">
+    <div class="page-header">
+      <h1>Test Data &amp; Environments</h1>
+      <p>Most "flaky tests" are not flaky tests. They are two runs fighting over the same row, or a fixture that was true last Tuesday.</p>
+    </div>
+
+    <div class="panel panel-accent">
+      <strong>Why this page exists.</strong> Everything else on this site
+      teaches you to write a test. This is about the ground it stands on. Data
+      and environment problems are the most common cause of the flakiness the
+      automation track tells you to eliminate, and almost nobody teaches them —
+      which is also why "how do you manage test data?" separates candidates so
+      cleanly in interviews.
+    </div>
+
+    <div class="section-toc">
+      <h4>◈ On this page</h4>
+      <ul>
+        <li><a href="#strategies">Four ways to get test data, and what each costs</a></li>
+        <li><a href="#collide">Why parallel runs collide</a></li>
+        <li><a href="#independent">Making a test independent</a></li>
+        <li><a href="#environments">Environments, and why shared ones lie</a></li>
+        <li><a href="#pii">Production data is a liability</a></li>
+        <li><a href="#interview">What interviewers ask</a></li>
+        <li><a href="#practice">Practice</a></li>
+      </ul>
+    </div>
+
+    <section id="strategies" class="panel">
+      <h2>Four ways to get test data, and what each costs</h2>
+      <table class="data-table">
+        <thead><tr><th>Approach</th><th>Good</th><th>The cost you pay later</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>Static fixtures</strong><br /><span class="text-dim">A seeded database, a JSON file</span></td>
+            <td>Fast, deterministic, readable. Everyone knows what user 7 is.</td>
+            <td>Goes stale. Tests start depending on "the third row", and every test shares one mutable world.</td>
+          </tr>
+          <tr>
+            <td><strong>Created per test</strong><br /><span class="text-dim">The test makes what it needs, usually via API</span></td>
+            <td>Independent, parallel-safe, self-documenting. Usually the right default.</td>
+            <td>Slower, needs a creation path, and leaks records unless you clean up.</td>
+          </tr>
+          <tr>
+            <td><strong>Generated</strong><br /><span class="text-dim">Faker, factories, property-based</span></td>
+            <td>Cheap volume, and randomness finds edge cases you would not have written.</td>
+            <td>Non-deterministic failures. Seed your generator and log the seed, or a failure is unreproducible.</td>
+          </tr>
+          <tr>
+            <td><strong>Copied from production</strong><br /><span class="text-dim">A restored or subsetted dump</span></td>
+            <td>Realistic shape, realistic volume, realistic mess.</td>
+            <td>Real people's data in a lower environment. See below — this is the one that becomes a legal problem.</td>
+          </tr>
+        </tbody>
+      </table>
+      <p class="text-dim mt-4">
+        Real suites mix them: seeded reference data that rarely changes
+        (countries, product types, roles), created-per-test data for anything
+        the test mutates. The failure pattern to recognise is a suite that used
+        only the first approach and has quietly become a suite where every test
+        depends on every other.
+      </p>
+    </section>
+
+    <section id="collide" class="panel">
+      <h2>Why parallel runs collide</h2>
+      <p>
+        Two workers run at once. Both use <code class="inline">qa@test.example</code>.
+        One signs in, the other changes that account's email mid-flow, and the
+        first fails with something that looks nothing like the real cause.
+      </p>
+      <p>The three collisions worth recognising by sight:</p>
+      <ol>
+        <li>
+          <strong>Shared account.</strong> Two tests using the same login. The
+          symptom is a test that passes alone and fails in the suite — the
+          single most useful diagnostic signal there is.
+        </li>
+        <li>
+          <strong>Shared unique value.</strong> Two tests both registering
+          <code class="inline">new@test.example</code>. The second gets "already
+          exists" and fails on a validation message that is completely correct.
+        </li>
+        <li>
+          <strong>Order dependence.</strong> Test A creates what test B asserts
+          on. Green for months, then the runner shards differently or someone
+          adds a <code class="inline">.only</code>, and B fails alone.
+        </li>
+      </ol>
+      <div class="panel panel-warn">
+        <strong>The diagnostic that costs nothing:</strong> run the failing test
+        by itself. Passes alone, fails in the suite means shared state, and you
+        can stop reading the test's own code. Fails both ways means the test or
+        the product is wrong. Two minutes of triage that decides which day you
+        are about to have.
+      </div>
+    </section>
+
+    <section id="independent" class="panel">
+      <h2>Making a test independent</h2>
+      <p>
+        The rule is one sentence: <strong>a test creates what it needs, asserts,
+        and leaves nothing behind that another test can see.</strong> Everything
+        below is a way of keeping it.
+      </p>
+      <pre class="code-block"><code>// Colliding: every worker fights over one account.
+const USER = 'qa@test.example';
+
+// Independent: unique per test, and traceable back to the run that made it.
+function uniqueEmail(label) {
+  return `qa-${label}-${process.env.RUN_ID}-${crypto.randomUUID()}@test.example`;
+}
+
+test('a new account can be created', async ({ page, request }) => {
+  const email = uniqueEmail('signup');
+  // Created through the API: fast, and it is not what this test is verifying.
+  await request.post('/api/users', { data: { email, plan: 'free' } });
+  // ... exercise the UI, assert
+});</code></pre>
+      <p class="mt-4">Four habits that follow from it:</p>
+      <ul>
+        <li><strong>Set up through the API, assert through the UI.</strong> Creating a user by driving the signup form ten times makes ten tests that all fail when signup breaks. Only one of them was about signup.</li>
+        <li><strong>Never reuse a unique field.</strong> Emails, usernames, order references, SKUs. A timestamp is not enough at speed — two workers can hit the same millisecond. A UUID is.</li>
+        <li><strong>Clean up, but do not depend on cleanup.</strong> A test that only passes when the previous run cleaned up correctly has just reintroduced order dependence through the back door.</li>
+        <li><strong>Tag what you create.</strong> A run id in the record means you can find and purge your own leftovers, and it tells you which run left the mess.</li>
+      </ul>
+      <p class="text-dim">
+        Where cleanup belongs is a genuine trade-off, and saying so is a good
+        interview answer: after each test is tidiest but slowest and can hide
+        the state you needed to debug; a scheduled purge is cheaper but leaves
+        a dirty environment between runs.
+      </p>
+    </section>
+
+    <section id="environments" class="panel">
+      <h2>Environments, and why shared ones lie</h2>
+      <table class="data-table">
+        <thead><tr><th>Environment</th><th>What it is for</th><th>What it will not tell you</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Local</strong></td><td>Fast feedback while writing.</td><td>Anything about integration, scale, or config.</td></tr>
+          <tr><td><strong>CI / ephemeral</strong></td><td>The suite, on a clean environment built per run.</td><td>Real data volume, real third parties.</td></tr>
+          <tr><td><strong>Staging</strong></td><td>Production-like config and integrations.</td><td>Production data volume — and staging drifts unless it is rebuilt.</td></tr>
+          <tr><td><strong>Production</strong></td><td>The truth. Smoke tests and monitoring belong here.</td><td>Nothing — but a destructive test here is a career event.</td></tr>
+        </tbody>
+      </table>
+      <p class="mt-4">
+        A <strong>shared staging environment</strong> is where suites go to
+        become unreliable. Someone deploys mid-run; someone else is manually
+        testing the same records; a third-party sandbox is rate-limiting all of
+        you. The failures are real failures — of the environment, not the
+        product — and a suite that cries wolf weekly stops being read.
+      </p>
+      <p class="text-dim">
+        The strong answer to "how would you fix our flaky pipeline" starts with
+        an ephemeral environment per run, not with retries. Retries are the
+        thing you add after you know what is failing, and the thing that hides
+        it if you add them first.
+      </p>
+      <div class="panel">
+        <strong>Config is test data too.</strong> Feature flags, currency,
+        locale, timezone, the seeded admin's permissions. A test that passes in
+        CI and fails in staging is very often a flag that is on in one and off
+        in the other — and pinning the flag inside the test is what makes it
+        answerable.
+      </div>
+    </section>
+
+    <section id="pii" class="panel">
+      <h2>Production data is a liability</h2>
+      <p>
+        Restoring a production dump into staging is the fastest way to get
+        realistic data and it copies real people into an environment with weaker
+        access control, wider access, and probably no audit trail. Under GDPR
+        that is processing personal data for a new purpose, and testing is not a
+        lawful basis on its own.
+      </p>
+      <ul>
+        <li><strong>Mask or synthesise before it lands.</strong> Not after — a copy that arrives unmasked has already been disclosed to everyone with staging access.</li>
+        <li><strong>Masking must be consistent.</strong> The same customer has to map to the same fake identity across every table, or the referential integrity you copied the data for is gone.</li>
+        <li><strong>Beware the leftovers.</strong> Real email addresses in a test database get sent real email by an integration nobody remembered. This is a well-worn way to email thousands of customers by accident.</li>
+        <li><strong>Subset, do not clone.</strong> A representative slice gives most of the realism at a fraction of the risk and restore time.</li>
+      </ul>
+      <p class="text-dim">
+        Being the person who asks "is this masked?" before a restore is cheap
+        and it is remembered. It is also a question that reads as senior in an
+        interview, because it shows you have thought past making the test pass.
+      </p>
+    </section>
+
+    <section id="interview" class="panel">
+      <h2>What interviewers ask</h2>
+      <ul>
+        <li><strong>"How do you manage test data?"</strong> Name the trade-off rather than a tool: seeded reference data that does not change, created-per-test for anything mutated, unique values on every unique field. Then say how you clean up.</li>
+        <li><strong>"A test passes locally and fails in CI. What now?"</strong> Run it alone. Passing alone and failing in the suite points at shared state; failing both ways points at environment or config. Say the diagnostic before you say the cause.</li>
+        <li><strong>"How do you make tests run in parallel safely?"</strong> No shared mutable data, unique values per test, setup through the API, and no assumption about ordering. Parallel safety is a data-design problem before it is a runner setting.</li>
+        <li><strong>"Would you test against production?"</strong> Read-only smoke tests and synthetic monitoring, yes — with clearly marked synthetic accounts and no destructive actions. It is a real practice, not a trick question, and the answer is about blast radius.</li>
+        <li><strong>"Can we just copy production data down?"</strong> Not unmasked. This is the one where a candidate who says "yes, that's easiest" loses the room.</li>
+      </ul>
+    </section>
+
+    <section id="practice" class="panel panel-accent">
+      <h2>Practice — earn Star-Dust</h2>
+      <ol>
+        <li>Take the <a href="../practice-tests.html?category=fundamentals">Fundamentals quiz</a> — the test-data and environment questions are in there.</li>
+        <li>Open the <a href="../code-review.html">Code Review Gauntlet</a> and find the exercise about tests that must run in order. It is this page in code form.</li>
+        <li>In the <a href="../../practice-apps/api-lab.html">API Lab</a>, work out which request you would use to create a fixture instead of driving the UI.</li>
+        <li>Look at any test you have written and ask: if this ran twice at once, what would break? That question alone finds most of it.</li>
+      </ol>
+    </section>
+
+    <div class="panel app-next-steps">
+      <span class="text-dim">Related:</span>
+      <a class="btn btn-primary btn-sm" href="../code-review.html">Code Review Gauntlet →</a>
+      <a class="btn btn-ghost btn-sm" href="automation.html">Automation track</a>
+      <a class="btn btn-ghost btn-sm" href="../../practice-apps/api-lab.html">API Lab</a>
+      <a class="btn btn-ghost btn-sm" href="../learn.html">All tracks</a>
+    </div>
+  </main>
+
+  <div id="site-footer"></div>
+
+  <script src="../../js/test-hooks.js"></script>
+  <script src="../../js/site-chrome.js"></script>
+  <script src="../../js/data/defects.js"></script>
+  <script src="../../js/profiles.js"></script>
+  <script src="../../js/progress.js"></script>
+  <script src="../../js/rpg.js"></script>
+</body>
+</html>
