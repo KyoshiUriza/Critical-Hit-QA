@@ -94,6 +94,93 @@
     "feedback-link",
     "source-link"
   ],
+  "pages/learn/accessibility.html": [
+    "book-link",
+    "copyright",
+    "donate-link",
+    "feedback-link",
+    "source-link"
+  ],
+  "pages/learn/automation.html": [
+    "book-link",
+    "copyright",
+    "donate-link",
+    "feedback-link",
+    "source-link"
+  ],
+  "pages/learn/codeless.html": [
+    "book-link",
+    "copyright",
+    "donate-link",
+    "feedback-link",
+    "source-link"
+  ],
+  "pages/learn/first-90-days.html": [
+    "book-link",
+    "copyright",
+    "donate-link",
+    "feedback-link",
+    "source-link"
+  ],
+  "pages/learn/frameworks.html": [
+    "book-link",
+    "copyright",
+    "donate-link",
+    "feedback-link",
+    "source-link"
+  ],
+  "pages/learn/locators.html": [
+    "book-link",
+    "code-lang-js",
+    "code-lang-ts",
+    "copyright",
+    "donate-link",
+    "feedback-link",
+    "source-link"
+  ],
+  "pages/learn/manual.html": [
+    "book-link",
+    "copyright",
+    "donate-link",
+    "feedback-link",
+    "source-link"
+  ],
+  "pages/learn/responsive.html": [
+    "book-link",
+    "copyright",
+    "donate-link",
+    "feedback-link",
+    "source-link"
+  ],
+  "pages/learn/setup-playwright.html": [
+    "book-link",
+    "copyright",
+    "donate-link",
+    "feedback-link",
+    "source-link"
+  ],
+  "pages/learn/sql.html": [
+    "book-link",
+    "copyright",
+    "donate-link",
+    "feedback-link",
+    "source-link"
+  ],
+  "pages/learn/suite-health.html": [
+    "book-link",
+    "copyright",
+    "donate-link",
+    "feedback-link",
+    "source-link",
+    "suite-link"
+  ],
+  "pages/learn/test-data.html": [
+    "book-link",
+    "copyright",
+    "donate-link",
+    "feedback-link",
+    "source-link"
+  ],
   "pages/playwright-errors.html": [
     "book-link",
     "code-lang-js",
@@ -243,93 +330,6 @@
     "skill-sql",
     "skill-test-design",
     "skill-tier",
-    "source-link"
-  ],
-  "pages/learn/accessibility.html": [
-    "book-link",
-    "copyright",
-    "donate-link",
-    "feedback-link",
-    "source-link"
-  ],
-  "pages/learn/automation.html": [
-    "book-link",
-    "copyright",
-    "donate-link",
-    "feedback-link",
-    "source-link"
-  ],
-  "pages/learn/codeless.html": [
-    "book-link",
-    "copyright",
-    "donate-link",
-    "feedback-link",
-    "source-link"
-  ],
-  "pages/learn/first-90-days.html": [
-    "book-link",
-    "copyright",
-    "donate-link",
-    "feedback-link",
-    "source-link"
-  ],
-  "pages/learn/frameworks.html": [
-    "book-link",
-    "copyright",
-    "donate-link",
-    "feedback-link",
-    "source-link"
-  ],
-  "pages/learn/locators.html": [
-    "book-link",
-    "code-lang-js",
-    "code-lang-ts",
-    "copyright",
-    "donate-link",
-    "feedback-link",
-    "source-link"
-  ],
-  "pages/learn/manual.html": [
-    "book-link",
-    "copyright",
-    "donate-link",
-    "feedback-link",
-    "source-link"
-  ],
-  "pages/learn/responsive.html": [
-    "book-link",
-    "copyright",
-    "donate-link",
-    "feedback-link",
-    "source-link"
-  ],
-  "pages/learn/setup-playwright.html": [
-    "book-link",
-    "copyright",
-    "donate-link",
-    "feedback-link",
-    "source-link"
-  ],
-  "pages/learn/sql.html": [
-    "book-link",
-    "copyright",
-    "donate-link",
-    "feedback-link",
-    "source-link"
-  ],
-  "pages/learn/suite-health.html": [
-    "book-link",
-    "copyright",
-    "donate-link",
-    "feedback-link",
-    "source-link",
-    "suite-link"
-  ],
-  "pages/learn/test-data.html": [
-    "book-link",
-    "copyright",
-    "donate-link",
-    "feedback-link",
     "source-link"
   ],
   "practice-apps/a11y-challenge.html": [
@@ -872,5 +872,73 @@
     "new-todo-input",
     "source-link",
     "todo-list"
+  ],
+  "practice-apps/window-redirect.html": [
+    "book-link",
+    "copyright",
+    "donate-link",
+    "feedback-link",
+    "redirect-heading",
+    "redirect-idle",
+    "redirecting",
+    "source-link",
+    "start-redirect"
+  ],
+  "practice-apps/window-target.html": [
+    "book-link",
+    "close-me",
+    "copyright",
+    "donate-link",
+    "feedback-link",
+    "opener-state",
+    "source-link",
+    "target-autoclose",
+    "target-from",
+    "target-heading",
+    "target-sku"
+  ],
+  "practice-apps/windows-lab.html": [
+    "book-link",
+    "challenge-blank-link",
+    "challenge-opener-access",
+    "challenge-pushstate",
+    "challenge-redirect",
+    "challenge-same-tab",
+    "challenge-self-closing",
+    "challenge-three-tabs",
+    "challenge-window-open",
+    "copyright",
+    "donate-link",
+    "event-log",
+    "feedback-link",
+    "go-redirect",
+    "go-same-tab",
+    "open-blank",
+    "open-popup",
+    "open-safe",
+    "open-self-closing",
+    "open-three",
+    "open-unsafe",
+    "pattern-blank-link",
+    "pattern-opener-access",
+    "pattern-pushstate",
+    "pattern-redirect",
+    "pattern-same-tab",
+    "pattern-self-closing",
+    "pattern-three-tabs",
+    "pattern-window-open",
+    "push-state",
+    "reveal-blank-link",
+    "reveal-opener-access",
+    "reveal-pushstate",
+    "reveal-redirect",
+    "reveal-same-tab",
+    "reveal-self-closing",
+    "reveal-three-tabs",
+    "reveal-window-open",
+    "source-link",
+    "spa-view",
+    "wl-reset",
+    "wl-score"
   ]
 }

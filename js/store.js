@@ -298,6 +298,15 @@
     box.appendChild(tid(el("p", "prod-meta",
       t.items.length + " line(s), " + money(t.total) + " charged."), "order-total-line"));
 
+    // Opens in a new tab, the way every real store's invoice does. Carries
+    // rel=noopener because the alternative is a genuine defect.
+    var invoice = el("a", "btn btn-ghost btn-sm", "View invoice (opens in a new tab)");
+    invoice.href = "window-target.html?from=invoice&ref=" + encodeURIComponent(ref);
+    invoice.target = "_blank";
+    invoice.rel = "noopener noreferrer";
+    tid(invoice, "view-invoice");
+    box.appendChild(invoice);
+
     // The legacy result node. Its testid predates the multi-step flow and both
     // this suite and a learner's own tests use it, so it keeps its wording.
     var result = byId("checkout-result");

@@ -20,9 +20,50 @@ test.describe('practice app catalog', () => {
     // This exists because a new app shipped unlisted: the file was on disk,
     // the tests all passed, and there was no route to it from the site. An
     // app nobody can find is an app that does not exist.
+    //
+    // Reachability is followed rather than checked one level deep. The
+    // Windows lab opens two supporting pages — a target and a redirect hop —
+    // which are genuinely findable but would clutter the listing as if they
+    // were apps in their own right. Requiring a direct link would have forced
+    // either a misleading catalog entry or an exception list, and exception
+    // lists are how the unreachable page eventually slips back in.
     const listing = fs.readFileSync(path.join(ROOT, 'pages', 'practice-apps.html'), 'utf8');
-    const orphans = appFiles().filter((f) => !listing.includes(`practice-apps/${f}`));
-    expect(orphans, 'apps on disk but not linked from the listing page').toEqual([]);
+
+    const linksIn = (html) =>
+      [...html.matchAll(/(?:practice-apps\/)?([A-Za-z0-9-]+\.html)/g)].map((m) => m[1]);
+
+    const apps = new Set(appFiles());
+    const reached = new Set(linksIn(listing).filter((f) => apps.has(f)));
+    const queue = [...reached];
+
+    // An app's routes are not all in its markup. The Windows lab builds its
+    // target URLs in JavaScript, so following only the HTML reported it as
+    // orphaned when it is opened on every click. Follow the scripts a page
+    // loads as well as its links.
+    const sourcesOf = (html) => {
+      const out = [html];
+      for (const m of html.matchAll(/<script src="\.\.\/(js\/[A-Za-z0-9/_-]+\.js)"/g)) {
+        const p = path.join(ROOT, m[1]);
+        if (fs.existsSync(p)) out.push(fs.readFileSync(p, 'utf8'));
+      }
+      return out;
+    };
+
+    while (queue.length) {
+      const file = queue.shift();
+      const html = fs.readFileSync(path.join(ROOT, 'practice-apps', file), 'utf8');
+      for (const source of sourcesOf(html)) {
+        for (const next of linksIn(source)) {
+          if (apps.has(next) && !reached.has(next)) {
+            reached.add(next);
+            queue.push(next);
+          }
+        }
+      }
+    }
+
+    const orphans = appFiles().filter((f) => !reached.has(f));
+    expect(orphans, 'apps on disk with no route to them from the site').toEqual([]);
   });
 
   test('the listing does not advertise apps that do not exist', async () => {

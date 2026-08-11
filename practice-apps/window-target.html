@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; object-src 'none'; frame-src 'none'; base-uri 'self'; form-action 'self'" />
+  <meta name="referrer" content="no-referrer" />
+  <title>Window Target — Critical Hit QA</title>
+  <link rel="stylesheet" href="../css/styles.css" />
+</head>
+<body data-page="practice-app-detail" data-depth="1">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div id="site-header"></div>
+
+  <main id="main" class="container">
+    <div class="page-header">
+      <h1 data-testid="target-heading">Window Target</h1>
+      <p>The page the Windows lab opens. It reports what it can see about the window that opened it.</p>
+    </div>
+
+    <div class="panel">
+      <h3>What this page knows</h3>
+      <table class="data-table">
+        <tbody>
+          <tr>
+            <th scope="row">Opened by</th>
+            <td data-testid="target-from">—</td>
+          </tr>
+          <tr>
+            <th scope="row">SKU parameter</th>
+            <td data-testid="target-sku">—</td>
+          </tr>
+          <tr>
+            <th scope="row">window.opener</th>
+            <td><strong data-testid="opener-state">—</strong></td>
+          </tr>
+          <tr>
+            <th scope="row">Closes itself</th>
+            <td data-testid="target-autoclose">no</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="panel panel-accent">
+      <strong>Why the opener row matters.</strong> A link with
+      <code class="inline">target="_blank"</code> and no
+      <code class="inline">rel="noopener"</code> hands the opened page a live
+      handle to the one that opened it. That page can then navigate its opener
+      somewhere else — a real phishing technique, and invisible unless you look
+      for it. Modern browsers imply <code class="inline">noopener</code> for
+      <code class="inline">target="_blank"</code>; older ones and non-browser
+      clients do not, so it is still worth asserting.
+      <br /><br />
+      This page never actually touches its opener. It only reports whether it
+      could.
+    </div>
+
+    <div class="panel app-next-steps">
+      <span class="text-dim">Next:</span>
+      <a class="btn btn-primary btn-sm" href="windows-lab.html">Back to the Windows lab →</a>
+      <button class="btn btn-ghost btn-sm" id="close-me" data-testid="close-me">Close this tab</button>
+    </div>
+  </main>
+
+  <script src="../js/test-hooks.js"></script>
+  <script src="../js/site-chrome.js"></script>
+  <script src="../js/data/defects.js"></script>
+  <script src="../js/profiles.js"></script>
+  <script src="../js/progress.js"></script>
+  <script src="../js/rpg.js"></script>
+  <script>
+    (function () {
+      var q = new URLSearchParams(location.search);
+      function set(id, value) {
+        document.querySelector('[data-testid="' + id + '"]').textContent = value;
+      }
+
+      set("target-from", q.get("from") || "opened directly");
+      set("target-sku", q.get("sku") || "none");
+
+      // Reading window.opener is the whole point of this page. Accessing it
+      // cross-origin can throw, so it is guarded — a thrown error here would
+      // be reported as "opener: null" and quietly teach the wrong lesson.
+      var state = "null";
+      try {
+        state = window.opener ? "reachable" : "null";
+      } catch (_) {
+        state = "blocked";
+      }
+      set("opener-state", "opener: " + state);
+
+      var closeAfter = parseInt(q.get("close"), 10);
+      if (closeAfter > 0) {
+        set("target-autoclose", "yes, after " + closeAfter + "ms");
+        setTimeout(function () { window.close(); }, closeAfter);
+      }
+
+      document.getElementById("close-me").addEventListener("click", function () {
+        window.close();
+      });
+    })();
+  </script>
+  <div id="site-footer"></div>
+</body>
+</html>

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; object-src 'none'; frame-src 'none'; base-uri 'self'; form-action 'self'" />
+  <meta name="referrer" content="no-referrer" />
+  <title>Windows, Tabs &amp; Navigation — Critical Hit QA</title>
+  <link rel="stylesheet" href="../css/styles.css" />
+  <link rel="stylesheet" href="../css/app-shell.css" />
+</head>
+<body data-page="practice-app-detail" data-depth="1">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div id="site-header"></div>
+
+  <main id="main" class="container">
+    <div class="page-header">
+      <h1>Windows, Tabs &amp; Navigation</h1>
+      <p>Eight behaviors that break naive automation: new tabs, a popup, a redirect, and a URL that changes without anything loading.</p>
+    </div>
+
+    <div class="panel panel-accent">
+      <strong>Why this exists.</strong> Every other practice app on this site
+      lived on one page that never changed its URL, which made a whole category
+      of automation unpractisable here. Waiting for a new tab, picking the right
+      one out of several, following a redirect to where it actually lands, and
+      telling a real navigation apart from a History push are all routine at
+      work and all absent from most portfolios.
+      <br /><br />
+      <strong>This lab is a target, not a quiz.</strong> It cannot see your
+      Playwright script and does not pretend to grade one. Trigger a behavior,
+      watch what the browser really does, then reveal the pattern — the reveal
+      unlocks only after you have met the problem.
+    </div>
+
+    <div class="panel">
+      <div class="quiz-progress"><div class="quiz-progress-bar" id="wl-progress" style="width:0%"></div></div>
+      <div class="lab-ex-head">
+        <p class="text-dim m-0" id="wl-score" data-testid="wl-score">0 exercised</p>
+        <button class="btn btn-ghost btn-sm" id="wl-reset" data-testid="wl-reset">Reset — close popups, restore the URL</button>
+      </div>
+    </div>
+
+    <div id="challenges"></div>
+
+    <div class="panel">
+      <h3>Event log</h3>
+      <p class="text-dim text-sm">What this page actually did. Deliberately has no timestamps — a clock in text you assert on makes the assertion nondeterministic.</p>
+      <div id="event-log" data-testid="event-log"></div>
+    </div>
+
+    <section class="panel">
+      <h2>The rules worth carrying to work</h2>
+      <ol>
+        <li><strong>Wait and click together.</strong> <code class="inline">Promise.all([context.waitForEvent('page'), click])</code>. Clicking first and waiting second is a race, and it is the kind you lose one run in fifty.</li>
+        <li><strong>A new tab is a new page object.</strong> Your original <code class="inline">page</code> handle does not follow it. Most "my assertion passes but the tab is wrong" reports are this.</li>
+        <li><strong>Never pick a tab by index.</strong> <code class="inline">context.pages()</code> order is not a contract. Find it by URL or title.</li>
+        <li><strong>Wait for where you land, not the first hop.</strong> A redirect that used <code class="inline">location.replace()</code> is not even in history.</li>
+        <li><strong>A URL is a hint, not evidence.</strong> <code class="inline">pushState</code> moves the address bar with no load at all. Assert what the user can see.</li>
+        <li><strong>Close what you open.</strong> Tabs left behind leak into the next test, and a closed page throws on every call — read what you need before it goes.</li>
+      </ol>
+      <div class="panel panel-warn">
+        <strong>The security one.</strong> A <code class="inline">target="_blank"</code>
+        link without <code class="inline">rel="noopener"</code> gives the opened
+        page a live handle to yours through <code class="inline">window.opener</code>,
+        and it can navigate you elsewhere. Browsers now imply it; older clients
+        do not. It is a legitimate finding, and this lab has one of each so you
+        can see the difference rather than take it on trust.
+      </div>
+    </section>
+
+    <div class="panel app-next-steps">
+      <span class="text-dim">Next:</span>
+      <a class="btn btn-primary btn-sm" href="../pages/automation-lab.html">Automation Lab →</a>
+      <a class="btn btn-ghost btn-sm" href="locator-lab.html">Locator Lab</a>
+      <a class="btn btn-ghost btn-sm" href="devtools-lab.html">DevTools Lab</a>
+      <a class="btn btn-ghost btn-sm" href="../pages/learn/automation.html">Automation track</a>
+    </div>
+  </main>
+
+  <script src="../js/test-hooks.js"></script>
+  <script src="../js/site-chrome.js"></script>
+  <script src="../js/data/defects.js"></script>
+  <script src="../js/profiles.js"></script>
+  <script src="../js/progress.js"></script>
+  <script src="../js/rpg.js"></script>
+  <script src="../js/data/window-challenges.js"></script>
+  <script src="../js/windows-lab.js"></script>
+  <div id="site-footer"></div>
+</body>
+</html>
