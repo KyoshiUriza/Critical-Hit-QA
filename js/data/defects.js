@@ -76,6 +76,29 @@ window.APP_DEFECTS = {
   // That is a real difference between accessibility work and functional
   // testing, and worth knowing: you find these by inspecting and by using a
   // keyboard, not by driving the app until something misbehaves.
+  responsive: {
+    name: "Responsive Lab",
+    url: "../practice-apps/responsive-broken.html",
+    defects: [
+      // Three of these fire automatically, because each has a moment where the
+      // defect becomes observable: the frame scrolls sideways, a control you
+      // never knew existed slides into view, or your typed text vanishes. The
+      // other two are steady-state layout facts with no such moment — the same
+      // reason the a11y challenge's defects are hunted by eye. Auto-ticking
+      // them the instant you chose a phone size would hand over the answers
+      // for picking a preset.
+      { id: "reflow-2d", severity: "high", title: "Content requires scrolling in two directions",
+        hint: "At phone width the order summary is a fixed 420px, so the whole screen scrolls sideways as well as down. WCAG 1.4.10 Reflow" },
+      { id: "clipped-cta", severity: "critical", title: "The Apply button is off-screen with no visible scrollbar",
+        hint: "The promo row never wraps and scrolls inside itself. On a touch device there is no scrollbar, so the control looks absent rather than hidden" },
+      { id: "tap-target", severity: "high", title: "Remove buttons shrink to 20x20 on phones",
+        hint: "Measure one in DevTools at phone width. WCAG 2.2 2.5.8 asks for 24x24 (AA); iOS guidance says 44pt and Android 48dp" },
+      { id: "header-eats-viewport", severity: "medium", title: "The sticky header takes 46% of the screen in landscape",
+        hint: "26% in portrait and 46% rotated — the header has a natural height and the viewport does not. Measure it, do not estimate: header height over viewport height" },
+      { id: "rotate-wipes-form", severity: "critical", title: "Rotating the device clears the delivery form",
+        hint: "Type a name and address, then rotate. The re-render rebuilds the inputs from empty state instead of preserving what you entered" }
+    ]
+  },
   a11y: {
     name: "Accessibility Challenge",
     url: "../practice-apps/a11y-challenge.html",

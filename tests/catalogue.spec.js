@@ -139,4 +139,44 @@ test.describe('practice app catalogue', () => {
     }
     expect(bare, 'practice apps with interactive elements and no test ids').toEqual([]);
   });
+  test('the app cards quote defect counts that match the catalogue', async ({ page }) => {
+    // The fourth hand-maintained list to be caught drifting. The Login card
+    // still advertised 9 defects after pw-length was removed as not-a-defect,
+    // so the site was promising a bug that no longer existed and a learner
+    // could hunt for it forever. The number is derived here rather than
+    // restated, which is the only version of this that stays true.
+    await page.goto('/pages/practice-apps.html?reset');
+
+    const stated = await page.evaluate(() => {
+      const out = {};
+      document.querySelectorAll('.app-card').forEach((card) => {
+        const link = card.querySelector('a[href*="practice-apps/"]');
+        const meta = card.querySelector('.app-meta');
+        if (!link || !meta) return;
+        const m = meta.textContent.match(/(\d+)\s+(?:known defects|seeded issues)/);
+        if (m) out[link.getAttribute('href').split('/').pop()] = Number(m[1]);
+      });
+      return out;
+    });
+
+    await page.goto('/pages/bug-bounty.html?reset');
+    const actual = await page.evaluate(() => {
+      const out = {};
+      Object.values(window.APP_DEFECTS).forEach((a) => {
+        out[a.url.split('/').pop()] = a.defects.length;
+      });
+      return out;
+    });
+
+    const wrong = [];
+    for (const [file, n] of Object.entries(stated)) {
+      if (actual[file] === undefined) wrong.push(`${file}: card quotes a count for an app not in the catalogue`);
+      else if (actual[file] !== n) wrong.push(`${file}: card says ${n}, catalogue has ${actual[file]}`);
+    }
+    // And every catalogued app must have a card at all.
+    for (const file of Object.keys(actual)) {
+      if (stated[file] === undefined) wrong.push(`${file}: catalogued but no card quotes its count`);
+    }
+    expect(wrong).toEqual([]);
+  });
 });

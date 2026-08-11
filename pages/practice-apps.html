@@ -228,7 +228,7 @@
     <div class="apps-grid">
       <div class="app-card" style="border-color: var(--danger);">
         <h3>Login Form <span style="color:var(--danger); font-size:0.8rem;">BUGGY</span></h3>
-        <div class="app-meta">Auth · 9 known defects</div>
+        <div class="app-meta">Auth · 8 known defects</div>
         <p class="text-dim">Validation, security-info leaks, lockout logic, and toggle behavior — all can be broken here.</p>
         <ul>
           <li>Hint: try boundary emails and passwords</li>
@@ -272,6 +272,18 @@
           <li>Hint: password strength — does it change?</li>
         </ul>
         <a class="btn btn-danger btn-sm" href="../practice-apps/register-broken.html">Open buggy app →</a>
+      </div>
+
+      <div class="app-card" style="border-color: var(--danger);">
+        <h3>Responsive Lab <span style="color:var(--danger); font-size:0.8rem;">BUGGY</span></h3>
+        <div class="app-meta">Mobile · 5 known defects</div>
+        <p class="text-dim">A checkout signed off on a laptop. Every defect here only exists below 480px or after a rotation — resize the device frame and look again.</p>
+        <ul>
+          <li>Hint: does the screen scroll in two directions?</li>
+          <li>Hint: measure a tap target, do not eyeball it</li>
+          <li>Hint: type something, then rotate</li>
+        </ul>
+        <a class="btn btn-danger btn-sm" href="../practice-apps/responsive-broken.html">Open buggy app →</a>
       </div>
     </div>
 

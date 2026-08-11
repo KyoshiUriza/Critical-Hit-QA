@@ -1313,6 +1313,103 @@ code.inline {
   min-height: 1.2em;
 }
 
+/* ── Responsive Lab ───────────────────────────────────────────────────
+   The seeded defects respond to the DEVICE FRAME's width, not the browser
+   window's, via container queries. That is deliberate: resizing the real
+   window would resize the site chrome and the answer key along with the app,
+   and a learner on a laptop cannot make their window 375px wide anyway.
+
+   The frame is a real scroll container with real overflow, so the reflow
+   defect below produces genuine horizontal scrolling that can be observed and
+   measured — not a picture of it. Everything here is also reproducible with
+   real device emulation, which the Learn track tells you to do next. */
+.rl-stage {
+  display: flex;
+  justify-content: center;
+  padding: var(--sp-4);
+  background: var(--bg-elev-2);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--rad-lg);
+  overflow: auto;
+}
+.rl-device {
+  container-type: inline-size;
+  container-name: device;
+  width: var(--rl-w, 375px);
+  height: var(--rl-h, 667px);
+  flex: 0 0 auto;
+  overflow: auto;
+  position: relative;
+  background: var(--bg);
+  border: 6px solid var(--border-strong);
+  border-radius: var(--rad-lg);
+  box-shadow: var(--shadow-md);
+}
+.rl-viewport-label {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--text-dim);
+}
+
+/* DEFECT: the header stacks at narrow widths and is never given a height
+   budget. Harmless in portrait, and it eats over half the screen in
+   landscape — which is why rotating is part of the exercise. */
+.rl-header {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: var(--bg-elev);
+  border-bottom: 1px solid var(--border);
+  padding: var(--sp-3);
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+}
+@container device (max-width: 720px) {
+  .rl-header { display: block; padding: var(--sp-4); }
+  .rl-header > * + * { margin-top: var(--sp-2); }
+}
+
+.rl-body { padding: var(--sp-3); }
+
+/* DEFECT: a fixed pixel width that exceeds a 320px-equivalent viewport.
+   WCAG 1.4.10 Reflow — content must not require scrolling in two directions. */
+@container device (max-width: 480px) {
+  .rl-summary { min-width: 420px; }
+}
+
+/* DEFECT: the promo row never wraps, so Apply is pushed outside the row's
+   own scroll box. The row scrolls, the page does not, and on a touch device
+   there is no scrollbar to hint that anything is over there. */
+.rl-promo { display: flex; gap: var(--sp-2); align-items: center; }
+@container device (max-width: 480px) {
+  .rl-promo { flex-wrap: nowrap; overflow-x: auto; }
+  .rl-promo input { flex: 0 0 300px; }
+  .rl-promo .btn { flex: 0 0 auto; }
+}
+
+/* DEFECT: tap targets shrink at the exact width where fingers replace mice.
+   20x20 fails WCAG 2.2 2.5.8 (24x24, AA) and both platform guidelines. */
+.rl-remove {
+  width: 44px; height: 44px;
+  display: inline-flex; align-items: center; justify-content: center;
+  border: 1px solid var(--border-control);
+  border-radius: var(--rad-sm);
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+}
+@container device (max-width: 480px) {
+  .rl-remove { width: 20px; height: 20px; font-size: var(--text-xs); padding: 0; }
+}
+
+.rl-row {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: var(--sp-2);
+  padding: var(--sp-2) 0;
+  border-bottom: 1px solid var(--border);
+}
+
 /* ── Interview rehearsal mode ────────────────────────────────────────── */
 .rehearse-toggle { display: inline-flex; align-items: center; gap: var(--sp-2); font-size: var(--text-sm); }
 .rehearse {

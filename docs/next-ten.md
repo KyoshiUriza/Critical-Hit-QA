@@ -72,6 +72,11 @@ ratios — and that work is invisible to learners. Making it visible is cheap
 teaching material with unusual credibility.
 
 ## 3. Mobile and responsive testing — the fastest-growing gap, and we have none
+
+**Shipped.** `practice-apps/responsive-broken.html` (5 seeded defects driven by
+container queries against a resizable device frame) plus
+`pages/learn/responsive.html`. `tests/responsive.spec.js` measures every defect
+as geometry rather than looking for class names.
 **Evidence: strong external. Cost: medium.**
 
 Named repeatedly as the fastest-growing QA pain point. The site has nothing:

@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; object-src 'none'; frame-src 'none'; base-uri 'self'; form-action 'self'" />
+  <meta name="referrer" content="no-referrer" />
+  <title>Practice (Broken): Responsive Lab — Critical Hit QA</title>
+  <link rel="stylesheet" href="../css/styles.css" />
+</head>
+<body data-page="practice-app-detail" data-depth="1">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div id="site-header"></div>
+
+  <main id="main" class="container">
+    <div class="page-header">
+      <h1>Responsive Lab <span style="color:var(--danger);font-size:1rem;">(Buggy build)</span></h1>
+      <p>A checkout that was signed off on a laptop. Five defects that only exist on a small screen or after a rotation.</p>
+    </div>
+
+    <div class="panel" style="border-color: var(--warn);">
+      <strong>Testing charter</strong> — Take this checkout through every preset
+      below, in both orientations. Can every control be reached? Can every
+      control be <em>hit</em>? Does the screen scroll in a direction it should
+      not? Does anything you typed survive a rotation?
+    </div>
+
+    <div class="panel">
+      <div class="rl-controls" style="display:flex;flex-wrap:wrap;gap:var(--sp-2);align-items:center;">
+        <strong>Device</strong>
+        <button class="btn btn-sm" data-preset="375x667" data-testid="preset-phone">Phone · 375×667</button>
+        <button class="btn btn-sm" data-preset="320x568" data-testid="preset-small">Small phone · 320×568</button>
+        <button class="btn btn-sm" data-preset="768x1024" data-testid="preset-tablet">Tablet · 768×1024</button>
+        <button class="btn btn-sm" data-preset="1280x800" data-testid="preset-desktop">Desktop · 1280×800</button>
+        <button class="btn btn-ghost btn-sm" id="rotate" data-testid="rotate">⟳ Rotate</button>
+        <span class="rl-viewport-label" id="viewport-label" data-testid="viewport-label"></span>
+      </div>
+      <p class="text-dim text-sm m-0" style="margin-top:var(--sp-2);">
+        The frame is a real scroll container, so its overflow is real overflow.
+        Do this again with DevTools device emulation afterwards — that is what
+        you will have on the job, and it catches things a frame cannot
+        (touch events, the on-screen keyboard, and the real address bar).
+      </p>
+    </div>
+
+    <div class="rl-stage">
+      <div class="rl-device" id="device" data-testid="device">
+        <header class="rl-header" data-testid="rl-header">
+          <strong>Northwind Outfitters</strong>
+          <nav style="display:flex;gap:var(--sp-3);font-size:var(--text-sm);">
+            <a href="#rl-cart">Cart</a><a href="#rl-cart">Account</a><a href="#rl-cart">Help</a>
+          </nav>
+          <div class="text-dim text-sm">Free delivery over $50 — ends Sunday</div>
+          <input type="search" data-testid="rl-search" placeholder="Search the store" aria-label="Search the store" style="width:100%;" />
+          <div style="display:flex;gap:var(--sp-2);flex-wrap:wrap;font-size:var(--text-xs);">
+            <span class="tag">Outerwear</span><span class="tag">Base layers</span><span class="tag">Packs</span>
+          </div>
+        </header>
+
+        <div class="rl-body">
+          <h2 id="rl-cart" style="font-size:var(--text-lg);">Your basket</h2>
+          <div id="rl-items"></div>
+
+          <div class="rl-promo" data-testid="promo-row" style="margin:var(--sp-3) 0;">
+            <input type="text" id="promo" data-testid="promo-input" placeholder="Promo code" />
+            <button class="btn btn-primary btn-sm" id="apply-promo" data-testid="apply-promo">Apply</button>
+          </div>
+          <p class="text-dim text-sm" id="promo-result" data-testid="promo-result"></p>
+
+          <table class="data-table rl-summary" data-testid="rl-summary">
+            <thead><tr><th>Item</th><th>Qty</th><th>Unit</th><th>Tax</th><th>Line total</th></tr></thead>
+            <tbody id="rl-summary-body"></tbody>
+          </table>
+
+          <h3 style="font-size:var(--text-base);margin-top:var(--sp-4);">Delivery details</h3>
+          <form id="rl-form" onsubmit="return false;">
+            <div class="form-field">
+              <label for="rl-name">Full name</label>
+              <input type="text" id="rl-name" data-testid="rl-name" autocomplete="off" />
+            </div>
+            <div class="form-field">
+              <label for="rl-address">Address</label>
+              <input type="text" id="rl-address" data-testid="rl-address" autocomplete="off" />
+            </div>
+            <button class="btn btn-primary" data-testid="rl-place-order">Place order</button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <section class="panel">
+      <h2>What to measure, and against what</h2>
+      <table class="data-table">
+        <thead><tr><th>Symptom</th><th>How to confirm it</th><th>The rule it breaks</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>Screen scrolls sideways</td>
+            <td>Compare <code class="inline">scrollWidth</code> to <code class="inline">clientWidth</code>, then find the widest child</td>
+            <td>WCAG 1.4.10 Reflow — no 2D scrolling at 320px equivalent</td>
+          </tr>
+          <tr>
+            <td>A control is missing</td>
+            <td>Search the DOM before believing it. Present-but-clipped and absent are different bugs</td>
+            <td>Not a WCAG failure by itself — a functional one</td>
+          </tr>
+          <tr>
+            <td>Hard to tap</td>
+            <td>Measure the box, not the icon. Padding counts; a 20px glyph in a 44px button is fine</td>
+            <td>WCAG 2.2 2.5.8 (24×24, AA). Platform guidance is stricter</td>
+          </tr>
+          <tr>
+            <td>Barely any content visible</td>
+            <td>Header height as a percentage of viewport height, in landscape</td>
+            <td>No numeric rule — argue it with the measurement</td>
+          </tr>
+          <tr>
+            <td>Input lost</td>
+            <td>Type, rotate, look. Then check whether the re-render or a reload caused it</td>
+            <td>Data loss. Severity is high regardless of the standard</td>
+          </tr>
+        </tbody>
+      </table>
+      <p class="text-dim">
+        Rotation is the one most teams never test, and on a real device it can
+        also mean the on-screen keyboard appearing, the address bar collapsing,
+        or the OS killing and restoring your activity — all of which look like
+        a rotation and none of which are.
+      </p>
+    </section>
+
+    <div class="panel app-next-steps">
+      <span class="text-dim">Next:</span>
+      <a class="btn btn-primary btn-sm" href="../pages/learn/responsive.html">Learn the method →</a>
+      <a class="btn btn-ghost btn-sm" href="../pages/learn/accessibility.html">Accessibility track</a>
+      <a class="btn btn-ghost btn-sm" href="../pages/bug-report-builder.html">Write one up</a>
+    </div>
+  </main>
+
+  <script>
+    (function () {
+      var ITEMS = [
+        { sku: "NW-114", name: "Trail shell jacket", qty: 1, unit: 128.0 },
+        { sku: "NW-207", name: "Merino base layer", qty: 2, unit: 44.5 },
+        { sku: "NW-318", name: "Dry bag, 20L", qty: 1, unit: 29.0 }
+      ];
+      var device = document.getElementById("device");
+      var label = document.getElementById("viewport-label");
+
+      function trigger(id) { if (window.Detector) window.Detector.trigger(id); }
+
+      function renderItems() {
+        document.getElementById("rl-items").innerHTML = ITEMS.map(function (i, n) {
+          return '<div class="rl-row" data-testid="rl-row">' +
+            '<span>' + i.name + ' <span class="text-dim">x' + i.qty + '</span></span>' +
+            '<button class="rl-remove" data-testid="rl-remove-' + n + '" ' +
+            'aria-label="Remove ' + i.name + '">&times;</button></div>';
+        }).join("");
+      }
+
+      function renderSummary() {
+        document.getElementById("rl-summary-body").innerHTML = ITEMS.map(function (i) {
+          var line = i.qty * i.unit, tax = line * 0.2;
+          return "<tr><td>" + i.name + "</td><td>" + i.qty + "</td><td>$" + i.unit.toFixed(2) +
+            "</td><td>$" + tax.toFixed(2) + "</td><td>$" + (line + tax).toFixed(2) + "</td></tr>";
+        }).join("");
+      }
+
+      // DEFECT (rotate-wipes-form): the form is rebuilt from markup on every
+      // orientation change and nothing carries the entered values across. The
+      // fix is to read them before the re-render and write them back after —
+      // or not to re-render at all.
+      function renderForm() {
+        var f = document.getElementById("rl-form");
+        f.querySelectorAll("input").forEach(function (i) { i.value = ""; });
+      }
+
+      function setSize(w, h) {
+        device.style.setProperty("--rl-w", w + "px");
+        device.style.setProperty("--rl-h", h + "px");
+        label.textContent = w + " x " + h + (w < h ? " portrait" : " landscape");
+      }
+
+      function currentSize() {
+        return {
+          w: parseInt(device.style.getPropertyValue("--rl-w"), 10) || 375,
+          h: parseInt(device.style.getPropertyValue("--rl-h"), 10) || 667
+        };
+      }
+
+      document.querySelectorAll("[data-preset]").forEach(function (b) {
+        b.addEventListener("click", function () {
+          var p = b.getAttribute("data-preset").split("x");
+          setSize(+p[0], +p[1]);
+        });
+      });
+
+      document.getElementById("rotate").addEventListener("click", function () {
+        var s = currentSize();
+
+        // Observable only if there was something to lose. Rotating an empty
+        // form destroys nothing, so it is not evidence of the defect.
+        var typed = [...document.querySelectorAll("#rl-form input")].some(function (i) { return i.value.trim(); });
+
+        setSize(s.h, s.w);
+        renderForm();
+        if (typed) trigger("rotate-wipes-form");
+      });
+
+      // The frame scrolling sideways IS the reflow defect. Requiring the
+      // learner to actually do it keeps the tick honest: they saw it happen.
+      device.addEventListener("scroll", function () {
+        if (device.scrollLeft > 0) trigger("reflow-2d");
+      });
+
+      // Same rule for the hidden Apply button — the tick belongs to the moment
+      // a control they could not see slides into view.
+      document.querySelector(".rl-promo").addEventListener("scroll", function (e) {
+        if (e.target.scrollLeft > 0) trigger("clipped-cta");
+      });
+
+      document.getElementById("apply-promo").addEventListener("click", function () {
+        var code = document.getElementById("promo").value.trim().toUpperCase();
+        document.getElementById("promo-result").textContent =
+          code === "TRAIL10" ? "Promo applied — 10% off." : "That code is not recognised.";
+      });
+
+      renderItems();
+      renderSummary();
+      setSize(375, 667);
+    })();
+  </script>
+  <script src="../js/test-hooks.js"></script>
+  <script src="../js/site-chrome.js"></script>
+  <script src="../js/data/defects.js"></script>
+  <script src="../js/profiles.js"></script>
+  <script src="../js/progress.js"></script>
+  <script src="../js/rpg.js"></script>
+  <script src="../js/defect-detector.js"></script>
+  <script src="../js/bounty-panel.js"></script>
+  <div id="site-footer"></div>
+</body>
+</html>

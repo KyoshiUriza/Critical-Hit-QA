@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; object-src 'none'; frame-src 'none'; base-uri 'self'; form-action 'self'" />
+  <meta name="referrer" content="no-referrer" />
+  <title>Mobile &amp; Responsive Testing — Learn — Critical Hit QA</title>
+  <link rel="stylesheet" href="../../css/styles.css" />
+</head>
+<body data-page="learn-responsive" data-depth="2">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div id="site-header"></div>
+
+  <main id="main" class="container">
+    <div class="page-header">
+      <h1>Mobile &amp; Responsive Testing</h1>
+      <p>Most traffic is mobile. Most sign-off happens on a 27-inch monitor. That gap is where these defects live, and interviewers know it.</p>
+    </div>
+
+    <div class="section-toc">
+      <h4>◈ On this page</h4>
+      <ul>
+        <li><a href="#breakpoints">Where to test, and why those widths</a></li>
+        <li><a href="#five">The five defects worth knowing by name</a></li>
+        <li><a href="#emulation">Emulator, simulator, real device</a></li>
+        <li><a href="#measure">Measuring instead of squinting</a></li>
+        <li><a href="#automation">Automating it</a></li>
+        <li><a href="#interview">What interviewers ask</a></li>
+        <li><a href="#practice">Practice</a></li>
+      </ul>
+    </div>
+
+    <section id="breakpoints" class="panel">
+      <h2>Where to test, and why those widths</h2>
+      <p>
+        Testing "on mobile" is not a test plan. Pick widths for a reason, and be
+        able to say what the reason was:
+      </p>
+      <table class="data-table">
+        <thead><tr><th>Width</th><th>Why this one</th></tr></thead>
+        <tbody>
+          <tr><td><strong>320px</strong></td><td>The floor WCAG 1.4.10 Reflow is written against. If it works here it works everywhere.</td></tr>
+          <tr><td><strong>375px</strong></td><td>The most common real phone width for years running.</td></tr>
+          <tr><td><strong>390–430px</strong></td><td>Current large phones. Often where a layout starts fitting and stops being tested.</td></tr>
+          <tr><td><strong>768px</strong></td><td>Tablet portrait, and the classic breakpoint boundary — test <em>at</em> it and one pixel either side.</td></tr>
+          <tr><td><strong>1280px+</strong></td><td>Desktop, where it was built and where it already works.</td></tr>
+        </tbody>
+      </table>
+      <p class="mt-4">
+        Two habits that separate a real responsive pass from a glance:
+      </p>
+      <ul>
+        <li>
+          <strong>Test the boundary, not the middle.</strong> A breakpoint at
+          768px means 767 and 768 are different code paths. Bugs cluster on
+          boundaries in layout for exactly the reason they do in input
+          validation, and it is the same equivalence-partitioning skill.
+        </li>
+        <li>
+          <strong>Test both orientations at every width.</strong> Landscape
+          phone is short, not wide — 375×667 becomes 667×375, and anything
+          sized against the viewport's <em>height</em> suddenly has a third of
+          the room. This is the least-tested state on the web.
+        </li>
+      </ul>
+      <div class="panel panel-warn">
+        <strong>Zoom is the same test.</strong> A user at 400% zoom on a
+        1280px desktop gets a 320px-equivalent viewport. That is not an edge
+        case, it is WCAG 1.4.4 and 1.4.10, and it means your narrow-width
+        findings apply to desktop users with low vision too. Say that in the
+        bug report and the priority changes.
+      </div>
+    </section>
+
+    <section id="five" class="panel">
+      <h2>The five defects worth knowing by name</h2>
+      <ol>
+        <li>
+          <strong>Two-dimensional scrolling (reflow).</strong> The page scrolls
+          sideways as well as down. Almost always one fixed-width child — a
+          table, an image, a <code class="inline">min-width</code> nobody
+          revisited. WCAG 1.4.10.
+        </li>
+        <li>
+          <strong>A control that is present but unreachable.</strong> Clipped by
+          an overflow, pushed outside a non-wrapping row, or covered by a sticky
+          element. Check the DOM before you write "the button is missing" —
+          missing and hidden get fixed by different people.
+        </li>
+        <li>
+          <strong>Tap targets too small.</strong> WCAG 2.2 2.5.8 asks for 24×24
+          CSS pixels at Level AA; Apple's guidance says 44pt and Google's says
+          48dp. Measure the hit box, not the icon — a 16px glyph inside a 44px
+          button is correct.
+        </li>
+        <li>
+          <strong>Chrome eating the viewport.</strong> A sticky header, a cookie
+          bar and a sticky footer that are each reasonable and together leave a
+          band of content. Worst in landscape. Express it as a percentage of
+          viewport height and the argument makes itself.
+        </li>
+        <li>
+          <strong>State lost on rotation.</strong> Type into a form, rotate,
+          and find it empty. The classic, and the one nobody tests. On a real
+          device the same symptom can also come from the keyboard opening or
+          the OS restoring a backgrounded app — worth distinguishing, because
+          the fix differs.
+        </li>
+      </ol>
+    </section>
+
+    <section id="emulation" class="panel">
+      <h2>Emulator, simulator, real device — and what each one lies about</h2>
+      <table class="data-table">
+        <thead><tr><th>Tool</th><th>Good for</th><th>Will not tell you</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>DevTools device mode</strong></td>
+            <td>Layout, breakpoints, reflow, tap-target measurement. Free and instant.</td>
+            <td>Real touch behaviour, real performance, the on-screen keyboard, browser chrome that grows and shrinks as you scroll.</td>
+          </tr>
+          <tr>
+            <td><strong>Simulator / emulator</strong></td>
+            <td>OS-level behaviour, real Safari or Chrome engine, permission dialogs.</td>
+            <td>Performance on a cheap device, battery, real network, camera and sensors.</td>
+          </tr>
+          <tr>
+            <td><strong>Real device</strong></td>
+            <td>The truth.</td>
+            <td>Nothing — but you will only ever have two or three of them.</td>
+          </tr>
+        </tbody>
+      </table>
+      <p class="text-dim mt-4">
+        The practical answer to "how do you cover mobile" is a pyramid: nearly
+        everything in device mode because it is free, the risky flows on a
+        simulator, and the money paths on the one or two real devices your
+        analytics say your users actually hold. Naming that trade-off is a
+        better interview answer than naming a paid device cloud.
+      </p>
+    </section>
+
+    <section id="measure" class="panel">
+      <h2>Measuring instead of squinting</h2>
+      <p>
+        "It looks cramped" gets closed as won't-fix. A number does not. These
+        run in the DevTools console on any page:
+      </p>
+      <pre class="code-block"><code>// Is the page scrolling in two directions?
+document.documentElement.scrollWidth &gt; document.documentElement.clientWidth
+
+// What is causing it? Anything sticking out past the right edge.
+[...document.querySelectorAll('*')]
+  .filter(el =&gt; el.getBoundingClientRect().right &gt; document.documentElement.clientWidth)
+  .slice(0, 10)
+
+// Which tap targets are under the 24x24 AA minimum?
+[...document.querySelectorAll('a, button, input, select, [role="button"]')]
+  .map(el =&gt; ({ el, r: el.getBoundingClientRect() }))
+  .filter(({ r }) =&gt; r.width &lt; 24 || r.height &lt; 24)
+
+// How much of the screen is header?
+document.querySelector('header').getBoundingClientRect().height / window.innerHeight</code></pre>
+      <p class="text-dim">
+        Paste these into a bug report with their output. A finding that arrives
+        with the selector of the offending element and its measured width is a
+        finding a developer can act on without reproducing anything.
+      </p>
+    </section>
+
+    <section id="automation" class="panel">
+      <h2>Automating it</h2>
+      <p>
+        Playwright emulates devices as a first-class concept, so responsive
+        checks are ordinary tests rather than a separate discipline:
+      </p>
+      <pre class="code-block"><code>const { devices } = require('@playwright/test');
+
+// A whole project running the suite as a phone.
+projects: [
+  { name: 'phone', use: { ...devices['iPhone 13'] } },
+]
+
+// Or per-test, which is usually what you want for a layout assertion.
+test('no horizontal scroll at the reflow floor', async ({ page }) =&gt; {
+  await page.setViewportSize({ width: 320, height: 640 });
+  await page.goto('/checkout');
+  const overflows = await page.evaluate(() =&gt;
+    document.documentElement.scrollWidth &gt; document.documentElement.clientWidth
+  );
+  expect(overflows, 'content requires 2D scrolling — WCAG 1.4.10').toBe(false);
+});</code></pre>
+      <p class="mt-4">Two things to say about this in an interview:</p>
+      <ul>
+        <li>
+          <strong>Assert measurements, not screenshots.</strong> A visual
+          snapshot fails on a font rendering difference and tells you nothing
+          about why. <code class="inline">scrollWidth &gt; clientWidth</code>
+          fails only when the defect is real, and the failure message can name
+          the standard.
+        </li>
+        <li>
+          <strong>Emulation is not a device.</strong> A Playwright device
+          descriptor sets viewport, user agent, device scale factor and touch
+          support. It does not run WebKit's mobile engine on iOS hardware.
+          Knowing what your automation does not cover is the point.
+        </li>
+      </ul>
+    </section>
+
+    <section id="interview" class="panel">
+      <h2>What interviewers ask</h2>
+      <ul>
+        <li><strong>"How do you decide which devices to test on?"</strong> From analytics, not from a catalogue. Cover the widths your users actually have, plus 320px because it is the standard's floor.</li>
+        <li><strong>"What's the difference between responsive and adaptive?"</strong> Responsive is one fluid layout that reflows continuously; adaptive serves distinct layouts at fixed breakpoints. Most real sites are a mixture, which is why boundary testing matters.</li>
+        <li><strong>"How would you test a form on mobile?"</strong> Correct keyboard type per field, no zoom-on-focus, the keyboard not covering the submit button, autofill, and rotation mid-entry. The last one finds bugs almost every time.</li>
+        <li><strong>"Is emulation enough?"</strong> For layout, largely yes. For touch, performance, and anything OS-mediated, no — and say which of your flows justify a real device.</li>
+        <li><strong>"How is this different from accessibility testing?"</strong> It substantially overlaps. Reflow, tap-target size and zoom are WCAG criteria. Someone who can point that out has understood both.</li>
+      </ul>
+    </section>
+
+    <section id="practice" class="panel panel-accent">
+      <h2>Practice — earn Star-Dust</h2>
+      <ol>
+        <li>Work the <a href="../../practice-apps/responsive-broken.html">Responsive Lab</a> through every preset, in both orientations. Five defects are seeded; three of them only exist below 480px and one only appears when you rotate.</li>
+        <li>Measure each finding with the console snippets above rather than describing it.</li>
+        <li>Repeat the pass in DevTools device mode on the same page — the frame and real emulation disagree about some things, and noticing which is the lesson.</li>
+        <li>Write the worst one up in the <a href="../bug-report-builder.html">Bug Report Builder</a>, with the measurement and the criterion.</li>
+        <li>Cross-check against the <a href="accessibility.html">Accessibility track</a> — three of the five are also WCAG failures.</li>
+      </ol>
+    </section>
+
+    <div class="panel app-next-steps">
+      <span class="text-dim">Related:</span>
+      <a class="btn btn-primary btn-sm" href="../../practice-apps/responsive-broken.html">Responsive Lab →</a>
+      <a class="btn btn-ghost btn-sm" href="accessibility.html">Accessibility Testing</a>
+      <a class="btn btn-ghost btn-sm" href="../../practice-apps/devtools-lab.html">DevTools Lab</a>
+      <a class="btn btn-ghost btn-sm" href="../learn.html">All tracks</a>
+    </div>
+  </main>
+
+  <div id="site-footer"></div>
+
+  <script src="../../js/test-hooks.js"></script>
+  <script src="../../js/site-chrome.js"></script>
+  <script src="../../js/data/defects.js"></script>
+  <script src="../../js/profiles.js"></script>
+  <script src="../../js/progress.js"></script>
+  <script src="../../js/rpg.js"></script>
+</body>
+</html>
