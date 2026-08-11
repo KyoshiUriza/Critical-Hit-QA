@@ -7,6 +7,7 @@
   <meta name="referrer" content="no-referrer" />
   <title>Practice (Broken): Registration — Critical Hit QA</title>
   <link rel="stylesheet" href="../css/styles.css" />
+  <link rel="stylesheet" href="../css/app-shell.css" />
 </head>
 <body data-page="practice-app-detail" data-depth="1">
   <a class="skip-link" href="#main">Skip to content</a>
@@ -14,7 +15,7 @@
 
   <main id="main" class="container">
     <div class="page-header">
-      <h1>Registration Form <span style="color:var(--danger);font-size:1rem;">(Buggy build)</span></h1>
+      <h1>Northwind Account &mdash; Sign up <span style="color:var(--danger);font-size:1rem;">(buggy build)</span></h1>
       <p>Same feature as the clean register — but this build's validation lies to you.</p>
     </div>
 
@@ -22,9 +23,25 @@
       <strong>Testing charter</strong> — Push every field at its boundaries. Try mismatched passwords, edge-case ages, invalid emails, and skipping the TOS. Compare each interaction against the spec.
     </div>
 
-    <div class="two-col">
-      <div>
-        <div class="app-frame">
+        <div class="app-shell" data-brand="northwind" data-chrome="minimal"
+             data-crumbs="Home|Account|Sign up" data-help="Have an account?|login.html">
+          <div class="auth-split">
+        <div class="auth-aside">
+          <h2>Create your account</h2>
+          <p>One account for the store, your orders and your gear list.</p>
+          <ul>
+            <li>Free to join, no card required</li>
+            <li>Members-only pricing on sale stock</li>
+            <li>Cancel any time from Settings</li>
+          </ul>
+        </div>
+            <div class="auth-card app-frame">
+          <div class="auth-providers">
+            <button type="button" class="auth-provider" data-testid="sso-google" data-inert-nav="true">Continue with Google</button>
+            <button type="button" class="auth-provider" data-testid="sso-apple" data-inert-nav="true">Continue with Apple</button>
+          </div>
+          <div class="auth-divider">or</div>
+
           <h2>Create your account</h2>
           <form id="reg-form" novalidate>
             <div class="form-field">
@@ -73,8 +90,13 @@
             <button type="submit" class="btn btn-primary" data-testid="reg-submit">Create account</button>
           </form>
           <div class="mt-3" id="reg-result"></div>
+          <div class="auth-foot">
+            <a href="login.html" data-testid="go-login">Already have an account? Sign in</a>
+            <a href="#main" data-inert-nav="true" data-testid="terms-link">Terms &amp; privacy</a>
+          </div>
+            </div>
+          </div>
         </div>
-      </div>
 
       <div class="panel">
         <h3>Behavior spec</h3>
@@ -91,7 +113,6 @@
           <li>No double-submit.</li>
         </ul>
       </div>
-    </div>
 
     <div class="panel mt-4">
       <h3>Answer key</h3>
@@ -228,6 +249,7 @@
   <script src="../js/profiles.js"></script>
   <script src="../js/progress.js"></script>
   <script src="../js/rpg.js"></script>
+  <script src="../js/app-shell.js"></script>
   <script src="../js/defect-detector.js"></script>
   <script src="../js/bounty-panel.js"></script>
   <div id="site-footer"></div>

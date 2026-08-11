@@ -78,8 +78,9 @@
     brandEl.append(mark, el("span", null, brand.name));
     bar.appendChild(brandEl);
 
+    var minimal = shell.getAttribute("data-chrome") === "minimal";
     var items = (shell.getAttribute("data-nav") || "").trim();
-    var navItems = items ? items.split("|") : brand.nav;
+    var navItems = minimal ? [] : (items ? items.split("|") : brand.nav);
     var active = shell.getAttribute("data-nav-active") || navItems[0];
 
     var nav = el("nav", "app-nav");
@@ -130,6 +131,17 @@
       avatar.setAttribute("title", who);
       testid(avatar, "app-avatar");
       actions.appendChild(avatar);
+    }
+
+    var help = shell.getAttribute("data-help");
+    if (help) {
+      var parts = help.split("|");
+      var a = el("a", null, parts[0]);
+      a.href = parts[1] || "#main";
+      if (!parts[1]) a.setAttribute("data-inert-nav", "true");
+      a.className = "text-sm";
+      testid(a, "app-help-link");
+      actions.appendChild(a);
     }
 
     bar.appendChild(actions);

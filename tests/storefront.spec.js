@@ -296,3 +296,71 @@ test.describe('the two builds differ only in the defects', () => {
     expect(finds).toContain('coupon-persists');
   });
 });
+
+// ── Auth pages ────────────────────────────────────────────────────────
+// The sign-in and sign-up forms are unchanged; what is new is the product
+// around them. That chrome is testable surface, not decoration, so it is
+// tested — including the part that matters most, that wrapping the form did
+// not disturb the form.
+test.describe('Northwind Account', () => {
+  const AUTH = [
+    '/practice-apps/login.html',
+    '/practice-apps/login-broken.html',
+    '/practice-apps/register.html',
+    '/practice-apps/register-broken.html',
+  ];
+
+  for (const url of AUTH) {
+    test(`${url} carries sign-in chrome`, async ({ page }) => {
+      await page.goto(url + '?reset');
+      await expect(page.getByTestId('app-brand')).toContainText('Northwind');
+      await expect(page.getByTestId('app-crumbs')).toBeVisible();
+      await expect(page.getByTestId('app-help-link')).toBeVisible();
+      await expect(page.getByTestId('sso-google')).toBeVisible();
+      await expect(page.getByTestId('sso-apple')).toBeVisible();
+
+      // A sign-in page does not show product nav to someone not signed in.
+      await expect(page.locator('.app-nav a')).toHaveCount(0);
+    });
+  }
+
+  test('the login form still works exactly as before', async ({ page }) => {
+    // The whole risk of the rebuild in one test: new markup around a form
+    // whose behaviour must not have moved.
+    await page.goto('/practice-apps/login.html?reset');
+    await page.getByTestId('login-email').fill('demo@qa.test');
+    await page.getByTestId('login-password').fill('Passw0rd!');
+    await page.getByTestId('login-submit').click();
+    await expect(page.getByTestId('login-result')).toContainText(/welcome/i);
+  });
+
+  test('the show/hide password toggle still works', async ({ page }) => {
+    await page.goto('/practice-apps/login.html?reset');
+    const pw = page.getByTestId('login-password');
+    await expect(pw).toHaveAttribute('type', 'password');
+    await page.getByTestId('toggle-password').click();
+    await expect(pw).toHaveAttribute('type', 'text');
+    await page.getByTestId('toggle-password').click();
+    await expect(pw).toHaveAttribute('type', 'password');
+  });
+
+  test('sign-in and sign-up link to each other', async ({ page }) => {
+    await page.goto('/practice-apps/login.html?reset');
+    await page.getByTestId('go-register').click();
+    await expect(page).toHaveURL(/register\.html/);
+    await page.getByTestId('go-login').click();
+    await expect(page).toHaveURL(/login\.html/);
+  });
+
+  test('inert controls are marked as inert rather than looking broken', async ({ page }) => {
+    // A link that goes nowhere is a defect unless it is deliberately a
+    // placeholder. Marking them means a learner inspecting one can tell the
+    // difference, and it keeps us honest about what is real here.
+    await page.goto('/practice-apps/login.html?reset');
+    const inert = await page.locator('[data-inert-nav="true"]').count();
+    expect(inert).toBeGreaterThan(0);
+    await expect(page.getByTestId('forgot-password')).toHaveAttribute('data-inert-nav', 'true');
+    // The links that DO go somewhere must not be marked inert.
+    await expect(page.getByTestId('go-register')).not.toHaveAttribute('data-inert-nav', 'true');
+  });
+});

@@ -7,6 +7,7 @@
   <meta name="referrer" content="no-referrer" />
   <title>Practice (Broken): Login Form — Critical Hit QA</title>
   <link rel="stylesheet" href="../css/styles.css" />
+  <link rel="stylesheet" href="../css/app-shell.css" />
 </head>
 <body data-page="practice-app-detail" data-depth="1">
   <a class="skip-link" href="#main">Skip to content</a>
@@ -14,7 +15,7 @@
 
   <main id="main" class="container">
     <div class="page-header">
-      <h1>Login Form <span style="color:var(--danger);font-size:1rem;">(Buggy build)</span></h1>
+      <h1>Northwind Account <span style="color:var(--danger);font-size:1rem;">(buggy build)</span></h1>
       <p>Same feature as the clean login — but this build contains real defects. Your mission: find and log them all.</p>
       <p class="text-dim">Intended valid credentials: <code class="inline">demo@qa.test</code> / <code class="inline">Passw0rd!</code></p>
     </div>
@@ -23,9 +24,25 @@
       <strong>Testing charter</strong> — Verify the behavior spec on the right against what the app actually does. File one bug per real defect you find. Try boundary values, invalid input, security-shaped payloads, and repeated actions before revealing the answer key at the bottom.
     </div>
 
-    <div class="two-col">
-      <div>
-        <div class="app-frame" role="region" aria-label="Login form">
+        <div class="app-shell" data-brand="northwind" data-chrome="minimal"
+             data-crumbs="Home|Account|Sign in" data-help="New here?|register.html">
+          <div class="auth-split">
+        <div class="auth-aside">
+          <h2>Welcome back</h2>
+          <p>Sign in to track orders, save your gear list, and get member pricing.</p>
+          <ul>
+            <li>Order history and returns</li>
+            <li>Saved delivery addresses</li>
+            <li>Early access to sale stock</li>
+          </ul>
+        </div>
+            <div class="auth-card app-frame" role="region" aria-label="Login form">
+          <div class="auth-providers">
+            <button type="button" class="auth-provider" data-testid="sso-google" data-inert-nav="true">Continue with Google</button>
+            <button type="button" class="auth-provider" data-testid="sso-apple" data-inert-nav="true">Continue with Apple</button>
+          </div>
+          <div class="auth-divider">or</div>
+
           <h2>Sign in</h2>
           <form id="login-form" novalidate>
             <div class="form-field">
@@ -56,8 +73,13 @@
             <button class="btn btn-ghost ml-2" type="button" id="reset-btn" data-testid="reset-lockout">Reset lockout (test)</button>
           </form>
           <div id="result" style="margin-top:14px;"></div>
+          <div class="auth-foot">
+            <a href="#main" data-inert-nav="true" data-testid="forgot-password">Forgot your password?</a>
+            <a href="register.html" data-testid="go-register">Create an account</a>
+          </div>
+            </div>
+          </div>
         </div>
-      </div>
 
       <div class="panel">
         <h3>Behavior spec (your oracle)</h3>
@@ -84,7 +106,6 @@
           actually written.
         </p>
       </div>
-    </div>
 
     <div class="panel mt-4">
       <h3>Answer key</h3>
@@ -275,6 +296,7 @@
   <script src="../js/profiles.js"></script>
   <script src="../js/progress.js"></script>
   <script src="../js/rpg.js"></script>
+  <script src="../js/app-shell.js"></script>
   <script src="../js/defect-detector.js"></script>
   <script src="../js/bounty-panel.js"></script>
   <div id="site-footer"></div>
