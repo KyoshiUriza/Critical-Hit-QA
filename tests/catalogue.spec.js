@@ -38,11 +38,19 @@ test.describe('practice app catalogue', () => {
     // The claim drifted once already — the site said 14 apps while shipping
     // 16. On a site whose whole premise is that claims should be checkable,
     // its own headline numbers have to be checkable too.
+    //
+    // "Buggy" is derived from the DEFECT CATALOGUE, not the filename. The
+    // a11y challenge has 13 seeded defects and is not called -broken, so the
+    // filename heuristic counted it as clean and the guard passed on a wrong
+    // number. What makes an app buggy is having seeded defects.
+    await page.goto('/pages/bug-bounty.html?reset');
     const actual = appFiles().length;
-    const buggy = appFiles().filter((f) => f.endsWith('-broken.html')).length;
+    const buggyFiles = await page.evaluate(() =>
+      Object.values(window.APP_DEFECTS).map((a) => a.url.split('/').pop()));
+    const buggy = appFiles().filter((f) => buggyFiles.includes(f)).length;
     const clean = actual - buggy;
 
-    await page.goto('/index.html?reset');
+    await page.goto('/index.html');
     const home = await page.locator('main').textContent();
 
     expect(home, `home page should claim ${actual} apps`).toContain(`${actual} working apps`);
@@ -58,6 +66,8 @@ test.describe('practice app catalogue', () => {
     // in Bug Bounty and silently teach nothing.
     await page.goto('/pages/bug-bounty.html?reset');
     const keys = await page.evaluate(() => Object.keys(window.APP_DEFECTS));
+    // Every -broken build must have a catalogue. (The reverse — a catalogue
+    // for an app not named -broken — is legitimate: see the a11y challenge.)
     const buggy = appFiles().filter((f) => f.endsWith('-broken.html'))
       .map((f) => f.replace('-broken.html', ''));
     for (const app of buggy) {
@@ -112,5 +122,21 @@ test.describe('practice app catalogue', () => {
 
     const err = (await page.getByTestId('login-password-error').textContent()) || '';
     expect(err, 'sign-in must not complain about password length').not.toMatch(/8 characters|at least/i);
+  });
+
+  test('every practice app exposes data-testid, as the README promises', async () => {
+    // README: "data-testid on every interactive element in the practice apps —
+    // automation-first by design." The a11y challenge shipped with zero, so a
+    // documented promise was false for one of the apps a learner is told to
+    // automate. A testid is not an accessibility affordance, so adding them
+    // left every seeded a11y defect intact.
+    const bare = [];
+    for (const f of appFiles()) {
+      const src = fs.readFileSync(path.join(ROOT, 'practice-apps', f), 'utf8');
+      const interactive = (src.match(/<(input|button|select|textarea)/g) || []).length;
+      const testids = (src.match(/data-testid=/g) || []).length;
+      if (interactive >= 3 && testids === 0) bare.push(f);
+    }
+    expect(bare, 'practice apps with interactive elements and no test ids').toEqual([]);
   });
 });

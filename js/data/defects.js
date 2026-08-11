@@ -66,5 +66,46 @@ window.APP_DEFECTS = {
       { id: "tos-missing", severity: "high", title: "TOS acceptance not enforced", hint: "Form submits with checkbox unchecked" },
       { id: "double-submit", severity: "medium", title: "Submit button not disabled after success", hint: "Rapid double-click submits twice" }
     ]
+  },
+  // The accessibility challenge had a 13-item answer key in prose and no
+  // catalogue entry, so Bug Bounty, the auto-detector and the character sheet
+  // all knew nothing about it — a learner could work it and record nothing.
+  //
+  // NOTE ON DETECTION: these are static markup defects, present on load rather
+  // than behaviours you trigger, so js/defect-detector.js has nothing to hook.
+  // That is a real difference between accessibility work and functional
+  // testing, and worth knowing: you find these by inspecting and by using a
+  // keyboard, not by driving the app until something misbehaves.
+  a11y: {
+    name: "Accessibility Challenge",
+    url: "../practice-apps/a11y-challenge.html",
+    defects: [
+      { id: "missing-labels", severity: "high", title: "Form inputs have no <label>",
+        hint: "Email and Full name are plain divs above bare inputs — click the text and focus does not move to the field. WCAG 1.3.1, 3.3.2, 4.1.2" },
+      { id: "required-color-only", severity: "medium", title: "Required fields indicated by colour alone",
+        hint: "The asterisk carries the meaning and nothing says 'Required' in text. WCAG 1.4.1, 3.3.2" },
+      { id: "focus-removed", severity: "high", title: "Focus indicator removed with no replacement",
+        hint: "Tab through the form — nothing shows where you are. outline:none with nothing put back. WCAG 2.4.7" },
+      { id: "text-contrast", severity: "high", title: "Input text contrast below 4.5:1",
+        hint: "Grey text on a light field. Sample the two colours in DevTools and compute the ratio. WCAG 1.4.3" },
+      { id: "button-contrast", severity: "medium", title: "Button label contrast below 3:1",
+        hint: "Light blue on blue. WCAG 1.4.11" },
+      { id: "div-as-button", severity: "critical", title: "A div acts as a button",
+        hint: "Tab to Subscribe — you cannot. It has a click handler but no role, no tabindex and no key handler, so keyboard and screen-reader users cannot activate it. WCAG 2.1.1, 4.1.2" },
+      { id: "icon-no-name", severity: "high", title: "Icon-only button has no accessible name",
+        hint: "The x button announces as 'button' with no purpose. WCAG 4.1.2" },
+      { id: "no-fieldset", severity: "medium", title: "Checkbox group has no fieldset/legend",
+        hint: "A screen reader announces three unrelated checkboxes with no idea what they belong to. WCAG 1.3.1" },
+      { id: "img-no-alt", severity: "medium", title: "Image has no alt attribute",
+        hint: "The logo is announced as its filename or skipped entirely. WCAG 1.1.1" },
+      { id: "link-text", severity: "medium", title: "Link text is 'click here'",
+        hint: "Screen-reader users navigate by pulling up a list of links. Out of context this one says nothing. WCAG 2.4.4" },
+      { id: "new-window", severity: "low", title: "Link opens a new window with no warning",
+        hint: "target=_blank with no indication, and no rel=noopener. WCAG 3.2.5" },
+      { id: "heading-skip", severity: "low", title: "Heading levels skip from h2 to h5",
+        hint: "Headings are the document outline. Skipping levels breaks navigation by heading. WCAG 1.3.1" },
+      { id: "error-color-only", severity: "high", title: "Error state uses colour only and is not announced",
+        hint: "Red text with no icon, no role=alert and no aria-live, so it is invisible to a screen reader and to anyone who cannot distinguish the colour. WCAG 1.4.1, 4.1.3" }
+    ]
   }
 };

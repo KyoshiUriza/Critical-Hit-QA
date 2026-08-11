@@ -52,7 +52,7 @@ the audience is professional testers, and verifying claims is literally their jo
 >
 > **What's in it, all free:**
 >
-> - **17 practice applications** — 13 clean, 4 seeded with 30 real defects
+> - **17 practice applications** — 12 clean, 5 seeded with 43 real defects
 >   across validation, calculation, security, and state
 > - **Locator Lab** — type a CSS selector or XPath and it grades it live: does it
 >   match, does it match the *right* element, and will it survive the next
@@ -119,7 +119,7 @@ both directions.
 
 ## Notes on the copy
 
-- **It stays concrete.** 17 apps, 30 seeded defects, a real SQL engine, offline.
+- **It stays concrete.** 17 apps, 43 seeded defects, a real SQL engine, offline.
   Nothing is inflated, because the readers will check.
 - **The pitch is the differentiator, not the feature list.** The opening contrast
   — flashcards teach recitation, this teaches finding — is what competitors don't
