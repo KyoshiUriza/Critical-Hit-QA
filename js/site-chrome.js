@@ -48,6 +48,8 @@
     "learn-a11y": "learn",
     "learn-responsive": "learn",
     "learn-test-data": "learn",
+    "learn-first-90": "learn",
+    "learn-suite-health": "learn",
     "learn-sql": "learn",
     "playwright-errors": "automation-lab",
     // Deliberately NOT a 12th nav item. The header needs 1200px for 11 items

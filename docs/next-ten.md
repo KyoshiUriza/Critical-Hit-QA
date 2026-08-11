@@ -154,6 +154,8 @@ because it is the most expensive and the least evidenced.
 Both are genuinely valuable and neither is urgent relative to 1–4.
 
 ## 9. A "first 90 days" track
+
+**Shipped.** `pages/learn/first-90-days.html`.
 **Evidence: moderate external. Cost: low.**
 
 The stated gap is between "can answer interview questions" and "can prevent
@@ -165,6 +167,11 @@ niche writes, and it is the difference between a site that gets you hired and
 one that keeps you employed.
 
 ## 10. Suite health metrics for the learner's own work
+
+**Shipped.** `pages/learn/suite-health.html`. Its claims about this repo's own
+tests are asserted against the filesystem and against playwright.config.js, so
+a renamed spec or a changed retry setting fails rather than quietly making the
+page untrue.
 **Evidence: weak external, strong internal. Cost: medium.**
 
 The site's own suite is 283 tests with derived guards, a Linux-vs-Windows bug

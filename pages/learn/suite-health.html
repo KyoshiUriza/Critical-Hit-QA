@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; object-src 'none'; frame-src 'none'; base-uri 'self'; form-action 'self'" />
+  <meta name="referrer" content="no-referrer" />
+  <title>Suite Health — Learn — Critical Hit QA</title>
+  <link rel="stylesheet" href="../../css/styles.css" />
+</head>
+<body data-page="learn-suite-health" data-depth="2">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div id="site-header"></div>
+
+  <main id="main" class="container">
+    <div class="page-header">
+      <h1>Suite Health</h1>
+      <p>How to tell whether your test suite is an asset or a liability — with worked examples from this site's own suite, which you can read.</p>
+    </div>
+
+    <div class="panel panel-accent">
+      <strong>Every example on this page is real and in the repository.</strong>
+      This site is tested by a Playwright suite that runs on every push. Several
+      of its tests exist because a specific defect shipped, and the comment
+      above each one says which. That is unusual to be able to show a learner,
+      so the file names below are worth opening:
+      <a href="https://github.com/KyoshiUriza/Critical-Hit-QA/tree/main/tests" target="_blank" rel="noopener noreferrer" data-testid="suite-link">the tests directory</a>.
+    </div>
+
+    <div class="section-toc">
+      <h4>◈ On this page</h4>
+      <ul>
+        <li><a href="#metrics">Four numbers worth tracking</a></li>
+        <li><a href="#flake">Flake rate, as a number</a></li>
+        <li><a href="#coverage">Why coverage percentage misleads</a></li>
+        <li><a href="#guards">Guards: tests that stop a claim from rotting</a></li>
+        <li><a href="#regression">A test per shipped defect</a></li>
+        <li><a href="#interview">What interviewers ask</a></li>
+      </ul>
+    </div>
+
+    <section id="metrics" class="panel">
+      <h2>Four numbers worth tracking</h2>
+      <table class="data-table">
+        <thead><tr><th>Metric</th><th>Why it matters</th><th>When to act</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>Wall-clock runtime</strong></td>
+            <td>The single biggest driver of whether people run the suite before pushing. A suite nobody runs locally finds things a day late.</td>
+            <td>When it stops fitting in the gap people are willing to wait — for most teams, ten minutes.</td>
+          </tr>
+          <tr>
+            <td><strong>Flake rate</strong></td>
+            <td>The percentage of runs that fail and then pass unchanged. This is the number that decides whether failures get read.</td>
+            <td>Anything above a few percent. Past roughly one in ten, people start re-running by reflex and the suite has stopped working.</td>
+          </tr>
+          <tr>
+            <td><strong>Time to diagnose a failure</strong></td>
+            <td>Rarely measured and enormously important. A red build that takes an hour to understand costs more than the bug did.</td>
+            <td>When failure messages need someone to open the code to interpret. Assertion messages are the cheap fix.</td>
+          </tr>
+          <tr>
+            <td><strong>Escaped defects</strong></td>
+            <td>Bugs found in production that the suite could plausibly have caught. The only metric that measures whether the suite does its job.</td>
+            <td>Every one of them. Each is a specific, answerable question about a specific gap.</td>
+          </tr>
+        </tbody>
+      </table>
+      <p class="text-dim mt-4">
+        Notice what is absent: test count. A suite of 500 tests is not healthier
+        than one of 200, and reporting the number as an achievement is how teams
+        end up with hundreds of tests asserting the same happy path. Growth in
+        test count is a cost as well as a benefit, and it should be justified
+        the same way any other code is.
+      </p>
+    </section>
+
+    <section id="flake" class="panel">
+      <h2>Flake rate, as a number</h2>
+      <p>
+        "The suite is a bit flaky" is not actionable. A percentage is:
+      </p>
+      <pre class="code-block"><code>flake rate = runs that failed then passed with no code change
+             ─────────────────────────────────────────────────
+                              total runs</code></pre>
+      <p class="mt-4">
+        Playwright records this for you — a test that fails and passes on retry
+        is reported as <strong>flaky</strong>, distinct from failed. If you are
+        running with <code class="inline">retries</code> above zero, that number
+        is already being produced on every run and is almost certainly being
+        thrown away.
+      </p>
+      <div class="panel panel-warn">
+        <strong>Retries hide the number they are meant to help you fix.</strong>
+        Retrying a flaky test is a reasonable operational choice — it keeps a
+        pipeline moving. Retrying it and not recording that it retried is how a
+        suite gets to a 30% flake rate without anyone noticing. Configure
+        retries if you need them, then track the flaky count as a metric with a
+        target, or you have simply bought silence.
+      </div>
+      <p>
+        This site's own config sets <code class="inline">retries: 1</code> on CI
+        and zero locally. That is deliberate: locally a flaky test should fail
+        loudly while you are the person who can fix it. The asymmetry is worth
+        copying.
+      </p>
+    </section>
+
+    <section id="coverage" class="panel">
+      <h2>Why coverage percentage misleads</h2>
+      <p>
+        Line coverage measures which lines were executed, not which behaviours
+        were verified. A test that calls every function and asserts nothing
+        scores 100%.
+      </p>
+      <pre class="code-block"><code>// 100% line coverage of applyDiscount. Zero behaviour verified.
+test('discount', async () =&gt; {
+  await applyDiscount(basket, 'TRAIL10');
+  expect(true).toBe(true);
+});</code></pre>
+      <p class="mt-4">What to say about coverage in an interview:</p>
+      <ul>
+        <li><strong>It is a floor, not a target.</strong> Low coverage reliably tells you something is untested. High coverage tells you almost nothing.</li>
+        <li><strong>Uncovered lines are the useful output.</strong> The list of what was never executed is a genuine to-do; the percentage is a number for a slide.</li>
+        <li><strong>A coverage target creates coverage-shaped tests.</strong> Mandate 80% and you will get assertion-free tests that reach 80%. This is Goodhart's law and it happens every time.</li>
+        <li><strong>Mutation testing is the honest version.</strong> It changes the code and checks whether a test notices. Slow, and it measures the thing coverage pretends to.</li>
+      </ul>
+    </section>
+
+    <section id="guards" class="panel">
+      <h2>Guards: tests that stop a claim from rotting</h2>
+      <p>
+        Most tests check the product. A <strong>guard</strong> checks that
+        something you asserted elsewhere is still true — a number in the docs, a
+        count on a page, a promise in a README. They cost almost nothing and
+        they catch a class of defect that reviews never do.
+      </p>
+      <p>
+        This site's suite has several, and every one of them was written after
+        the thing it guards had already drifted:
+      </p>
+      <table class="data-table">
+        <thead><tr><th>Guard</th><th>What had gone wrong</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><code class="inline">catalogue.spec.js</code></td>
+            <td>The home page advertised 14 practice apps while shipping 16, and a card advertised 9 seeded defects in an app that had 8 — so learners were told to hunt for a bug that had been removed.</td>
+          </tr>
+          <tr>
+            <td><code class="inline">smoke.spec.js</code></td>
+            <td>The sitewide sweep ran against a hand-written list of pages that had fallen five apps behind, including two shipped the same day. It now reads the filesystem.</td>
+          </tr>
+          <tr>
+            <td><code class="inline">labs.spec.js</code></td>
+            <td>The Locator Lab grew to nine exercises and three pages still said six.</td>
+          </tr>
+          <tr>
+            <td><code class="inline">contrast.spec.js</code></td>
+            <td>Colour pairs were documented as passing WCAG with ratios that had never been computed. The test computes them.</td>
+          </tr>
+        </tbody>
+      </table>
+      <p class="text-dim mt-4">
+        The pattern in all four: <strong>a hand-maintained list drifted from the
+        thing it described.</strong> The fix is never to update the list — it is
+        to derive it from the source, so it cannot be wrong again. If you take
+        one idea from this page into a real job, take that one.
+      </p>
+    </section>
+
+    <section id="regression" class="panel">
+      <h2>A test per shipped defect</h2>
+      <p>
+        The cheapest high-value test you can write is one that reproduces a bug
+        that reached users. It is already reproduced, its value is proven, and
+        it never needs justifying.
+      </p>
+      <p>The convention worth adopting: <strong>say why the test exists.</strong></p>
+      <pre class="code-block"><code>// The RPG chip must mount on EVERY page. Nine pages shipped without
+// rpg.js, so the chip was absent there and the header's justify-between
+// slid the nav to the right edge — the nav visibly jumped sideways as
+// you navigated between chip and chip-less pages.
+await expect(page.locator('.site-header .rpg-chip')).toBeVisible();</code></pre>
+      <p class="mt-4">
+        That comment is from this site's smoke suite, and it is doing real work.
+        Two years from now someone will find this assertion inconvenient. The
+        comment is the difference between deleting it and understanding what it
+        was protecting. A test without one is a test that gets removed the first
+        time it is in the way.
+      </p>
+      <div class="panel">
+        <strong>Where regression tests belong.</strong> Push each one to the
+        lowest level that can catch it. A calculation error belongs in a unit
+        test, not an end-to-end journey. The e2e suite should hold the journeys
+        that only exist at that level — and staying disciplined about this is
+        the main defence against the runtime metric at the top of this page.
+      </div>
+    </section>
+
+    <section id="interview" class="panel">
+      <h2>What interviewers ask</h2>
+      <ul>
+        <li><strong>"How do you know your tests are any good?"</strong> Escaped defects and flake rate, both as numbers over time. Test count and coverage percentage are the answers that get a follow-up you do not want.</li>
+        <li><strong>"What's your flake rate?"</strong> If you can answer with a number you are already unusual. If you cannot, say how you would start measuring it — that is a good answer too.</li>
+        <li><strong>"What do you do about a flaky test?"</strong> Quarantine it so it stops eroding trust, then fix or delete it on a deadline. A quarantine with no deadline is a graveyard.</li>
+        <li><strong>"Our suite takes 45 minutes. What now?"</strong> Find out where the time goes before doing anything. Usually a handful of tests, or a setup path being driven through the UI once per test. Parallelism is a real answer but it is the second one.</li>
+        <li><strong>"When would you delete a test?"</strong> When it tests something no longer true, duplicates a cheaper test, or has been failing for weeks and nobody looks. A suite people ignore is worse than a smaller one they trust.</li>
+      </ul>
+    </section>
+
+    <div class="panel app-next-steps">
+      <span class="text-dim">Related:</span>
+      <a class="btn btn-primary btn-sm" href="../code-review.html">Code Review Gauntlet →</a>
+      <a class="btn btn-ghost btn-sm" href="test-data.html">Test Data &amp; Environments</a>
+      <a class="btn btn-ghost btn-sm" href="automation.html">Automation track</a>
+      <a class="btn btn-ghost btn-sm" href="../learn.html">All tracks</a>
+    </div>
+  </main>
+
+  <div id="site-footer"></div>
+
+  <script src="../../js/test-hooks.js"></script>
+  <script src="../../js/site-chrome.js"></script>
+  <script src="../../js/data/defects.js"></script>
+  <script src="../../js/profiles.js"></script>
+  <script src="../../js/progress.js"></script>
+  <script src="../../js/rpg.js"></script>
+</body>
+</html>

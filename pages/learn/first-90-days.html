@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; object-src 'none'; frame-src 'none'; base-uri 'self'; form-action 'self'" />
+  <meta name="referrer" content="no-referrer" />
+  <title>Your First 90 Days — Learn — Critical Hit QA</title>
+  <link rel="stylesheet" href="../../css/styles.css" />
+</head>
+<body data-page="learn-first-90" data-depth="2">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div id="site-header"></div>
+
+  <main id="main" class="container">
+    <div class="page-header">
+      <h1>Your First 90 Days</h1>
+      <p>Everything else here optimises for the interview and stops at the offer. This is the part after.</p>
+    </div>
+
+    <div class="panel panel-accent">
+      <strong>The gap this covers.</strong> Passing an interview proves you can
+      answer questions about testing. The job asks something different: read a
+      product nobody has documented, work out what matters, and become useful
+      before anyone's patience runs out. Nobody writes this down, so most people
+      learn it by getting it wrong for a quarter.
+      <br /><br />
+      Nothing here is about being clever. It is about being the person the team
+      is glad they hired, which is a different and more achievable target.
+    </div>
+
+    <div class="section-toc">
+      <h4>◈ On this page</h4>
+      <ul>
+        <li><a href="#week1">Week one: access and orientation</a></li>
+        <li><a href="#weeks2-4">Weeks two to four: learn the product</a></li>
+        <li><a href="#firstbug">Your first bug report at a new company</a></li>
+        <li><a href="#undocumented">When nothing is documented</a></li>
+        <li><a href="#month2">Month two: start contributing</a></li>
+        <li><a href="#month3">Month three: the 90-day conversation</a></li>
+        <li><a href="#traps">Traps that catch new joiners</a></li>
+      </ul>
+    </div>
+
+    <section id="week1" class="panel">
+      <h2>Week one: access and orientation</h2>
+      <p>
+        Your only real goal in week one is to be able to <em>do</em> the job by
+        the end of it. Access requests take days and nobody chases them for you.
+        Ask on day one, in writing, as a list:
+      </p>
+      <ul>
+        <li>The application, in every environment you are expected to test — and the credentials for each.</li>
+        <li>The bug tracker and the test management tool, with permission to <em>create</em>, not just read.</li>
+        <li>The code repositories, including the test suite. Read access is enough at first.</li>
+        <li>CI, so you can see runs and read failures without asking someone to paste them.</li>
+        <li>Logging and monitoring. This is the one people forget to request and then spend a year without.</li>
+        <li>The team's channels, the incident channel, and whatever the release calendar lives in.</li>
+      </ul>
+      <p class="text-dim">
+        Track which are still outstanding and mention them once a week until
+        they land. This reads as organised, not as nagging — and a blocked
+        first month is remembered as a slow start regardless of whose fault it
+        was.
+      </p>
+      <div class="panel">
+        <strong>Ask this in your first one-to-one:</strong> "What does a good
+        first 90 days look like to you?" It is a fair question, managers rarely
+        get asked it, and the answer tells you what you will actually be judged
+        on — which is often not what the job description said.
+      </div>
+    </section>
+
+    <section id="weeks2-4" class="panel">
+      <h2>Weeks two to four: learn the product before you critique it</h2>
+      <p>
+        The instinct is to start finding bugs immediately, because that is the
+        thing you know how to do. Resist it for a fortnight. Bugs found before
+        you understand the product are usually either intended behaviour or
+        already known, and both cost you credibility you have not earned yet.
+      </p>
+      <ol>
+        <li>
+          <strong>Use the product as a customer would.</strong> Sign up, buy
+          something, cancel it, use it on a phone. Write down every moment you
+          were confused — that list is worth more in week three than it will
+          ever be again, because in a month you will have stopped noticing.
+        </li>
+        <li>
+          <strong>Read the last three months of bugs.</strong> Not for the
+          bugs — for the shape. Which areas generate them, what severity
+          language the team uses, what a good report looks like here, who
+          argues about what.
+        </li>
+        <li>
+          <strong>Read the last few incidents.</strong> Postmortems tell you
+          what this team is actually afraid of, which is the fastest possible
+          route to knowing what is worth testing.
+        </li>
+        <li>
+          <strong>Run the test suite and read a failure.</strong> Even if you
+          will not write tests for months. Knowing how long it takes, how often
+          it is red, and whether anyone trusts it tells you where you are.
+        </li>
+        <li>
+          <strong>Draw the system on one page.</strong> Boxes and arrows,
+          however wrong. Show it to an engineer and ask what you got wrong —
+          people who will not read your questions will happily correct your
+          diagram.
+        </li>
+      </ol>
+      <p class="text-dim">
+        Keep a running list of questions rather than asking each one the moment
+        it appears. Batching them into a single conversation respects people's
+        focus, and half of them answer themselves by Friday.
+      </p>
+    </section>
+
+    <section id="firstbug" class="panel">
+      <h2>Your first bug report at a new company</h2>
+      <p>
+        It will be read more carefully than any report you file for the next two
+        years, because it is how the team decides what your reports are worth.
+        Before you file it, do three things:
+      </p>
+      <ol>
+        <li><strong>Search the tracker.</strong> Filing a known issue as new is the standard first-week mistake and it is entirely avoidable.</li>
+        <li><strong>Check it is not intended.</strong> "Is this deliberate?" asked quietly beats a confident report that turns out to describe the requirement.</li>
+        <li><strong>Reproduce it twice, on a clean state.</strong> Once might be your session, your data, or your extension.</li>
+      </ol>
+      <p>
+        Then match the house style — their severity scale, their template,
+        their level of detail — even where you think yours is better. Adopt the
+        conventions for a quarter and earn the standing to change them later.
+        Arriving and reformatting everything is how a new tester becomes the
+        person the team routes around.
+      </p>
+      <div class="panel panel-warn">
+        <strong>And calibrate down, not up.</strong> A new joiner who files
+        their first three findings as critical has spent their credibility
+        before the end of the month. If you are unsure between two bands, take
+        the lower one and state the impact clearly — the evidence will argue it
+        up for you if it deserves it.
+      </div>
+    </section>
+
+    <section id="undocumented" class="panel">
+      <h2>When nothing is documented</h2>
+      <p>
+        This is the normal case, not the bad one. Almost no team has current
+        documentation, and expecting it is the fastest way to be unhappy for a
+        quarter. What exists instead:
+      </p>
+      <table class="data-table">
+        <thead><tr><th>Instead of docs</th><th>What it tells you</th></tr></thead>
+        <tbody>
+          <tr><td>The test suite</td><td>The behaviour someone cared enough to pin down. Often the most accurate spec in the building.</td></tr>
+          <tr><td>Closed tickets</td><td>What was asked for and what was actually built, including the arguments.</td></tr>
+          <tr><td>Pull request discussion</td><td>Why it was built that way, and what was rejected.</td></tr>
+          <tr><td>Support tickets</td><td>What users actually do, which is never what the design assumed.</td></tr>
+          <tr><td>Analytics and logs</td><td>Which paths are hot. Test coverage should roughly follow this and usually does not.</td></tr>
+          <tr><td>The oldest engineer</td><td>The reasons behind everything strange. Ask why, not what — the what you can read.</td></tr>
+        </tbody>
+      </table>
+      <p class="mt-4">
+        <strong>Then write down what you learn.</strong> As a new joiner you are
+        the only person who can see what is missing, and that window closes in
+        about six weeks. A short page on how to set up the environment, or a
+        map of which service does what, is often the single most valued thing a
+        new tester produces in their first quarter — and it is the artefact
+        that gets remembered at your review.
+      </p>
+    </section>
+
+    <section id="month2" class="panel">
+      <h2>Month two: start contributing</h2>
+      <ul>
+        <li><strong>Take a real area and own it.</strong> Not the whole product. One feature, end to end, well enough that people ask you about it.</li>
+        <li><strong>Join refinement and ask about acceptance criteria.</strong> "How would we know this works?" is the highest-value sentence a tester says, and it is worth more before the code exists than after.</li>
+        <li><strong>Fix one thing about the suite.</strong> A flaky test, a slow one, a missing check for a bug that shipped. Small and finished beats a proposal to rewrite it.</li>
+        <li><strong>Automate something you have done manually three times.</strong> Three is the threshold where the effort pays and where you understand it well enough to automate correctly.</li>
+        <li><strong>Say what you are not covering.</strong> A tester who names the gaps is trusted far more than one who implies everything is fine.</li>
+      </ul>
+      <p class="text-dim">
+        If your first automated test lands in month two rather than week two,
+        that is normal and usually better. A test written before you understand
+        the product tends to assert the current behaviour, which is exactly the
+        failure the Code Review Gauntlet's generated exercises are about.
+      </p>
+    </section>
+
+    <section id="month3" class="panel">
+      <h2>Month three: the 90-day conversation</h2>
+      <p>
+        Most places have some version of a probation or 90-day review. Walk into
+        it with your own summary rather than waiting to be assessed:
+      </p>
+      <ul>
+        <li><strong>What you shipped.</strong> Bugs found and their impact, tests written, documentation created, releases supported. Numbers where you have them.</li>
+        <li><strong>What you learned.</strong> Areas you can now work independently, and — honestly — the ones you still cannot.</li>
+        <li><strong>What you noticed.</strong> The observations from week three, now that you can say which ones matter. This is where a new joiner's value is highest and it expires.</li>
+        <li><strong>What you want next.</strong> A specific area, skill, or responsibility. Managers can act on specific.</li>
+      </ul>
+      <p class="text-dim">
+        Keep a running note from week one. Reconstructing three months from
+        memory in the week before the review produces a thinner and less
+        accurate story than the one you actually lived.
+      </p>
+    </section>
+
+    <section id="traps" class="panel">
+      <h2>Traps that catch new joiners</h2>
+      <ul>
+        <li><strong>Comparing everything to your last job.</strong> "At my last company we…" is useful once a month and corrosive once a day. Understand why it is done this way before proposing that it is not.</li>
+        <li><strong>Waiting to be told what to test.</strong> Nobody is coming with a plan. Pick an area, say what you are going to do, and do it.</li>
+        <li><strong>Hiding confusion.</strong> The window where "I don't understand this yet" costs you nothing is roughly your first month, and it never reopens. Spend it.</li>
+        <li><strong>Being the quality police.</strong> Blocking releases and counting other people's mistakes makes you an obstacle. Testers with influence got it by being useful, not by being right.</li>
+        <li><strong>Rewriting the framework in month one.</strong> It is almost always the wrong call, and it is always read as a judgment on whoever wrote it.</li>
+        <li><strong>Going quiet when blocked.</strong> A day stuck is fine. A week stuck and silent is the thing that ends probations.</li>
+      </ul>
+      <div class="panel panel-accent">
+        <strong>The one habit worth more than the rest of this page:</strong>
+        write down what you were confused by, in your first month, before you
+        stop being confused. It becomes your onboarding document, your first
+        real contribution, and the reason the next person has an easier start
+        than you did.
+      </div>
+    </section>
+
+    <div class="panel app-next-steps">
+      <span class="text-dim">Related:</span>
+      <a class="btn btn-primary btn-sm" href="../take-home.html">Take-Home Simulator →</a>
+      <a class="btn btn-ghost btn-sm" href="../severity-drill.html">Severity &amp; Priority Drill</a>
+      <a class="btn btn-ghost btn-sm" href="test-data.html">Test Data &amp; Environments</a>
+      <a class="btn btn-ghost btn-sm" href="../interview-questions.html">Interview questions</a>
+      <a class="btn btn-ghost btn-sm" href="../learn.html">All tracks</a>
+    </div>
+  </main>
+
+  <div id="site-footer"></div>
+
+  <script src="../../js/test-hooks.js"></script>
+  <script src="../../js/site-chrome.js"></script>
+  <script src="../../js/data/defects.js"></script>
+  <script src="../../js/profiles.js"></script>
+  <script src="../../js/progress.js"></script>
+  <script src="../../js/rpg.js"></script>
+</body>
+</html>
