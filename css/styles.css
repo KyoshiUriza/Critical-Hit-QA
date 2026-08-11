@@ -1300,6 +1300,55 @@ code.inline {
 }
 .btn-sort:hover { color: var(--accent); }
 
+/* ── Interview rehearsal mode ────────────────────────────────────────── */
+.rehearse-toggle { display: inline-flex; align-items: center; gap: var(--sp-2); font-size: var(--text-sm); }
+.rehearse {
+  border: 1px solid var(--border-strong);
+  border-left: 3px solid var(--accent);
+  border-radius: var(--rad-md);
+  padding: var(--sp-3);
+  margin: var(--sp-3) 0;
+}
+.rehearse-input { width: 100%; margin: var(--sp-2) 0; }
+.rehearse-check { margin-top: var(--sp-3); font-size: var(--text-sm); }
+.rehearse-check ul { list-style: none; padding: 0; margin: var(--sp-2) 0 0; }
+.rehearse-check li { padding: 3px 0; }
+.rehearse-check label { display: flex; gap: var(--sp-2); align-items: flex-start; cursor: pointer; }
+
+/* ── Take-Home Simulator ─────────────────────────────────────────────── */
+.takehome-card { margin-bottom: var(--sp-3); }
+.takehome-brief { border-left: 3px solid var(--accent); }
+.takehome-clock-wrap { text-align: right; flex-shrink: 0; }
+.takehome-clock {
+  font-family: var(--font-mono);
+  font-size: var(--text-2xl);
+  font-weight: 700;
+  color: var(--accent);
+}
+/* Over budget is warn, never danger: running long is information, not a
+   failure, and colouring it red would just add anxiety to a practice tool. */
+.takehome-clock.over-budget { color: var(--warn); }
+
+.takehome-rubric { list-style: none; padding: 0; margin: var(--sp-3) 0 0; }
+.takehome-rubric-item {
+  padding: var(--sp-3);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--border);
+  border-radius: var(--rad-md);
+  margin-bottom: var(--sp-2);
+}
+.rubric-pass { border-left-color: var(--accent-2); background: color-mix(in srgb, var(--accent-2) 8%, transparent); }
+.rubric-miss { border-left-color: var(--warn);     background: color-mix(in srgb, var(--warn) 8%, transparent); }
+
+.takehome-reveal { list-style: none; padding: 0; margin: var(--sp-3) 0; }
+.takehome-reveal li {
+  padding: var(--sp-2) 0;
+  border-bottom: 1px solid var(--border);
+  font-size: var(--text-sm);
+}
+.takehome-reveal li:last-child { border-bottom: 0; }
+.takehome-reveal li.missed { opacity: 0.65; }
+
 /* Locator Lab: the no-test-id region. Marked visually so nobody wastes a
    session hunting for an attribute that was never there. */
 .lab-hard { border-left: 3px solid var(--warn); }

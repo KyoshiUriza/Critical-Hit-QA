@@ -29,6 +29,7 @@ const PAGES = [
   '/pages/resources.html',             // the most outbound links of any page
   '/pages/account.html',               // profiles + sync codes
   '/pages/tester-lattice.html',        // character sheet
+  '/pages/take-home.html',             // take-home simulator
   '/practice-apps/cart-broken.html',   // buggy app + bounty side panel
   '/practice-apps/locator-lab.html',
   '/practice-apps/sql-sandbox.html',

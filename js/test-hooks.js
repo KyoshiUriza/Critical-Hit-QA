@@ -22,9 +22,11 @@
     "remembered_email",
     "remembered_pw",      // only ever written by the intentionally-broken login
     "practice_todos",
-    "practice_todos_broken"
+    "practice_todos_broken",
+    "qaprep_rehearse",
+    "qaprep_locator_solved"
   ];
-  var OWNED_SESSION_KEYS = ["login_fails", "login_locked", "bounty_panel_open"];
+  var OWNED_SESSION_KEYS = ["login_fails", "login_locked", "bounty_panel_open", "qaprep_takehome_run"];
   // Auto-detection markers are per app and created at runtime, so they are
   // swept by prefix in reset() alongside the profile data keys.
   var SESSION_PREFIXES = ["qaprep_auto_"];

@@ -51,7 +51,8 @@
     // and collapses at 1250 — a new item costs ~80px and would put the row
     // back over its own breakpoint. Reached from Automation Lab, the Learn
     // track, and Playwright Errors instead.
-    "code-review": "automation-lab"
+    "code-review": "automation-lab",
+    "take-home": "bug-bounty"
   };
 
   var AUTHOR = "Kyoshi Uriza";

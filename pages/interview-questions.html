@@ -15,7 +15,7 @@
   <main id="main" class="container">
     <div class="page-header">
       <h1>Interview Questions</h1>
-      <p>Curated questions with model answers. Click a question to reveal the answer.</p>
+      <p>Curated questions with model answers. Click a question to reveal the answer — or turn on Rehearsal mode and commit to your own first.</p>
     </div>
 
     <div class="quiz-controls">
@@ -26,7 +26,20 @@
         <option value="medium">Medium</option>
         <option value="hard">Hard</option>
       </select>
+      <label class="rehearse-toggle">
+        <input type="checkbox" id="rehearse-toggle" data-testid="rehearse-toggle" />
+        <span>Rehearsal mode</span>
+      </label>
       <span class="text-dim" id="result-count"></span>
+    </div>
+
+    <div class="panel panel-accent">
+      <strong>Why rehearsal mode exists.</strong> Every other exercise on this
+      site is multiple choice or a form — but interviews are spoken, and what
+      gets graded is how you think out loud. Reading a model answer feels like
+      learning and measures nothing. Turn it on and each question asks you to
+      commit to your own answer first; what you wrote locks when you reveal, so
+      you can see honestly how close you were.
     </div>
 
     <div id="category-tabs" class="category-tabs"></div>

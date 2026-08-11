@@ -99,16 +99,45 @@
     ].filter(function (x) { return x !== null; }).join("\n");
   }
 
+  // A submitted assignment, exported as the document an employer received.
+  function takeHomeToMd(a) {
+    var f = a.fields || {};
+    return [
+      "## " + (a.title || "Take-home assignment"),
+      "",
+      f["th-brief"] ? "**Brief:** " + f["th-brief"] + "  " : null,
+      f["th-time"] ? "**Time taken:** " + f["th-time"] + "  " : null,
+      f["th-score"] ? "**Reviewer checks met:** " + f["th-score"] : null,
+      "",
+      "### " + (f["th-title"] || "(untitled finding)"),
+      "",
+      "**Severity:** " + (f["th-severity"] || "—"),
+      "",
+      "**Steps to reproduce**",
+      f["th-steps"] || "_Not recorded._",
+      "",
+      "**Expected result**  ",
+      f["th-expected"] || "_Not recorded._",
+      "",
+      "**Actual result**  ",
+      f["th-actual"] || "_Not recorded._",
+      "",
+      f["th-notes"] ? "**Recommendation**  \n" + f["th-notes"] : null
+    ].filter(function (x) { return x !== null; }).join("\n");
+  }
+
   function buildMarkdown() {
     var bugs = window.Progress.listArtifacts("bug-report");
     var cases = window.Progress.listArtifacts("test-case");
     var reviews = window.Progress.listArtifacts("code-review");
+    var takehomes = window.Progress.listArtifacts("take-home");
     var out = [
       "# QA Portfolio",
       "",
       "_" + bugs.length + " bug report" + (bugs.length === 1 ? "" : "s") +
       ", " + cases.length + " test case" + (cases.length === 1 ? "" : "s") +
-      " and " + reviews.length + " code review" + (reviews.length === 1 ? "" : "s") +
+      ", " + reviews.length + " code review" + (reviews.length === 1 ? "" : "s") +
+      " and " + takehomes.length + " take-home assignment" + (takehomes.length === 1 ? "" : "s") +
       ", written against the practice applications at Critical Hit QA._",
       ""
     ];
@@ -123,6 +152,10 @@
     if (reviews.length) {
       out.push("---", "", "# Code reviews", "");
       reviews.forEach(function (a) { out.push(reviewToMd(a), ""); });
+    }
+    if (takehomes.length) {
+      out.push("---", "", "# Take-home assignments", "");
+      takehomes.forEach(function (a) { out.push(takeHomeToMd(a), ""); });
     }
     return out.join("\n");
   }
@@ -183,13 +216,15 @@
     var bugs = renderList("list-bugs", "bug-report", "bug-report-builder.html");
     var cases = renderList("list-cases", "test-case", "test-case-builder.html");
     var reviews = renderList("list-reviews", "code-review", "code-review.html");
-    var total = bugs + cases + reviews;
+    var takehomes = renderList("list-takehomes", "take-home", "take-home.html");
+    var total = bugs + cases + reviews + takehomes;
 
     el("empty-state").classList.toggle("hidden", total > 0);
     el("portfolio-body").classList.toggle("hidden", total === 0);
     el("count-bugs").textContent = bugs ? "· " + bugs : "";
     el("count-cases").textContent = cases ? "· " + cases : "";
     el("count-reviews").textContent = reviews ? "· " + reviews : "";
+    el("count-takehomes").textContent = takehomes ? "· " + takehomes : "";
   }
 
   function showExport(text) {

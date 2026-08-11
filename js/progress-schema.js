@@ -19,7 +19,10 @@
   // because a QA lead's review made the point plainly: the Gauntlet simulates
   // an interview round they actually run, and produced nothing a candidate
   // could show afterwards.
-  var ALLOWED_ARTIFACT_TYPES = ["bug-report", "test-case", "code-review"];
+  // "take-home" is a submitted assignment from the Take-Home Simulator. It is
+  // the artifact closest to what an employer actually saw, so it belongs in
+  // the portfolio alongside the rest.
+  var ALLOWED_ARTIFACT_TYPES = ["bug-report", "test-case", "code-review", "take-home"];
 
   // Caps exist so a hostile code cannot fill the origin's storage quota and
   // wedge the site for the person who pasted it.

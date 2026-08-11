@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; object-src 'none'; frame-src 'none'; base-uri 'self'; form-action 'self'" />
+  <meta name="referrer" content="no-referrer" />
+  <title>Take-Home Simulator — Critical Hit QA</title>
+  <link rel="stylesheet" href="../css/styles.css" />
+</head>
+<body data-page="take-home" data-depth="1">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div id="site-header"></div>
+
+  <main id="main" class="container">
+    <div class="page-header">
+      <h1>Take-Home Simulator</h1>
+      <p>The interview stage this site was missing: a written brief, a clock, a real app to break, and a submission that gets graded the way a hiring manager would read it.</p>
+    </div>
+
+    <!-- ── Picker ── -->
+    <div id="picker">
+      <section class="panel panel-accent">
+        <h2>How this differs from a bug hunt</h2>
+        <p>
+          Bug Bounty asks "how many can you find". A take-home asks something
+          harder: <strong>did you stay in scope, pick the right thing to lead
+          with, and write it so a stranger can act on it?</strong> Most
+          candidates who fail this stage find the defects and lose on the
+          write-up.
+        </p>
+        <ul>
+          <li>You get a brief from a named person, with a scope that is deliberately narrower than the app.</li>
+          <li>A clock runs. It does not stop you — but it records how long you took, because over-running a stated budget is itself a signal.</li>
+          <li>On submit you get a rubric: what a reviewer checks, and whether your submission met it.</li>
+          <li>The finished submission lands in your <a href="portfolio.html">portfolio</a>.</li>
+        </ul>
+        <p class="text-dim text-sm m-0">
+          One honest note on grading. The objective parts — which defects you
+          actually triggered, whether your report has steps, expected and actual
+          — are checked automatically. Whether your writing is <em>clear</em> is
+          not something this page can judge, so the rubric tells you what a
+          human would look for rather than pretending to score it.
+        </p>
+      </section>
+
+      <h2 class="mt-6">Choose an assignment</h2>
+      <div id="brief-list" data-testid="brief-list"></div>
+    </div>
+
+    <!-- ── Active assignment ── -->
+    <div id="assignment" class="hidden">
+      <section class="panel takehome-brief">
+        <div class="lab-ex-head">
+          <div>
+            <h2 class="m-0" id="assign-title" data-testid="assign-title"></h2>
+            <div class="text-dim text-sm" id="assign-from"></div>
+          </div>
+          <div class="takehome-clock-wrap">
+            <div class="takehome-clock" id="clock" data-testid="clock">0m 00s</div>
+            <div class="text-dim text-xs">budget <span id="assign-budget"></span></div>
+          </div>
+        </div>
+
+        <p id="assign-context" data-testid="assign-context"></p>
+
+        <h3>Scope</h3>
+        <ul id="assign-scope" data-testid="assign-scope"></ul>
+
+        <h3>Deliverable</h3>
+        <p id="assign-deliverable" data-testid="assign-deliverable"></p>
+
+        <p class="text-dim text-sm" id="clock-note" data-testid="clock-note"></p>
+
+        <div class="flex gap-2 flex-wrap mt-4">
+          <a class="btn btn-primary" id="open-app" target="_blank" rel="noopener" data-testid="open-app">
+            Open the app ↗
+          </a>
+          <a class="btn btn-ghost" id="open-builder" data-testid="open-builder">Full Bug Report Builder</a>
+          <button class="btn btn-ghost" id="abandon" type="button" data-testid="abandon">Abandon</button>
+        </div>
+        <p class="text-dim text-sm mt-2" data-testid="live-found" id="live-found"></p>
+      </section>
+
+      <section class="panel">
+        <h2>Your submission</h2>
+        <p class="text-dim text-sm">
+          Write it here, or use the full builder and paste the important parts
+          back. A reviewer reads the title and the steps first — if those two do
+          not stand alone, the rest rarely gets read.
+        </p>
+
+        <div class="form-field">
+          <label for="th-title">Title — what, where, under what condition</label>
+          <input type="text" id="th-title" data-testid="th-title" autocomplete="off"
+                 placeholder="Tax is calculated on the pre-discount subtotal, overcharging any order with a coupon" />
+        </div>
+
+        <div class="form-field">
+          <label for="th-severity">Severity</label>
+          <select id="th-severity" data-testid="th-severity">
+            <option value="">Select…</option>
+            <option value="S1">S1 — Critical (blocks core function, or money/data loss)</option>
+            <option value="S2">S2 — High (major function broken, no workaround)</option>
+            <option value="S3">S3 — Medium (works, with a workaround)</option>
+            <option value="S4">S4 — Low (cosmetic or minor)</option>
+          </select>
+        </div>
+
+        <div class="form-field">
+          <label for="th-steps">Steps to reproduce — numbered, deterministic</label>
+          <textarea id="th-steps" rows="5" data-testid="th-steps"
+                    placeholder="1. Add Widget ($10.00) to the cart&#10;2. Apply coupon SAVE10&#10;3. Read the Tax line"></textarea>
+        </div>
+
+        <div class="two-col">
+          <div class="form-field">
+            <label for="th-expected">Expected result</label>
+            <textarea id="th-expected" rows="3" data-testid="th-expected"
+                      placeholder="Tax of 8% is charged on the discounted subtotal ($9.00) = $0.72"></textarea>
+          </div>
+          <div class="form-field">
+            <label for="th-actual">Actual result</label>
+            <textarea id="th-actual" rows="3" data-testid="th-actual"
+                      placeholder="Tax of $0.80 is charged — 8% of the pre-discount $10.00"></textarea>
+          </div>
+        </div>
+
+        <div class="form-field">
+          <label for="th-notes">Your recommendation to the person who briefed you</label>
+          <textarea id="th-notes" rows="3" data-testid="th-notes"
+                    placeholder="Do not ship Thursday. Two defects affect the amount charged…"></textarea>
+        </div>
+
+        <button class="btn btn-primary" id="submit-assignment" type="button" data-testid="submit-assignment">
+          Submit assignment
+        </button>
+        <p class="form-error" id="submit-error" data-testid="submit-error" role="alert"></p>
+      </section>
+    </div>
+
+    <!-- ── Result ── -->
+    <div id="result" class="hidden" data-testid="result" role="status" aria-live="polite"></div>
+  </main>
+
+  <div id="site-footer"></div>
+
+  <script src="../js/test-hooks.js"></script>
+  <script src="../js/site-chrome.js"></script>
+  <script src="../js/data/defects.js"></script>
+  <script src="../js/profiles.js"></script>
+  <script src="../js/progress.js"></script>
+  <script src="../js/rpg.js"></script>
+  <script src="../js/data/takehome-briefs.js"></script>
+  <script src="../js/takehome.js"></script>
+</body>
+</html>
