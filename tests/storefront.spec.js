@@ -364,3 +364,38 @@ test.describe('Northwind Account', () => {
     await expect(page.getByTestId('go-register')).not.toHaveAttribute('data-inert-nav', 'true');
   });
 });
+
+// ── Tasklane ──────────────────────────────────────────────────────────
+test.describe('Tasklane', () => {
+  for (const url of ['/practice-apps/todo.html', '/practice-apps/todo-broken.html']) {
+    test(`${url} is a different product, not a restyled storefront`, async ({ page }) => {
+      // Two apps that look like the same product teach that all software
+      // looks alike. The brand, the accent and the nav all differ.
+      await page.goto(url + '?reset');
+      await expect(page.getByTestId('app-brand')).toContainText('Tasklane');
+      await expect(page.getByTestId('board-personal')).toBeVisible();
+      await expect(page.getByTestId('app-cart-count')).toHaveCount(0);
+
+      const accent = await page.locator('.app-shell').evaluate((el) =>
+        getComputedStyle(el).getPropertyValue('--app-accent').trim());
+      expect(accent).toBe('#5b5bd6');
+    });
+  }
+
+  test('the todo behaviour is untouched by the new chrome', async ({ page }) => {
+    await page.goto('/practice-apps/todo.html?reset');
+    await page.getByTestId('new-todo-input').fill('Write the test plan');
+    await page.getByTestId('add-todo').click();
+    await expect(page.getByTestId('todo-list').locator('li')).toHaveCount(1);
+    await expect(page.getByTestId('items-left')).toContainText('1 item');
+
+    // The empty state is itself an <li>, so counting bare list items would
+    // never reach zero. Count real todos instead.
+    const todos = page.getByTestId('todo-list').locator('li.todo-item');
+    await page.getByTestId('filter-done').click();
+    await expect(todos).toHaveCount(0);
+    await expect(page.getByTestId('todo-list')).toContainText('No items');
+    await page.getByTestId('filter-all').click();
+    await expect(todos).toHaveCount(1);
+  });
+});

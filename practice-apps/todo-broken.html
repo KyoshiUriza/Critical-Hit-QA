@@ -7,6 +7,7 @@
   <meta name="referrer" content="no-referrer" />
   <title>Practice (Broken): Todo List — Critical Hit QA</title>
   <link rel="stylesheet" href="../css/styles.css" />
+  <link rel="stylesheet" href="../css/app-shell.css" />
 </head>
 <body data-page="practice-app-detail" data-depth="1">
   <a class="skip-link" href="#main">Skip to content</a>
@@ -14,7 +15,7 @@
 
   <main id="main" class="container">
     <div class="page-header">
-      <h1>Todo List <span style="color:var(--danger);font-size:1rem;">(Buggy build)</span></h1>
+      <h1>Tasklane <span style="color:var(--danger);font-size:1rem;">(buggy build)</span></h1>
       <p>Same feature as the clean todo — but this build contains real defects.</p>
     </div>
 
@@ -22,9 +23,21 @@
       <strong>Testing charter</strong> — Verify the behavior spec on the right. Try edge cases: empty input, whitespace, filters with 0 items, refresh, XSS-shaped payloads, the counter after various actions.
     </div>
 
-    <div class="two-col">
-      <div>
-        <div class="app-frame">
+        <div class="app-shell" data-brand="tasklane" data-user="Alex Rivera"
+             data-nav-active="Boards" data-crumbs="Tasklane|Personal|Tasks">
+          <div class="app-body-split">
+        <aside class="app-side" aria-label="Boards">
+          <h4>Boards</h4>
+          <ul>
+            <li><a href="#main" class="is-active" data-inert-nav="true" data-testid="board-personal">Personal</a></li>
+            <li><a href="#main" data-inert-nav="true" data-testid="board-work">Work</a></li>
+            <li><a href="#main" data-inert-nav="true" data-testid="board-someday">Someday</a></li>
+          </ul>
+          <h4>This board</h4>
+          <p class="text-dim text-sm">Shared with 2 people. Changes save to this browser only — there is no server.</p>
+        </aside>
+            <div class="app-frame" style="border:0;padding:0;">
+
           <h2>My Todos</h2>
           <form id="add-form" class="todo-input-row" onsubmit="return false;">
             <input type="text" id="new-todo" data-testid="new-todo-input" placeholder="What needs doing?" maxlength="120" />
@@ -44,7 +57,8 @@
             <a href="#" id="clear-completed" data-testid="clear-completed">Clear completed</a>
           </div>
         </div>
-      </div>
+          </div>
+        </div>
 
       <div class="panel">
         <h3>Behavior spec</h3>
@@ -57,7 +71,6 @@
           <li>State persists across refresh.</li>
         </ul>
       </div>
-    </div>
 
     <div class="panel mt-4">
       <h3>Answer key</h3>
@@ -198,6 +211,7 @@
   <script src="../js/profiles.js"></script>
   <script src="../js/progress.js"></script>
   <script src="../js/rpg.js"></script>
+  <script src="../js/app-shell.js"></script>
   <script src="../js/defect-detector.js"></script>
   <script src="../js/bounty-panel.js"></script>
   <div id="site-footer"></div>
