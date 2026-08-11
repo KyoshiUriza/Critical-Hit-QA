@@ -1300,6 +1300,19 @@ code.inline {
 }
 .btn-sort:hover { color: var(--accent); }
 
+/* ── DevTools Lab ─────────────────────────────────────────────────────
+   The ghost error is opacity:0 on purpose. Not display:none — the whole
+   exercise is that the element is present, occupies space, is focusable and
+   is announced by a screen reader, while being invisible. display:none would
+   remove all of that and make it a different (easier) defect. */
+.dl-ghost-error {
+  opacity: 0;
+  color: var(--danger);
+  font-size: var(--text-sm);
+  margin-top: var(--sp-1);
+  min-height: 1.2em;
+}
+
 /* ── Interview rehearsal mode ────────────────────────────────────────── */
 .rehearse-toggle { display: inline-flex; align-items: center; gap: var(--sp-2); font-size: var(--text-sm); }
 .rehearse {

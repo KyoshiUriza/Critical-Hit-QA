@@ -10,7 +10,7 @@ A self-contained static web app for Software QA interview prep. No build step, n
 ## What's inside
 
 **The core loop**
-- **Practice Apps** — 17 working mini-apps: 12 clean, 5 with intentionally seeded defects (43 total).
+- **Practice Apps** — 18 working mini-apps: 13 clean, 5 with intentionally seeded defects (43 total).
 - **Bug Bounty** — tick off the defects you found; scored against the seeded catalog, weighted by severity.
 - **Bug Report Builder** — turn a find into a real report. Exports Markdown / GitHub Issue / Jira / JSON. A defect ticked in Bug Bounty carries straight through with its app, environment and title prefilled.
 - **My Portfolio** — every draft you've written, autosaved as you type. Export the lot as one Markdown document to hand to an interviewer.

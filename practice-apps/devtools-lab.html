@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; object-src 'none'; frame-src 'none'; base-uri 'self'; form-action 'self'" />
+  <meta name="referrer" content="no-referrer" />
+  <title>DevTools Lab — Critical Hit QA</title>
+  <link rel="stylesheet" href="../css/styles.css" />
+</head>
+<body data-page="practice-app-detail" data-depth="1">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div id="site-header"></div>
+
+  <main id="main" class="container">
+    <div class="page-header">
+      <h1>DevTools Lab</h1>
+      <p>Four times the interface tells you one thing and the browser knows another. Go and get the evidence.</p>
+    </div>
+
+    <div class="panel panel-accent">
+      <strong>Why this exists.</strong> Hiring managers report rejecting
+      candidates for failing elementary tasks — reading a console log, checking
+      what a request returned, looking at what was actually stored. This site
+      already covers running queries and calling an API. It did not cover
+      reading the browser, which is the tool you will use every single day.
+      <br /><br />
+      <strong>Everything here is real.</strong> The console entries are real
+      console entries, the failed request is a real 404 in the Network tab, and
+      the storage write is real localStorage. Nothing on this page is a mock-up
+      of DevTools — a simulated panel would teach you the simulation.
+      <br /><br />
+      Nothing fires until you press a button, so open the panel first and watch
+      it happen. That is also the habit worth building: act, then read.
+    </div>
+
+    <div class="panel">
+      <h3>Your run</h3>
+      <div class="quiz-progress"><div class="quiz-progress-bar" id="dl-progress" style="width:0%"></div></div>
+      <p class="text-dim" id="dl-score" data-testid="dl-score">0 evidenced</p>
+      <p class="text-dim text-sm m-0">
+        Answers are values you can only get from the panel. That is deliberate —
+        a question you could answer from the page would be testing reading, not
+        tooling.
+      </p>
+    </div>
+
+    <div id="challenges"></div>
+
+    <!-- Controls live here as real markup, then get moved into their
+         challenge. Generated inputs would not be the thing being inspected. -->
+    <div hidden id="slot-console">
+      <div class="form-field">
+        <label for="dl-coupon">Coupon code</label>
+        <input type="text" id="dl-coupon" value="SAVE20" readonly data-testid="dl-coupon" />
+      </div>
+      <p id="coupon-result" data-testid="coupon-result"></p>
+    </div>
+
+    <div hidden id="slot-network">
+      <img id="product-image" alt="Product photograph" hidden
+           data-testid="product-image" style="max-width:180px; border-radius:var(--rad-md);" />
+      <p id="network-result" data-testid="network-result"></p>
+    </div>
+
+    <div hidden id="slot-storage">
+      <div class="form-field">
+        <label><input type="checkbox" id="pref-newsletter" data-testid="pref-newsletter" checked /> Email me the newsletter</label>
+      </div>
+      <div class="form-field">
+        <label for="pref-theme">Theme</label>
+        <select id="pref-theme" data-testid="pref-theme">
+          <option value="system">Match my system</option>
+          <option value="dark">Always dark</option>
+          <option value="light">Always light</option>
+        </select>
+      </div>
+      <p id="storage-result" data-testid="storage-result"></p>
+    </div>
+
+    <div hidden id="slot-elements">
+      <div class="form-field">
+        <label for="dl-email">Email address</label>
+        <input type="text" id="dl-email" value="not-an-email" autocomplete="off" data-testid="dl-email" />
+        <!-- Rendered at opacity:0 by .dl-ghost-error. Present, focusable,
+             announced by a screen reader, and invisible. -->
+        <div class="dl-ghost-error" id="dl-email-error" data-testid="dl-email-error" hidden></div>
+      </div>
+      <p id="elements-result" data-testid="elements-result"></p>
+    </div>
+
+    <section class="panel">
+      <h2>The four panels, and when to reach for each</h2>
+      <table class="data-table">
+        <thead><tr><th>Panel</th><th>Answers the question</th><th>Put in the bug report</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>Console</strong></td>
+            <td>Did the code complain?</td>
+            <td>The exact error text and the file:line it came from.</td>
+          </tr>
+          <tr>
+            <td><strong>Network</strong></td>
+            <td>What did the server actually return?</td>
+            <td>Method, URL, status, and how long it took. A HAR export if it is intermittent.</td>
+          </tr>
+          <tr>
+            <td><strong>Application</strong></td>
+            <td>What was really stored, and where?</td>
+            <td>The key name and its value — redacted if it contains anything sensitive.</td>
+          </tr>
+          <tr>
+            <td><strong>Elements</strong></td>
+            <td>Is it missing, or just invisible?</td>
+            <td>The element, and the computed style that hides or disables it.</td>
+          </tr>
+        </tbody>
+      </table>
+      <p class="text-dim">
+        One habit worth more than any of them: <strong>reproduce with the panel
+        already open.</strong> Console and Network only record while they are
+        watching, so a defect reproduced first and inspected second often leaves
+        no evidence at all.
+      </p>
+    </section>
+
+    <div class="panel app-next-steps">
+      <span class="text-dim">Next:</span>
+      <a class="btn btn-primary btn-sm" href="../pages/bug-report-builder.html">Write one of these up →</a>
+      <a class="btn btn-ghost btn-sm" href="login-broken.html">Login (buggy) — one defect is storage-only</a>
+      <a class="btn btn-ghost btn-sm" href="../pages/take-home.html">Take-Home Simulator</a>
+    </div>
+  </main>
+
+  <div id="site-footer"></div>
+
+  <script src="../js/test-hooks.js"></script>
+  <script src="../js/site-chrome.js"></script>
+  <script src="../js/data/defects.js"></script>
+  <script src="../js/profiles.js"></script>
+  <script src="../js/progress.js"></script>
+  <script src="../js/rpg.js"></script>
+  <script src="../js/data/devtools-challenges.js"></script>
+  <script src="../js/devtools-lab.js"></script>
+</body>
+</html>

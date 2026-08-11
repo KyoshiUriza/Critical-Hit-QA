@@ -2,39 +2,33 @@
 // and the core loop (hunt -> score -> report) is reachable.
 const { test, expect } = require('@playwright/test');
 
-const ALL_PAGES = [
-  'index.html',
-  'pages/learn.html',
-  'pages/learn/manual.html',
-  'pages/learn/automation.html',
-  'pages/learn/codeless.html',
-  'pages/learn/frameworks.html',
-  'pages/practice-tests.html',
-  'pages/interview-questions.html',
-  'pages/practice-apps.html',
-  'pages/bug-bounty.html',
-  'pages/automation-lab.html',
-  'pages/progress.html',
-  'pages/tester-lattice.html',
-  'pages/study-plan.html',
-  'pages/resources.html',
-  'pages/test-case-builder.html',
-  'pages/bug-report-builder.html',
-  'practice-apps/login.html',
-  'practice-apps/todo.html',
-  'practice-apps/cart.html',
-  'practice-apps/register.html',
-  'practice-apps/data-table.html',
-  'practice-apps/file-upload.html',
-  'practice-apps/modal.html',
-  'practice-apps/a11y-challenge.html',
-  'practice-apps/locator-lab.html',
-  'practice-apps/sql-sandbox.html',
-  'pages/learn/locators.html',
-  'pages/learn/sql.html',
-  'pages/playwright-errors.html',
-  'pages/portfolio.html',
-];
+const fs = require('fs');
+const path = require('path');
+
+const ROOT = path.join(__dirname, '..');
+
+// Derived from the filesystem, not listed by hand. The hand-written list had
+// silently fallen five apps behind — including two shipped the same session —
+// so the sitewide sweep was not sweeping the site. A new page is now covered
+// the moment it exists, which is the only way this stays true.
+//
+// frame-content.html is excluded: it is loaded inside the Component Gauntlet's
+// iframe and deliberately has no site chrome, so the chrome assertions below
+// do not apply to it.
+const NOT_STANDALONE = new Set(['frame-content.html']);
+
+function discover() {
+  const out = ['index.html'];
+  for (const dir of ['pages', 'pages/learn', 'practice-apps']) {
+    for (const f of fs.readdirSync(path.join(ROOT, dir)).sort()) {
+      if (!f.endsWith('.html') || NOT_STANDALONE.has(f)) continue;
+      out.push(dir + '/' + f);
+    }
+  }
+  return out;
+}
+
+const ALL_PAGES = discover();
 
 test.describe('shared chrome', () => {
   for (const path of ALL_PAGES) {
