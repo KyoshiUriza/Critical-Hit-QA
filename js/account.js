@@ -185,8 +185,11 @@
       out.classList.remove("hidden");
       copy.hidden = false;
 
-      // A code carrying a hundred drafts is far too long to paste by hand.
-      // Say so rather than let someone discover it halfway through.
+      // Measured: progress with no drafts is about 6,000 characters, and the
+      // TWELFTH saved draft takes it to roughly 30,000. This comment used to
+      // say "a hundred drafts", which put the limit an order of magnitude
+      // further away than it is — the code is a fine transport for progress
+      // and a poor one for drafts, and that happens almost immediately.
       if (code.length > 4000) {
         meta.textContent =
           "This code is " + code.length.toLocaleString() + " characters — long enough that " +

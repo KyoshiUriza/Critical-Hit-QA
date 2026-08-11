@@ -84,6 +84,12 @@ valuable thing in the store.
 
 ## Revisiting
 
+**That condition has since been met, and the assessment is
+[ADR 0004](0004-optional-cross-device-sync.md).** It measures the payload,
+prices four options, and revises one claim below: a code carrying "many
+drafts" is unwieldy far sooner than this ADR implies — the twelfth draft
+produces roughly 30,000 characters.
+
 If cross-device sync becomes the thing people actually ask for, the upgrade
 path is GitHub OAuth rather than email and password: the audience is testers
 and developers who mostly have GitHub accounts, and it means never holding a
