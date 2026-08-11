@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; object-src 'none'; frame-src 'none'; base-uri 'self'; form-action 'self'" />
+  <meta name="referrer" content="no-referrer" />
+  <title>Severity &amp; Priority Drill — Critical Hit QA</title>
+  <link rel="stylesheet" href="../css/styles.css" />
+</head>
+<body data-page="severity-drill" data-depth="1">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div id="site-header"></div>
+
+  <main id="main" class="container">
+    <div class="page-header">
+      <h1>Severity &amp; Priority Drill</h1>
+      <p>Ten defects. Call the severity and the priority before you read the reasoning, and find out which way you lean.</p>
+    </div>
+
+    <div class="panel panel-accent">
+      <strong>Severity is what the defect does. Priority is when it gets fixed.</strong>
+      They are two different questions answered by two different people, and
+      interviewers probe the distinction constantly because collapsing them is
+      how a bug queue stops meaning anything.
+      <br /><br />
+      Severity is largely yours to judge: impact if it happens, whether there
+      is a workaround, whether data is wrong. Priority belongs to the business:
+      how many users, how visible, what else is in flight, what ships next
+      week. Your job on priority is to supply the evidence, not to win the
+      argument.
+      <br /><br />
+      <strong>These are model answers, not facts.</strong> Grading treats a
+      one-band disagreement as defensible on purpose. Two bands apart is a
+      different thing, and it is what the report at the end counts.
+    </div>
+
+    <div class="panel">
+      <div class="quiz-progress"><div class="quiz-progress-bar" id="drill-progress" style="width:0%"></div></div>
+      <p class="text-dim m-0" id="drill-position" data-testid="drill-position"></p>
+    </div>
+
+    <div class="panel" id="drill-card"></div>
+
+    <section class="panel">
+      <h2>The four questions that decide severity</h2>
+      <ol>
+        <li><strong>What is lost?</strong> Function, data, money, trust, time. Wrong data outranks a crash, because a crash is loud and wrong data is silent.</li>
+        <li><strong>Is there a workaround?</strong> A defect with a cheap workaround is not the same defect as one without, and the report should name the workaround and what it costs.</li>
+        <li><strong>Is it silent?</strong> A failure that tells the user it succeeded is worse than one that visibly fails — nobody reports what they do not notice.</li>
+        <li><strong>Is it systematic?</strong> One order out by a cent is a rounding nit. Two hundred a month that never reconcile is an audit finding.</li>
+      </ol>
+      <h3>And the four that decide priority</h3>
+      <ol>
+        <li><strong>How many users, how often?</strong> Bring the number. "Some users" loses to "0.2% of sessions, falling".</li>
+        <li><strong>Who are they?</strong> Two admins with a workaround and every visitor on a paid campaign are different answers to the same severity.</li>
+        <li><strong>What ships next?</strong> A regional formatting bug is P3 until the regional launch is nine days away.</li>
+        <li><strong>What does it cost to wait?</strong> Support volume, reconciliation work, legal exposure. This is the sentence that actually moves priority.</li>
+      </ol>
+      <div class="panel panel-warn">
+        <strong>The mistake that costs credibility</strong> is filing everything
+        high. It works once. After that your reports get discounted before
+        they are read, and the cost lands on the day something genuinely is
+        critical. Calibration is not caution — it is the thing that makes your
+        urgent report believable.
+      </div>
+    </section>
+
+    <div class="panel app-next-steps">
+      <span class="text-dim">Next:</span>
+      <a class="btn btn-primary btn-sm" href="bug-report-builder.html">Write one of these up →</a>
+      <a class="btn btn-ghost btn-sm" href="take-home.html">Take-Home Simulator</a>
+      <a class="btn btn-ghost btn-sm" href="bug-bounty.html">Bug Bounty</a>
+      <a class="btn btn-ghost btn-sm" href="interview-questions.html">Interview questions</a>
+    </div>
+  </main>
+
+  <div id="site-footer"></div>
+
+  <script src="../js/test-hooks.js"></script>
+  <script src="../js/site-chrome.js"></script>
+  <script src="../js/data/defects.js"></script>
+  <script src="../js/profiles.js"></script>
+  <script src="../js/progress.js"></script>
+  <script src="../js/rpg.js"></script>
+  <script src="../js/data/severity-scenarios.js"></script>
+  <script src="../js/severity-drill.js"></script>
+</body>
+</html>

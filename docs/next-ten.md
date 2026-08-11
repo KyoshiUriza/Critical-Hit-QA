@@ -112,6 +112,10 @@ existing material has a hole in the middle of it.
 Fits as a Learn section plus quiz questions rather than an app.
 
 ## 6. Severity and priority calibration drill
+
+**Shipped.** `pages/severity-drill.html` with ten scenarios. Grading is
+band-tolerant on purpose and the report names directional bias, which is the
+feedback a tester never gets on the job.
 **Evidence: moderate external. Cost: low.**
 
 Carried from the previous roadmap, and reinforced: the Take-Home Simulator now

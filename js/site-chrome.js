@@ -54,7 +54,8 @@
     // back over its own breakpoint. Reached from Automation Lab, the Learn
     // track, and Playwright Errors instead.
     "code-review": "automation-lab",
-    "take-home": "bug-bounty"
+    "take-home": "bug-bounty",
+    "severity-drill": "bug-bounty"
   };
 
   var AUTHOR = "Kyoshi Uriza";
