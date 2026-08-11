@@ -845,7 +845,7 @@ Say that plainly, but do not stop there — "your metric is bad" without an alte
 
 **What it does not do:**
 - **Decide what is worth testing.** Risk assessment needs context about users, money, and consequence that is nowhere in the code.
-- **Provide an oracle.** Generate tests from an implementation and they encode current behaviour, bugs included. They will pass forever and catch nothing.
+- **Provide an oracle.** Generate tests from an implementation and they encode current behavior, bugs included. They will pass forever and catch nothing.
 - **Notice the thing nobody specified.** Most serious defects are gaps between what was written and what was meant. A model given only what was written cannot see the gap.
 - **Own the decision.** Someone accountable has to say "this is ready." That is a human role for reasons that are legal as much as technical.
 

@@ -7,7 +7,7 @@
    that. Real products have their own header, a brand, breadcrumbs, a
    toolbar, a cart badge, an account menu, toasts, empty states and a
    multi-step checkout — and the majority of real defects live in exactly
-   those parts rather than in the four inputs at the centre.
+   those parts rather than in the four inputs at the center.
 
    This layer gives each app that chrome. It is loaded ONLY by the practice
    apps, so the study site's own pages are untouched.
@@ -16,7 +16,7 @@
    - It only ADDS classes. No existing selector is renamed, because the
      Playwright suite and any learner's own suite are written against them.
      tests/testid-contract.spec.js enforces the same for test ids.
-   - Every colour comes from the existing token palette, so both themes work
+   - Every color comes from the existing token palette, so both themes work
      and tests/contrast.spec.js audits this chrome like everything else.
    - Each app sets its own accent with --app-accent, which defaults to the
      site accent. That is what makes two apps feel like two products.
@@ -283,7 +283,7 @@
 .prod-card .app-badge { position: absolute; top: var(--sp-2); left: var(--sp-2); z-index: 1; }
 
 /* Rating stars. The number goes in the text as well as the glyphs — a row of
-   stars alone is colour-and-shape information with no text alternative. */
+   stars alone is color-and-shape information with no text alternative. */
 .rating { display: inline-flex; gap: 2px; align-items: center; font-size: var(--text-sm); }
 .rating-stars { color: var(--warn); letter-spacing: 1px; }
 

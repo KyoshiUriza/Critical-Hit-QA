@@ -4,17 +4,17 @@
  * The problem this solves: you find a bug, and then you have to guess which
  * hidden row on the checklist it corresponds to. That guessing is not testing
  * — it is a matching puzzle bolted onto the exercise, and it punishes people
- * for finding something the catalogue words differently.
+ * for finding something the catalog words differently.
  *
  * So a buggy app calls Detector.trigger(defectId) at the exact line where its
- * defective behaviour happens. The Bug Bounty panel then reveals that row and
+ * defective behavior happens. The Bug Bounty panel then reveals that row and
  * marks it AUTO-DETECTED.
  *
  * The honesty question this raises, and how it is answered:
  *
  *   Triggering a defect is not the same as noticing it. Someone could set a
  *   quantity, never look at the total, and be credited with finding a tax bug.
- *   So a detected defect is revealed and counted, but it is LABELLED as
+ *   So a detected defect is revealed and counted, but it is LABELED as
  *   auto-detected and kept visually distinct from one you ticked yourself.
  *   The score stays honest because the panel — and the Bug Bounty page — can
  *   both say which finds you claimed and which the app handed you.
@@ -61,7 +61,7 @@
 
   var Detector = {
     /**
-     * Called by a buggy app when its defective behaviour actually occurs.
+     * Called by a buggy app when its defective behavior actually occurs.
      * Safe to call repeatedly — a defect triggered fifty times is still one
      * find, and the event only fires the first time so the toast does not
      * become noise.

@@ -184,7 +184,7 @@ window.SEVERITY_SCENARIOS = [
       "\"200 orders a month fail reconciliation\" is the one that gets it " +
       "fixed. Same defect, different sentence.",
     changes:
-      "If it were one cent in favour of the customer on one order ever, this " +
+      "If it were one cent in favor of the customer on one order ever, this " +
       "would be low and P3. Systematic and reconciliation-visible is what " +
       "raises it."
   },

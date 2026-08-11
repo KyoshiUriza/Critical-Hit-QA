@@ -11,7 +11,7 @@
  *
  *  1. THE CLOCK DOES NOT STOP YOU. It records elapsed time and keeps going.
  *     A timer that locks the page turns a practice exercise into an anxiety
- *     machine, and real take-homes are trusted-honour anyway. What matters is
+ *     machine, and real take-homes are trusted-honor anyway. What matters is
  *     that you know how long you took, because "I spent four hours on a
  *     90-minute assignment" is a real thing candidates do and never notice.
  *
@@ -132,8 +132,8 @@
 
   function renderProgress(brief) {
     var found = foundSoFar(brief);
-    var catalogue = (window.APP_DEFECTS && window.APP_DEFECTS[brief.app]) || { defects: [] };
-    el("live-found").textContent = found.length + " of " + catalogue.defects.length +
+    var catalog = (window.APP_DEFECTS && window.APP_DEFECTS[brief.app]) || { defects: [] };
+    el("live-found").textContent = found.length + " of " + catalog.defects.length +
       " seeded defects triggered so far";
   }
 
@@ -148,14 +148,14 @@
     }
 
     var found = foundSoFar(b);
-    var catalogue = (window.APP_DEFECTS && window.APP_DEFECTS[b.app]) || { defects: [] };
+    var catalog = (window.APP_DEFECTS && window.APP_DEFECTS[b.app]) || { defects: [] };
     var weights = { low: 1, medium: 2, high: 3, critical: 5 };
 
-    var foundHigh = catalogue.defects.filter(function (d) {
+    var foundHigh = catalog.defects.filter(function (d) {
       return found.indexOf(d.id) !== -1 && (d.severity === "high" || d.severity === "critical");
     });
-    var totalWeight = catalogue.defects.reduce(function (n, d) { return n + weights[d.severity]; }, 0);
-    var foundWeight = catalogue.defects.reduce(function (n, d) {
+    var totalWeight = catalog.defects.reduce(function (n, d) { return n + weights[d.severity]; }, 0);
+    var foundWeight = catalog.defects.reduce(function (n, d) {
       return found.indexOf(d.id) !== -1 ? n + weights[d.severity] : n;
     }, 0);
 
@@ -242,9 +242,9 @@
     // What was actually in the app, now that it is over.
     var reveal = node("div", "panel");
     reveal.appendChild(node("h3", "", "What was in the build"));
-    var catalogue = (window.APP_DEFECTS && window.APP_DEFECTS[brief.app]) || { defects: [] };
+    var catalog = (window.APP_DEFECTS && window.APP_DEFECTS[brief.app]) || { defects: [] };
     var ul = node("ul", "takehome-reveal");
-    catalogue.defects.forEach(function (d) {
+    catalog.defects.forEach(function (d) {
       var hit = r.found.indexOf(d.id) !== -1;
       var li = node("li", hit ? "found" : "missed");
       li.appendChild(node("span", "tag difficulty-" +

@@ -122,7 +122,7 @@ window.APP_DEFECTS = {
       // be triggered by doing one thing at a time and waiting.
       { id: "double-submit", severity: "critical", title: "Nothing prevents a second submit while the first is in flight",
         hint: "Click Post twice quickly. The control is never disabled and there is no idempotency guard, so the message is posted twice" },
-      { id: "optimistic-no-rollback", severity: "critical", title: "A failed post stays on screen labelled as sent",
+      { id: "optimistic-no-rollback", severity: "critical", title: "A failed post stays on screen labeled as sent",
         hint: "Post three times and read the save log against the row. One save is rejected and the post still says Sent — reload and it is gone" },
       { id: "stale-response", severity: "high", title: "A slower earlier search overwrites the newer results",
         hint: "Type a query quickly. The shorter query takes longer to answer, so it lands last and wins. The result count names a query you are no longer searching for" },
@@ -135,11 +135,11 @@ window.APP_DEFECTS = {
     ]
   },
   // The accessibility challenge had a 13-item answer key in prose and no
-  // catalogue entry, so Bug Bounty, the auto-detector and the character sheet
+  // catalog entry, so Bug Bounty, the auto-detector and the character sheet
   // all knew nothing about it — a learner could work it and record nothing.
   //
   // NOTE ON DETECTION: these are static markup defects, present on load rather
-  // than behaviours you trigger, so js/defect-detector.js has nothing to hook.
+  // than behaviors you trigger, so js/defect-detector.js has nothing to hook.
   // That is a real difference between accessibility work and functional
   // testing, and worth knowing: you find these by inspecting and by using a
   // keyboard, not by driving the app until something misbehaves.
@@ -149,12 +149,12 @@ window.APP_DEFECTS = {
     defects: [
       { id: "missing-labels", severity: "high", title: "Form inputs have no <label>",
         hint: "Email and Full name are plain divs above bare inputs — click the text and focus does not move to the field. WCAG 1.3.1, 3.3.2, 4.1.2" },
-      { id: "required-color-only", severity: "medium", title: "Required fields indicated by colour alone",
+      { id: "required-color-only", severity: "medium", title: "Required fields indicated by color alone",
         hint: "The asterisk carries the meaning and nothing says 'Required' in text. WCAG 1.4.1, 3.3.2" },
       { id: "focus-removed", severity: "high", title: "Focus indicator removed with no replacement",
         hint: "Tab through the form — nothing shows where you are. outline:none with nothing put back. WCAG 2.4.7" },
       { id: "text-contrast", severity: "high", title: "Input text contrast below 4.5:1",
-        hint: "Grey text on a light field. Sample the two colours in DevTools and compute the ratio. WCAG 1.4.3" },
+        hint: "Gray text on a light field. Sample the two colors in DevTools and compute the ratio. WCAG 1.4.3" },
       { id: "button-contrast", severity: "medium", title: "Button label contrast below 3:1",
         hint: "Light blue on blue. WCAG 1.4.11" },
       { id: "div-as-button", severity: "critical", title: "A div acts as a button",
@@ -171,8 +171,8 @@ window.APP_DEFECTS = {
         hint: "target=_blank with no indication, and no rel=noopener. WCAG 3.2.5" },
       { id: "heading-skip", severity: "low", title: "Heading levels skip from h2 to h5",
         hint: "Headings are the document outline. Skipping levels breaks navigation by heading. WCAG 1.3.1" },
-      { id: "error-color-only", severity: "high", title: "Error state uses colour only and is not announced",
-        hint: "Red text with no icon, no role=alert and no aria-live, so it is invisible to a screen reader and to anyone who cannot distinguish the colour. WCAG 1.4.1, 4.1.3" }
+      { id: "error-color-only", severity: "high", title: "Error state uses color only and is not announced",
+        hint: "Red text with no icon, no role=alert and no aria-live, so it is invisible to a screen reader and to anyone who cannot distinguish the color. WCAG 1.4.1, 4.1.3" }
     ]
   }
 };

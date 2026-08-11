@@ -12,7 +12,7 @@
  * status codes, error shapes, auth and idempotency.
  *
  * The trade-off, stated because a learner should know it: you are not
- * practising HTTP itself — no DNS, no TLS, no real latency. You are practising
+ * practicing HTTP itself — no DNS, no TLS, no real latency. You are practicing
  * the part interviews actually probe, which is what to assert and why.
  */
 (function () {

@@ -2,9 +2,9 @@
  * Take-home assignment briefs.
  *
  * The gap this closes: the site had every component of the modern take-home
- * stage — buggy apps, charters, builders, a defect catalogue, portfolio export
+ * stage — buggy apps, charters, builders, a defect catalog, portfolio export
  * — and no assembly of it. No brief, no clock, no rubric, no submission. So a
- * learner practised the pieces and never once practised the thing an employer
+ * learner practiced the pieces and never once practiced the thing an employer
  * actually sets.
  *
  * Each brief reads the way a real one does: business context first, a scope
@@ -26,7 +26,7 @@ window.TAKEHOME_BRIEFS = [
       "is safe to release, and if not, what specifically is wrong.",
     scope: [
       "The cart and checkout flow only — adding items, quantities, coupons, totals, and placing an order.",
-      "Do not review the product catalogue or the site navigation.",
+      "Do not review the product catalog or the site navigation.",
       "Assume the visual design is signed off. Layout nitpicks are out of scope."
     ],
     deliverable:
@@ -78,7 +78,7 @@ window.TAKEHOME_BRIEFS = [
       { id: "expected-actual", label: "Cited the policy as the oracle",
         why: "The brief gave you the spec. A report that says 'should be stronger' rather than 'policy requires a symbol; the form accepted none' is opinion rather than evidence." },
       { id: "recommendation", label: "Named what you would block on",
-        why: "Prioritising under someone else's constraints is the judgement being assessed." }
+        why: "Prioritizing under someone else's constraints is the judgment being assessed." }
     ],
     expectHigh: ["pw-complexity", "tos-missing"]
   },
@@ -92,7 +92,7 @@ window.TAKEHOME_BRIEFS = [
     context:
       "A prospective customer's security team will review our login before they " +
       "sign. I want our own findings first so we are not surprised. Their " +
-      "reviewer will look at storage as well as behaviour.",
+      "reviewer will look at storage as well as behavior.",
     scope: [
       "The sign-in form and the Remember me option.",
       "Valid credentials are demo@qa.test / Passw0rd!.",
@@ -108,9 +108,9 @@ window.TAKEHOME_BRIEFS = [
         why: "A one-way Show-password toggle and a plaintext stored password are both defects. Treating them as comparable is the error." },
       { id: "repro-steps", label: "Steps a reviewer can follow exactly",
         why: "Especially for anything found outside the UI — say where you looked, not just what you saw." },
-      { id: "expected-actual", label: "Stated the expected behaviour explicitly",
+      { id: "expected-actual", label: "Stated the expected behavior explicitly",
         why: "'Should be more secure' is not an expectation. 'Remember me should persist the email only' is." },
-      { id: "recommendation", label: "Prioritised for the audience named in the brief",
+      { id: "recommendation", label: "Prioritized for the audience named in the brief",
         why: "The brief said a customer's security team. The finding you lead with should be chosen for that reader." }
     ],
     expectHigh: ["password-persisted", "user-enumeration", "empty-password"]

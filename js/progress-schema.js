@@ -115,16 +115,16 @@
     }
 
     // ---- Bug bounty ----
-    // Defect ids are checked against the real catalogue, so an imported blob
+    // Defect ids are checked against the real catalog, so an imported blob
     // cannot claim finds that do not exist and inflate the dashboard.
     out.bugBounty = {};
-    var catalogue = window.APP_DEFECTS || {};
+    var catalog = window.APP_DEFECTS || {};
     if (raw.bugBounty && typeof raw.bugBounty === "object") {
       Object.keys(raw.bugBounty).forEach(function (appKey) {
-        if (!Object.prototype.hasOwnProperty.call(catalogue, appKey)) return;
+        if (!Object.prototype.hasOwnProperty.call(catalog, appKey)) return;
         var ids = raw.bugBounty[appKey];
         if (!Array.isArray(ids)) return;
-        var valid = (catalogue[appKey].defects || []).map(function (d) { return d.id; });
+        var valid = (catalog[appKey].defects || []).map(function (d) { return d.id; });
         out.bugBounty[appKey] = ids.filter(function (id) {
           return typeof id === "string" && has(valid, id);
         });

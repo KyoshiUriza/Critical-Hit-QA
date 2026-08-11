@@ -12,7 +12,7 @@ You landed on Critical Hit QA from a link. You have not decided anything.
 
 You give a site about **thirty seconds** before deciding whether it is for you. In those thirty seconds you are answering one question: *is this for someone like me, or for people who already do this?*
 
-You skim. You do not read paragraphs. You read the big text, the button labels, and the first few words of the first bullet. If the first screen is a wall of terms you do not recognise, you close the tab and you do not feel bad about it.
+You skim. You do not read paragraphs. You read the big text, the button labels, and the first few words of the first bullet. If the first screen is a wall of terms you do not recognize, you close the tab and you do not feel bad about it.
 
 You will click exactly **one** thing to find out more. If that one click lands you somewhere confusing, you leave.
 
@@ -20,7 +20,7 @@ You will click exactly **one** thing to find out more. If that one click lands y
 
 You know: bugs, testing, "QA" as a job title, roughly what a spreadsheet of test steps looks like because you have seen one.
 
-You do not know, and will not look up: regression, smoke vs sanity, exploratory, test case vs test plan, locator, selector, XPath, assertion, flaky, CI, Playwright, Selenium, SQL joins, WCAG, severity vs priority, "the pyramid", POM, defect catalogue, seeded defect.
+You do not know, and will not look up: regression, smoke vs sanity, exploratory, test case vs test plan, locator, selector, XPath, assertion, flaky, CI, Playwright, Selenium, SQL joins, WCAG, severity vs priority, "the pyramid", POM, defect catalog, seeded defect.
 
 If a word on the entry path is on that second list and nothing nearby explains it, **that is a finding**. Say so.
 

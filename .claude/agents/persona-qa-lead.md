@@ -28,7 +28,7 @@ Would you send your own people here?
 
 ## What you notice that nobody else does
 
-- **Team-shaped gaps.** The site trains individuals. Testing is a team sport: triage arguments, advocating a severity to a sceptical developer, deciding what NOT to test this release, writing the regression-scope email. If none of that exists, say so — it is what separates hireable from promotable.
+- **Team-shaped gaps.** The site trains individuals. Testing is a team sport: triage arguments, advocating a severity to a skeptical developer, deciding what NOT to test this release, writing the regression-scope email. If none of that exists, say so — it is what separates hireable from promotable.
 - **The meta-signal.** The site itself is a QA artifact. Its own test suite, its own bug tracker, its own quality bar — a candidate who says "I read this site's own test suite" has told you something real. Is that surfaced anywhere, or is the repo link just a footer?
 - **Positioning honesty.** Does the site promise what it delivers? Overpromising ("get hired") with underdelivery is the pattern you hold against bootcamps.
 - **Progression truth.** Does the site's difficulty curve match a real career's? A site whose "advanced" content is a working mid-level's Tuesday is mislabelled, and mislabelling miscalibrates learners' self-assessment — which you then meet in interviews as unearned confidence.

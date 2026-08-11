@@ -5,7 +5,7 @@
  * before loading this file and gets the same storefront with specific rules
  * broken. That matters more than it sounds: when the two builds are separate
  * copies they drift, and a learner comparing them ends up comparing layout
- * instead of behaviour. Here the ONLY difference between the builds is the
+ * instead of behavior. Here the ONLY difference between the builds is the
  * list of defect ids.
  *
  * Everything is built with createElement/textContent. Product names, prices
@@ -54,7 +54,7 @@
     return broken("money-rounding") ? "$" + n : "$" + n.toFixed(2);
   }
 
-  // ── Catalogue ───────────────────────────────────────────────────────
+  // ── Catalog ───────────────────────────────────────────────────────
   function visibleProducts() {
     var out = PRODUCTS.filter(function (p) {
       if (filters.category !== "All" && p.category !== filters.category) return false;
@@ -230,7 +230,7 @@
     if (!t.items.length) {
       var empty = el("div", "app-empty");
       empty.appendChild(el("h4", null, "Your basket is empty"));
-      empty.appendChild(tid(el("p", null, "Add something from the catalogue above."), "empty-cart"));
+      empty.appendChild(tid(el("p", null, "Add something from the catalog above."), "empty-cart"));
       box.appendChild(empty);
       return;
     }
@@ -401,7 +401,7 @@
     });
 
     byId("apply-coupon").addEventListener("click", function () {
-      // DEFECT (coupon-case): no normalisation, so a valid code in the wrong
+      // DEFECT (coupon-case): no normalization, so a valid code in the wrong
       // case is rejected as invalid.
       var typed = byId("coupon").value.trim();
       var raw = broken("coupon-case") ? typed : typed.toUpperCase();

@@ -62,7 +62,7 @@ reviewing — every dashboard looks clean with no data in it.
 
 `screenshots/` is gitignored. The repository is about 1.7 MB; the full set is
 27 MB, so committing it would grow the history roughly seventeenfold to store
-files that are stale the moment a colour token changes.
+files that are stale the moment a color token changes.
 
 This history has already been rewritten once to strip 11.7 MB of accidentally
 committed files. Re-adding twice that on purpose would be an odd lesson to

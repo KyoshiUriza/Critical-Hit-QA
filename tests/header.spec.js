@@ -239,7 +239,7 @@ test('the RPG chip stays on the top row when the nav collapses', async ({ page }
 
   const brandBox = await page.locator('.brand').boundingBox();
   const chipBox = await chip.boundingBox();
-  // Same row means their vertical centres line up closely.
+  // Same row means their vertical centers line up closely.
   const brandMid = brandBox.y + brandBox.height / 2;
   const chipMid = chipBox.y + chipBox.height / 2;
   expect(Math.abs(brandMid - chipMid)).toBeLessThan(24);

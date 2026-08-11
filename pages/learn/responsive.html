@@ -118,11 +118,11 @@
           <tr>
             <td><strong>DevTools device mode</strong></td>
             <td>Layout, breakpoints, reflow, tap-target measurement. Free and instant.</td>
-            <td>Real touch behaviour, real performance, the on-screen keyboard, browser chrome that grows and shrinks as you scroll.</td>
+            <td>Real touch behavior, real performance, the on-screen keyboard, browser chrome that grows and shrinks as you scroll.</td>
           </tr>
           <tr>
             <td><strong>Simulator / emulator</strong></td>
-            <td>OS-level behaviour, real Safari or Chrome engine, permission dialogs.</td>
+            <td>OS-level behavior, real Safari or Chrome engine, permission dialogs.</td>
             <td>Performance on a cheap device, battery, real network, camera and sensors.</td>
           </tr>
           <tr>
@@ -212,7 +212,7 @@ test('no horizontal scroll at the reflow floor', async ({ page }) =&gt; {
     <section id="interview" class="panel">
       <h2>What interviewers ask</h2>
       <ul>
-        <li><strong>"How do you decide which devices to test on?"</strong> From analytics, not from a catalogue. Cover the widths your users actually have, plus 320px because it is the standard's floor.</li>
+        <li><strong>"How do you decide which devices to test on?"</strong> From analytics, not from a catalog. Cover the widths your users actually have, plus 320px because it is the standard's floor.</li>
         <li><strong>"What's the difference between responsive and adaptive?"</strong> Responsive is one fluid layout that reflows continuously; adaptive serves distinct layouts at fixed breakpoints. Most real sites are a mixture, which is why boundary testing matters.</li>
         <li><strong>"How would you test a form on mobile?"</strong> Correct keyboard type per field, no zoom-on-focus, the keyboard not covering the submit button, autofill, and rotation mid-entry. The last one finds bugs almost every time.</li>
         <li><strong>"Is emulation enough?"</strong> For layout, largely yes. For touch, performance, and anything OS-mediated, no — and say which of your flows justify a real device.</li>

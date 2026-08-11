@@ -3,7 +3,7 @@
 **Date:** 2026-08-10 · **Against:** commit `94b89fe`, 271 tests passing
 
 A review of what the app currently does, grounded research on what QA hiring
-actually asks for, and a prioritised list of what to build next. Recommendations
+actually asks for, and a prioritized list of what to build next. Recommendations
 are checked against the existing feature set first — several obvious-sounding
 ideas are already built, and are listed as such rather than proposed again.
 
@@ -78,12 +78,12 @@ memorable interview stories come from.
 
 A briefed, timed, submitted exercise. Pick a scenario, get a written brief and a
 90-minute clock, run an exploratory session against a buggy app, then submit a
-bug report plus a short test plan. On submit, grade against the seeded catalogue
+bug report plus a short test plan. On submit, grade against the seeded catalog
 by severity, and show a rubric covering what an interviewer looks for: coverage,
-severity accuracy, report clarity, whether critical defects were prioritised.
+severity accuracy, report clarity, whether critical defects were prioritized.
 Output goes to the portfolio as a third artifact type.
 
-Mostly composition — buggy apps, defect catalogue, builders, portfolio export
+Mostly composition — buggy apps, defect catalog, builders, portfolio export
 and auto-detection all exist. New: the brief, the timer, the rubric, the
 submission flow.
 
@@ -130,7 +130,7 @@ existing both-directions grading with no new mechanism.
 - **Video content.** Breaks the offline guarantee, breaks the zero-dependency
   constraint, and is a large ongoing production cost for a solo project.
 - **A "certification" or badge.** The character sheet already tracks evidence.
-  A certificate nobody recognises adds no hiring signal and invites the
+  A certificate nobody recognizes adds no hiring signal and invites the
   comparison to real certifications, which this is not.
 - **More gamification.** ADR 0003 deliberately pulled the Lattice back toward
   evidence. Adding streak mechanics or leaderboards would re-open a decision

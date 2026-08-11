@@ -16,7 +16,7 @@ counter can't track it"), rank blurbs referenced factions ("D.A.C. has a
 designation"), and a "Bound Catalysts" panel listed artifacts from the novel
 with abilities like "Creature Affinity" that connect to nothing a learner does.
 
-For a reader of the book, this is flavour. For the site's actual audience —
+For a reader of the book, this is flavor. For the site's actual audience —
 someone preparing for QA interviews — it is unexplained noise on a page that
 claimed to be "your character sheet" while containing no information about
 them beyond one number.
@@ -43,7 +43,7 @@ something true about the user.**
 
 3. **Achievements stay, re-described.** Ids are stable (they persist in
    `qaprep_rpg_seen`; changing one re-toasts it for everyone who has it).
-   Names keep their light flavour. Every description now states the QA skill
+   Names keep their light flavor. Every description now states the QA skill
    the milestone evidences, and a test enforces that no book-plot reference
    returns.
 
@@ -72,6 +72,6 @@ something true about the user.**
   credit linking to the serial — and stops where it cost comprehension.
 - Guardrail from ADR 0001 still holds and is still tested: exported artifacts
   (portfolio documents) carry no in-universe vocabulary at all.
-- `tests/lattice.spec.js` pins the new behaviour, including a regression test
+- `tests/lattice.spec.js` pins the new behavior, including a regression test
   that fails if book-plot references (character or faction names) reappear in
   milestone text.

@@ -109,11 +109,11 @@
     <section id="coverage" class="panel">
       <h2>Why coverage percentage misleads</h2>
       <p>
-        Line coverage measures which lines were executed, not which behaviours
+        Line coverage measures which lines were executed, not which behaviors
         were verified. A test that calls every function and asserts nothing
         scores 100%.
       </p>
-      <pre class="code-block"><code>// 100% line coverage of applyDiscount. Zero behaviour verified.
+      <pre class="code-block"><code>// 100% line coverage of applyDiscount. Zero behavior verified.
 test('discount', async () =&gt; {
   await applyDiscount(basket, 'TRAIL10');
   expect(true).toBe(true);
@@ -143,7 +143,7 @@ test('discount', async () =&gt; {
         <thead><tr><th>Guard</th><th>What had gone wrong</th></tr></thead>
         <tbody>
           <tr>
-            <td><code class="inline">catalogue.spec.js</code></td>
+            <td><code class="inline">catalog.spec.js</code></td>
             <td>The home page advertised 14 practice apps while shipping 16, and a card advertised 9 seeded defects in an app that had 8 — so learners were told to hunt for a bug that had been removed.</td>
           </tr>
           <tr>
@@ -156,7 +156,7 @@ test('discount', async () =&gt; {
           </tr>
           <tr>
             <td><code class="inline">contrast.spec.js</code></td>
-            <td>Colour pairs were documented as passing WCAG with ratios that had never been computed. The test computes them.</td>
+            <td>Color pairs were documented as passing WCAG with ratios that had never been computed. The test computes them.</td>
           </tr>
         </tbody>
       </table>
@@ -193,7 +193,7 @@ await expect(page.locator('.site-header .rpg-chip')).toBeVisible();</code></pre>
         lowest level that can catch it. A calculation error belongs in a unit
         test, not an end-to-end journey. The e2e suite should hold the journeys
         that only exist at that level — and staying disciplined about this is
-        the main defence against the runtime metric at the top of this page.
+        the main defense against the runtime metric at the top of this page.
       </div>
     </section>
 

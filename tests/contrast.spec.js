@@ -17,7 +17,7 @@ const PAGES = [
   'pages/automation-lab.html',
   'pages/tester-lattice.html',
   // The storefront chrome is new visual surface with its own accent, its
-  // own badges and a sale/stock colour language. New surface gets measured.
+  // own badges and a sale/stock color language. New surface gets measured.
   'practice-apps/cart.html',
   'practice-apps/login.html',
   'practice-apps/todo.html',
@@ -124,7 +124,7 @@ for (const scheme of ['dark', 'light']) {
   });
 }
 
-// Buttons put text on a coloured background, which the walker above handles,
+// Buttons put text on a colored background, which the walker above handles,
 // but they only render in some states. Assert the token pairs directly so a
 // bad --on-* value fails even if no button of that variant is on screen.
 test.describe('button label contrast (token pairs)', () => {

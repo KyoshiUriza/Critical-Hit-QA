@@ -5,7 +5,7 @@
    visible borders rather than heavy shadows, which is the whole thesis: a
    precise, structural, developer-tool aesthetic.
 
-   COLOUR VALUES DIVERGE FROM THE MODERNIZATION PLAN, DELIBERATELY.
+   COLOR VALUES DIVERGE FROM THE MODERNIZATION PLAN, DELIBERATELY.
    The plan's own contrast table was wrong in all eight rows, and eleven pairs
    it did not list failed WCAG AA — including the light-mode primary button
    (4.10:1) and every link on white (4.10:1). Its border tokens sat at 1.19:1
@@ -285,7 +285,7 @@ h1, h2, h3, h4, h5, h6 {
 /* Links. There was no global rule, so prose links fell back to the browser
    default (#0000EE) — 1.97:1 on --bg and 1.77:1 on --bg-elev in dark mode.
    Component classes (.btn, .brand, .nav a, .feature-card, .donation-cta,
-   .skip-link) all set their own colour and outrank this on specificity. */
+   .skip-link) all set their own color and outrank this on specificity. */
 a {
   color: var(--accent);
 }
@@ -923,7 +923,7 @@ code.inline {
 }
 /* `outline: none` here beat the global :focus-visible rule on specificity
    (0,2,1 vs 0,1,0), leaving every form control in the site with a border
-   colour change as its ONLY focus indicator — which is not a 2.4.11 indicator
+   color change as its ONLY focus indicator — which is not a 2.4.11 indicator
    at all. Keep the accent border as reinforcement; let the outline through. */
 .form-field input:focus-visible,
 .form-field textarea:focus-visible,
@@ -935,7 +935,7 @@ code.inline {
 .form-error { color: var(--danger); font-size: var(--text-sm); margin-top: var(--sp-1); display: none; }
 .form-error.visible { display: block; }
 .form-success {
-  /* colour-mix keeps this tied to the token instead of a hardcoded rgba of a
+  /* color-mix keeps this tied to the token instead of a hardcoded rgba of a
      green that no longer exists — the old value was the previous palette's. */
   background: color-mix(in srgb, var(--accent-2) 10%, transparent);
   border: 1px solid var(--accent-2);
@@ -1282,7 +1282,7 @@ code.inline {
 .activity-text { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
 /* Current rank in the ladder. color-mix keeps it tied to the accent token
-   rather than a hardcoded rgba of a colour that no longer exists. */
+   rather than a hardcoded rgba of a color that no longer exists. */
 .rank-current { background: color-mix(in srgb, var(--accent) 10%, transparent); }
 
 /* ── Component Gauntlet widgets ──────────────────────────────────────────
@@ -1502,7 +1502,7 @@ code.inline {
 }
 .lab-hard-cards h4 { margin: 0 0 var(--sp-1); font-size: var(--text-base); }
 
-/* API Lab response status. Colour is reinforcement — the number itself is the
+/* API Lab response status. Color is reinforcement — the number itself is the
    signal, and it is always present as text. */
 .api-status {
   font-family: var(--font-mono);
@@ -1586,10 +1586,10 @@ code.inline {
 }
 
 /* ── Code Review Gauntlet ────────────────────────────────────────────────
-   Result colours use the semantic tokens rather than raw hex so they invert
+   Result colors use the semantic tokens rather than raw hex so they invert
    correctly in light mode. The left border carries the state as well as the
    background tint, because a tint alone would be the only cue for anyone who
-   cannot distinguish the hues (1.4.1: never colour as the sole signal — the
+   cannot distinguish the hues (1.4.1: never color as the sole signal — the
    prefix text in .cr-why says it too). */
 .cr-issues { list-style: none; padding: 0; margin: var(--sp-3) 0; }
 .cr-issue {
@@ -1624,7 +1624,7 @@ code.inline {
 /* ── Bug Bounty side panel ───────────────────────────────────────────────
    A non-modal drawer on the buggy practice apps, so a find gets ticked at
    the moment it happens instead of in another tab. Mounted by
-   js/bounty-panel.js only on pages whose defects are in the catalogue. */
+   js/bounty-panel.js only on pages whose defects are in the catalog. */
 .bounty-toggle {
   position: fixed;
   right: 0;

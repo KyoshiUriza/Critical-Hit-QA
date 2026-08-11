@@ -41,7 +41,7 @@ the audience is professional testers, and verifying claims is literally their jo
 > are tired of hearing.
 >
 > So I built the other thing. **Critical Hit QA** gives you deliberately broken
-> web applications with real, catalogued defects seeded into them. You run an
+> web applications with real, cataloged defects seeded into them. You run an
 > exploratory session, find what you can, and score yourself against the answer
 > key — weighted by severity, so a critical find counts for more than a cosmetic
 > one. Then you write the bug report and export it as a document you can
@@ -108,7 +108,7 @@ reads very differently from a landing page, and for this audience the repo is
 the stronger artifact.
 
 Note the wording throughout says "public source" and never "open source". The
-repo is source-available under an all-rights-reserved licence — readable, not
+repo is source-available under an all-rights-reserved license — readable, not
 reusable. Calling that open source would be inaccurate, and this audience is
 precisely the one that would notice.
 

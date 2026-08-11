@@ -94,7 +94,7 @@
 
     later(600, function () {
       // DEFECT (optimistic-no-rollback): on failure the post stays on screen
-      // and is labelled Sent anyway. The log says the save was rejected; the
+      // and is labeled Sent anyway. The log says the save was rejected; the
       // row says it went out. Reload and it is gone — the user believes they
       // said something they did not. The contradiction is what to notice; the
       // log does not name it for you.

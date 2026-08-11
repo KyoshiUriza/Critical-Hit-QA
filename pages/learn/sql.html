@@ -39,7 +39,7 @@
         <li><strong>Set up state.</strong> You need a user with 47 orders and an expired subscription. Clicking through the UI to build that takes twenty minutes; a seed script takes one.</li>
         <li><strong>Explain a defect.</strong> "The dashboard total is wrong" becomes actionable when you can say the aggregate query returns 14 but the UI renders 12.</li>
       </ul>
-      <p>You are not expected to optimise queries. You are expected to read data confidently and not break the environment.</p>
+      <p>You are not expected to optimize queries. You are expected to read data confidently and not break the environment.</p>
     </section>
 
     <section id="six" class="panel">
@@ -131,7 +131,7 @@ DELETE FROM users WHERE email LIKE '%@test.example%';
 COMMIT;   -- or ROLLBACK; if it looks wrong</pre>
         </li>
         <li><strong>Never <code class="inline">DELETE</code> without a <code class="inline">WHERE</code>.</strong> It empties the table. Some clients have a safe-mode setting that blocks this — leave it on.</li>
-        <li><strong>Know which environment you're connected to.</strong> Colour-code your production connection in whatever client you use. The most expensive incidents in this category are a correct query run against the wrong database.</li>
+        <li><strong>Know which environment you're connected to.</strong> Color-code your production connection in whatever client you use. The most expensive incidents in this category are a correct query run against the wrong database.</li>
       </ol>
       <p><strong>A note on <code class="inline">LIKE '%test%'</code>:</strong> that pattern matches <code class="inline">contest@real-customer.com</code>. Prefer a reserved domain like <code class="inline">@test.example</code> — <code class="inline">.example</code> is reserved by RFC 2606 and can never belong to a real user.</p>
     </section>

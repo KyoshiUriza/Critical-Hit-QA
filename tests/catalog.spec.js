@@ -15,7 +15,7 @@ function appFiles() {
     .sort();
 }
 
-test.describe('practice app catalogue', () => {
+test.describe('practice app catalog', () => {
   test('every practice app is reachable from the Practice Apps page', async () => {
     // This exists because a new app shipped unlisted: the file was on disk,
     // the tests all passed, and there was no route to it from the site. An
@@ -39,7 +39,7 @@ test.describe('practice app catalogue', () => {
     // 16. On a site whose whole premise is that claims should be checkable,
     // its own headline numbers have to be checkable too.
     //
-    // "Buggy" is derived from the DEFECT CATALOGUE, not the filename. The
+    // "Buggy" is derived from the DEFECT CATALOG, not the filename. The
     // a11y challenge has 13 seeded defects and is not called -broken, so the
     // filename heuristic counted it as clean and the guard passed on a wrong
     // number. What makes an app buggy is having seeded defects.
@@ -61,23 +61,23 @@ test.describe('practice app catalogue', () => {
     expect(Number(stat), 'the stats strip should agree with the hero copy').toBe(actual);
   });
 
-  test('every buggy app has a defect catalogue entry', async ({ page }) => {
+  test('every buggy app has a defect catalog entry', async ({ page }) => {
     // A -broken app with no seeded defects recorded would score as 0% forever
     // in Bug Bounty and silently teach nothing.
     await page.goto('/pages/bug-bounty.html?reset');
     const keys = await page.evaluate(() => Object.keys(window.APP_DEFECTS));
-    // Every -broken build must have a catalogue. (The reverse — a catalogue
+    // Every -broken build must have a catalog. (The reverse — a catalog
     // for an app not named -broken — is legitimate: see the a11y challenge.)
     const buggy = appFiles().filter((f) => f.endsWith('-broken.html'))
       .map((f) => f.replace('-broken.html', ''));
     for (const app of buggy) {
-      expect(keys, `${app} has a buggy build but no defect catalogue`).toContain(app);
+      expect(keys, `${app} has a buggy build but no defect catalog`).toContain(app);
     }
   });
 
-  test('the seeded-defect count claimed in the docs matches the catalogue', async ({ page }) => {
+  test('the seeded-defect count claimed in the docs matches the catalog', async ({ page }) => {
     // Same guard as the app count, for the same reason: removing "password
-    // minimum length not enforced" from the login catalogue left README and
+    // minimum length not enforced" from the login catalog left README and
     // the Buy Me a Coffee copy claiming 31 when there were 30.
     await page.goto('/pages/bug-bounty.html?reset');
     const total = await page.evaluate(() =>
@@ -94,7 +94,7 @@ test.describe('practice app catalogue', () => {
         ...[...text.matchAll(/defects?\s*\((\d+)\s+total\)/gi)].map((m) => Number(m[1])),
       ].filter((n) => n > 5);   // ignore per-app figures and prose numbers
       for (const claim of claims) {
-        expect(claim, `${file} claims ${claim} defects, catalogue has ${total}`).toBe(total);
+        expect(claim, `${file} claims ${claim} defects, catalog has ${total}`).toBe(total);
       }
     }
   });
@@ -116,7 +116,7 @@ test.describe('practice app catalogue', () => {
   });
 
   test('the clean login does not enforce password composition at sign-in', async ({ page }) => {
-    // The reference build was modelling the wrong pattern: length and
+    // The reference build was modeling the wrong pattern: length and
     // composition are registration-time rules. Enforcing them at sign-in adds
     // no security, leaks the policy, and locks out older accounts.
     await page.goto('/practice-apps/login.html?reset');
@@ -143,7 +143,7 @@ test.describe('practice app catalogue', () => {
     }
     expect(bare, 'practice apps with interactive elements and no test ids').toEqual([]);
   });
-  test('the app cards quote defect counts that match the catalogue', async ({ page }) => {
+  test('the app cards quote defect counts that match the catalog', async ({ page }) => {
     // The fourth hand-maintained list to be caught drifting. The Login card
     // still advertised 9 defects after pw-length was removed as not-a-defect,
     // so the site was promising a bug that no longer existed and a learner
@@ -174,12 +174,12 @@ test.describe('practice app catalogue', () => {
 
     const wrong = [];
     for (const [file, n] of Object.entries(stated)) {
-      if (actual[file] === undefined) wrong.push(`${file}: card quotes a count for an app not in the catalogue`);
-      else if (actual[file] !== n) wrong.push(`${file}: card says ${n}, catalogue has ${actual[file]}`);
+      if (actual[file] === undefined) wrong.push(`${file}: card quotes a count for an app not in the catalog`);
+      else if (actual[file] !== n) wrong.push(`${file}: card says ${n}, catalog has ${actual[file]}`);
     }
-    // And every catalogued app must have a card at all.
+    // And every cataloged app must have a card at all.
     for (const file of Object.keys(actual)) {
-      if (stated[file] === undefined) wrong.push(`${file}: catalogued but no card quotes its count`);
+      if (stated[file] === undefined) wrong.push(`${file}: cataloged but no card quotes its count`);
     }
     expect(wrong).toEqual([]);
   });

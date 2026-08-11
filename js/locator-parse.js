@@ -20,7 +20,7 @@
  *
  * THE HONEST LIMITATION, stated because a learner will meet the difference:
  * this is an approximation of the accessibility tree, not a real one. Roles
- * come from a tag/attribute mapping and names from the common labelling paths
+ * come from a tag/attribute mapping and names from the common labeling paths
  * (aria-label, aria-labelledby, <label>, text, placeholder, title). Playwright
  * uses the browser's computed tree, so exotic ARIA will diverge. Everything in
  * this sandbox is deliberately within the common cases.
@@ -59,7 +59,7 @@
     return (node.textContent || "").replace(/\s+/g, " ").trim();
   }
 
-  // The common labelling paths, in roughly the order the spec resolves them.
+  // The common labeling paths, in roughly the order the spec resolves them.
   function accessibleName(node) {
     var aria = node.getAttribute && node.getAttribute("aria-label");
     if (aria && aria.trim()) return aria.trim();
@@ -100,7 +100,7 @@
   function nameMatches(actual, wanted, exact) {
     if (wanted instanceof RegExp) return wanted.test(actual);
     if (exact) return actual === wanted;
-    // Playwright's default is case-insensitive, whitespace-normalised substring.
+    // Playwright's default is case-insensitive, whitespace-normalized substring.
     return actual.toLowerCase().indexOf(String(wanted).toLowerCase()) !== -1;
   }
 

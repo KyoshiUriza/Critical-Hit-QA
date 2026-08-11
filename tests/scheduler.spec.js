@@ -137,7 +137,7 @@ test.describe('Scheduler — detection', () => {
     await expect.poll(() => finds(page)).toContain('naive-local-store');
   });
 
-  test('every triggered id exists in the catalogue', async ({ page }) => {
+  test('every triggered id exists in the catalog', async ({ page }) => {
     await page.goto(APP + '?reset');
     const known = await page.evaluate(() => window.APP_DEFECTS.scheduler.defects.map((d) => d.id));
     const src = await (await page.request.get('/js/scheduler.js')).text();
@@ -146,12 +146,12 @@ test.describe('Scheduler — detection', () => {
     expect(known).toEqual(expect.arrayContaining(triggered));
   });
 
-  test('every catalogued defect is reachable — none are unfindable', async ({ page }) => {
+  test('every cataloged defect is reachable — none are unfindable', async ({ page }) => {
     // A seeded defect the app can never surface would sit at 0% forever.
     await page.goto(APP + '?reset');
     const known = await page.evaluate(() => window.APP_DEFECTS.scheduler.defects.map((d) => d.id));
     const src = await (await page.request.get('/js/scheduler.js')).text();
     const triggered = [...new Set([...src.matchAll(/trigger\("([a-z0-9-]+)"\)/g)].map((m) => m[1]))];
-    expect(known.filter((id) => !triggered.includes(id)), 'catalogued but never triggerable').toEqual([]);
+    expect(known.filter((id) => !triggered.includes(id)), 'cataloged but never triggerable').toEqual([]);
   });
 });

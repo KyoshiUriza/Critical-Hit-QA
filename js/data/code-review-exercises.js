@@ -40,7 +40,7 @@ window.CODE_REVIEW_EXERCISES = [
       { id: "css-id", present: false, label: "Using #email and #submit as locators is too brittle",
         why: "Decoy. Stable ids are a perfectly good locator — they are near the top of the priority order. The brittle ones are generated ids (`#mui-4821`) and positional selectors. Do not flag an id just for being CSS." },
       { id: "absolute-url", present: false, label: "The test navigates to a full URL instead of a relative path",
-        why: "Decoy in review terms. Using baseURL is tidier and helps run against multiple environments, but it is a config preference, not a defect — and worth raising as a nit, clearly labelled as one." }
+        why: "Decoy in review terms. Using baseURL is tidier and helps run against multiple environments, but it is a config preference, not a defect — and worth raising as a nit, clearly labeled as one." }
     ],
     fixed: `test('user can log in', async ({ page }) => {
   await page.goto('/login');
@@ -135,7 +135,7 @@ test('deletes the user', async ({ request }) => {
       { id: "no-wait-cart", present: false, label: "The test needs an explicit wait after clicking add-to-cart",
         why: "Decoy. `expect(...).toHaveText('1')` already retries until the badge updates or the timeout expires. Adding a sleep here would slow the test and fix nothing — the locators are the problem." },
       { id: "single-assert", present: false, label: "A test should never contain more than one assertion",
-        why: "Decoy — a rule people repeat without the reasoning. Multiple assertions verifying one behaviour are fine and often clearer. What matters is that the test has one reason to fail." }
+        why: "Decoy — a rule people repeat without the reasoning. Multiple assertions verifying one behavior are fine and often clearer. What matters is that the test has one reason to fail." }
     ],
     fixed: `test('adds an item to the cart', async ({ page }) => {
   await page.goto('/shop');
@@ -279,11 +279,11 @@ test('search returns results', async ({ page }) => {
       { id: "sleep-10s", present: true, label: "A 10-second sleep replaces a wait for results",
         why: "Guaranteed to be both too long on a fast run and too short on a slow one. `expect(page.getByTestId('result')).toHaveCount(...)` waits exactly as long as needed." },
       { id: "weak-count", present: true, label: "greaterThan(0) does not verify the search worked",
-        why: "It passes if the page shows unrelated default results, or a 'no results' block that happens to use the same class. Asserting that results relate to 'widget' is the actual behaviour under test." },
+        why: "It passes if the page shows unrelated default results, or a 'no results' block that happens to use the same class. Asserting that results relate to 'widget' is the actual behavior under test." },
       { id: "diagnose", present: true, label: "Nothing in the PR diagnoses WHY it was flaky",
         why: "The review question to ask: what was the failure rate, and what did the trace show? Without that, this change is a guess. `--repeat-each=100` turns 'sometimes' into a number." },
       { id: "no-retries", present: false, label: "Retries should always be set to zero",
-        why: "Decoy — an overcorrection. One retry in CI is a reasonable defence against genuine infrastructure flakiness, provided flaky results are reported and investigated rather than celebrated as green." }
+        why: "Decoy — an overcorrection. One retry in CI is a reasonable defense against genuine infrastructure flakiness, provided flaky results are reported and investigated rather than celebrated as green." }
     ],
     fixed: `// playwright.config.js — one retry, and flakes are reported, not hidden.
 retries: process.env.CI ? 1 : 0,
@@ -334,11 +334,11 @@ test('add to basket updates the badge', async ({ page }) => {
       { id: "ai-internal-state", present: true, label: "It reads window.__CART_STATE__ — internal state a user never sees",
         why: "The most valuable thing to catch here. The test now passes whenever the state object is right and the UI is broken, which is precisely the bug the ticket exists to prevent. Assert what the user can see; if that turns out to be hard, the difficulty is itself worth reporting." },
       { id: "ai-styling-locator", present: true, label: ".btn.btn-primary.add-to-cart couples the test to styling",
-        why: "Two of those three classes are visual. Changing the button from primary to secondary is a design decision that should never break a test, and it will. The behavioural part of that selector is add-to-cart on its own." },
+        why: "Two of those three classes are visual. Changing the button from primary to secondary is a design decision that should never break a test, and it will. The behavioral part of that selector is add-to-cart on its own." },
       { id: "ai-redundant-wait", present: true, label: "waitForSelector before an auto-waiting assertion is redundant",
         why: "The expect on the next line already waits and retries. The explicit wait adds nothing but a second place to time out, with a worse error message when it does. Generated code includes these defensively because they appear throughout older material." },
       { id: "ai-fixed-slug", present: false, label: "Hard-coding /products/nw-114 makes the test brittle",
-        why: "Decoy. A fixed, seeded product is the right call — it makes the test deterministic. Discovering a product at runtime adds a dependency on catalogue state, which is how you get a basket test that fails for reasons having nothing to do with the basket." },
+        why: "Decoy. A fixed, seeded product is the right call — it makes the test deterministic. Discovering a product at runtime adds a dependency on catalog state, which is how you get a basket test that fails for reasons having nothing to do with the basket." },
       { id: "ai-no-gwt", present: false, label: "The test name should follow a Given/When/Then convention",
         why: "Decoy. 'add to basket updates the badge' says what is being verified in plain language, which is what a name is for. Naming conventions are worth agreeing as a team and are not a review finding." }
     ],
@@ -431,11 +431,11 @@ test('applies a valid discount code with spaces', async ({ page }) => {
 test('rejects an invalid discount code', async ({ page }) => {
   await page.getByLabel('Discount code').fill('NOPE');
   await page.getByRole('button', { name: 'Apply' }).click();
-  await expect(page.getByRole('status')).toHaveText('That code is not recognised');
+  await expect(page.getByRole('status')).toHaveText('That code is not recognized');
 });`,
     issues: [
       { id: "ai-one-partition", present: true, label: "Three of the four tests are the same equivalence class",
-        why: "Uppercase, lowercase and padded are all 'a valid code, normalised' — one code path exercised three times. Four tests reads as thorough on a PR summary and buys roughly two tests' worth of confidence. This is how a generated suite inflates a coverage number without raising it." },
+        why: "Uppercase, lowercase and padded are all 'a valid code, normalized' — one code path exercised three times. Four tests reads as thorough on a PR summary and buys roughly two tests' worth of confidence. This is how a generated suite inflates a coverage number without raising it." },
       { id: "ai-no-total-check", present: true, label: "Nothing checks that the discount reached the total",
         why: "Every assertion is on the confirmation message. A build that says 'Discount applied' and charges full price passes all four. The message is the easiest thing to assert and the least valuable — the money is the requirement." },
       { id: "ai-missing-rules", present: true, label: "The business rules are untested",
@@ -445,14 +445,14 @@ test('rejects an invalid discount code', async ({ page }) => {
       { id: "ai-beforeeach", present: false, label: "The shared beforeEach hides setup and should be inlined",
         why: "Decoy. A beforeEach that puts every test at the same starting point is good practice and the opposite of a defect. Setup worth questioning is setup that differs per test, or that leaves state behind for the next one." },
       { id: "ai-parameterise", present: false, label: "These should be one parameterised test over a table of inputs",
-        why: "Decoy — a nit, not a defect. Parameterising would be tidier and would not add a single case. Raise it as a suggestion clearly labelled as one; raising style at the same volume as the missing business rules is how a review loses its signal." }
+        why: "Decoy — a nit, not a defect. Parameterising would be tidier and would not add a single case. Raise it as a suggestion clearly labeled as one; raising style at the same volume as the missing business rules is how a review loses its signal." }
     ],
-    fixed: `const NORMALISES = ['TRAIL10', 'trail10', '  TRAIL10  '];
+    fixed: `const NORMALIZES = ['TRAIL10', 'trail10', '  TRAIL10  '];
 
 test.beforeEach(async ({ page }) => await page.goto('/checkout'));
 
-for (const code of NORMALISES) {
-  test(\`normalises \${JSON.stringify(code)}\`, async ({ page }) => {
+for (const code of NORMALIZES) {
+  test(\`normalizes \${JSON.stringify(code)}\`, async ({ page }) => {
     await applyCode(page, code);
     // The money, not the message.
     await expect(page.getByTestId('order-total')).toHaveText('$115.20');

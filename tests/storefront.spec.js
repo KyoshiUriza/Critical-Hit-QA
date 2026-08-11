@@ -58,7 +58,7 @@ test.describe('product chrome', () => {
   });
 });
 
-test.describe('catalogue', () => {
+test.describe('catalog', () => {
   test('the four original SKUs keep their ids and prices', async ({ page }) => {
     // Load-bearing: the regression suite and any learner's own tests add
     // Widget twice and Gadget once and expect $45.00.
@@ -201,7 +201,7 @@ test.describe('checkout flow', () => {
 test.describe('the two builds differ only in the defects', () => {
   test('both builds render the same structure', async ({ page }) => {
     // If the buggy build drifts into looking different, a learner comparing
-    // them starts comparing layout instead of behaviour, which is the whole
+    // them starts comparing layout instead of behavior, which is the whole
     // reason the pair exists.
     const shape = async (url) => {
       await page.goto(url + '?reset');
@@ -326,7 +326,7 @@ test.describe('Northwind Account', () => {
 
   test('the login form still works exactly as before', async ({ page }) => {
     // The whole risk of the rebuild in one test: new markup around a form
-    // whose behaviour must not have moved.
+    // whose behavior must not have moved.
     await page.goto('/practice-apps/login.html?reset');
     await page.getByTestId('login-email').fill('demo@qa.test');
     await page.getByTestId('login-password').fill('Passw0rd!');
@@ -382,7 +382,7 @@ test.describe('Tasklane', () => {
     });
   }
 
-  test('the todo behaviour is untouched by the new chrome', async ({ page }) => {
+  test('the todo behavior is untouched by the new chrome', async ({ page }) => {
     await page.goto('/practice-apps/todo.html?reset');
     await page.getByTestId('new-todo-input').fill('Write the test plan');
     await page.getByTestId('add-todo').click();
@@ -422,7 +422,7 @@ test.describe('the apps do not converge into one product', () => {
   }
 
   test('every brand accent clears 4.5:1 against its own foreground', async ({ page }) => {
-    // The strip and brand mark paint accent-coloured backgrounds with text on
+    // The strip and brand mark paint accent-colored backgrounds with text on
     // top. The contrast sweep covers the pages that are in it; this covers
     // every brand in the registry, including ones no page uses yet.
     await page.goto('/practice-apps/cart.html?reset');

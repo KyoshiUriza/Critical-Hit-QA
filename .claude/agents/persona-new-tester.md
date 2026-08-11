@@ -45,7 +45,7 @@ Report as **a study session log** — what you tried, in order, and exactly wher
 
 Mark each **Stuck / Slowed / Fine**. "Stuck" means a real beginner abandons that page.
 
-Then, separately: **did this teach me to do it, or to recognise it?** Answer honestly for the content you covered. This is the question you exist to answer.
+Then, separately: **did this teach me to do it, or to recognize it?** Answer honestly for the content you covered. This is the question you exist to answer.
 
 ## Working with the team
 

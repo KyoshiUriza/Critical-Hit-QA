@@ -48,7 +48,7 @@
             <div class="form-field">
               <label for="email">Email</label>
               <!-- type="text", deliberately, and ONLY in the broken build.
-                   The catalogue seeds an "email is not trimmed" defect, but
+                   The catalog seeds an "email is not trimmed" defect, but
                    the HTML value-sanitisation algorithm strips leading and
                    trailing whitespace from type="email" before script ever
                    sees it — so that defect was unreachable through the UI and
@@ -163,7 +163,7 @@
         const pw = document.getElementById("password");
         pw.type = "text";
         // (never sets back to "password" and never updates the label)
-        // Detected on the SECOND click: one click is correct behaviour, and
+        // Detected on the SECOND click: one click is correct behavior, and
         // only the second proves the toggle does not toggle.
         toggleClicks += 1;
         if (toggleClicks >= 2 && window.Detector) window.Detector.trigger("toggle-oneway");
@@ -192,7 +192,7 @@
         const pw = document.getElementById("password").value;
 
         // ── Detection ──────────────────────────────────────────────────
-        // Only fires when the defective behaviour genuinely happens, not on
+        // Only fires when the defective behavior genuinely happens, not on
         // any interaction. Untrimmed email counts only when the trimmed form
         // WOULD have been accepted — otherwise it is just a typo.
         var D = window.Detector;
@@ -207,7 +207,7 @@
             D.trigger("empty-password"); // reached submit with an empty password
           }
           // No pw-length detector: that "defect" was removed from the
-          // catalogue. A login form should not enforce length or composition —
+          // catalog. A login form should not enforce length or composition —
           // it adds no security, leaks the policy, and locks out older
           // accounts. Registration is where the rule belongs.
         }

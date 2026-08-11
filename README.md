@@ -56,7 +56,7 @@ The suite (`tests/`) is five specs:
 | Spec | Guards |
 |---|---|
 | `smoke.spec.js` | Every page renders the shared chrome, exposes a skip link, and produces **zero console errors** |
-| `regression.spec.js` | One test per bug found in review, asserting the *correct* behaviour so a reverted fix goes red |
+| `regression.spec.js` | One test per bug found in review, asserting the *correct* behavior so a reverted fix goes red |
 | `contrast.spec.js` | WCAG AA text contrast on 8 pages × 2 themes, computed from live styles; `--on-*` token pairs; WCAG 1.4.11 control boundaries |
 | `focus-contrast.spec.js` | WCAG 2.4.11 — tab-walks each page and measures the focus indicator against the surface behind it |
 | `header.spec.js` | No nav item escapes the header at 10 widths (375–1440px); the collapse toggle; chip and brand never wrap |
@@ -108,7 +108,7 @@ QA Website Project/
 │   └── e2e.yml                     # Playwright suite on push + PR
 ├── .claude/agents/                 # 9-role agile team (see its README)
 ├── css/styles.css                  # token scales + all component styles
-│                                   #   colour, radius, elevation, spacing, type
+│                                   #   color, radius, elevation, spacing, type
 ├── js/
 │   ├── site-chrome.js              # single source of truth for header/footer
 │   ├── test-hooks.js               # ?reset and window.__qa
@@ -147,14 +147,14 @@ These are deliberate. Breaking one requires an explicit trade-off, not a silent 
 - **One header, one footer.** [`js/site-chrome.js`](js/site-chrome.js) renders both; pages declare only `data-page` and `data-depth`. Never hand-write a nav. The nav collapses behind an accessible toggle below 1180px — a fixed-height header once let items render outside it.
 - **JavaScript first.** Playwright examples default to JS; TypeScript is a toggle, not a fork. Add both variants inside a `.code-sample` wrapper with `data-lang="js"` / `data-lang="ts"`.
 - **User input never touches `innerHTML`.** Use `textContent` or `createElement` + `append`.
-- **Both themes are first-class.** Every colour is a token with a light-mode override that meets WCAG AA, and `tests/contrast.spec.js` enforces it.
+- **Both themes are first-class.** Every color is a token with a light-mode override that meets WCAG AA, and `tests/contrast.spec.js` enforces it.
 - **Everything visual is a token.** Five scales, and they are the contract:
   `--rad-xs…full` (radius tracks element size), `--shadow-sm/md/lg` (layered,
   with separate light values), `--sp-1…12` (4px grid), `--fs-xs…5xl` (type),
   and three border roles — `--border` decorative, `--border-strong` for card
   edges, `--border-control` for form controls, which needs 3:1 under WCAG
   1.4.11. Do not hardcode a px value where a scale exists.
-- **`--on-*` colours are theme-aware.** A bright accent takes dark text; a dark
+- **`--on-*` colors are theme-aware.** A bright accent takes dark text; a dark
   accent takes light text. Getting this backwards shipped 2.76:1 buttons.
 
 ## Extending it
@@ -176,10 +176,10 @@ See [SECURITY.md](SECURITY.md) for the threat model, the Content Security
 Policy, how to report a vulnerability, and the repository hardening checklist.
 
 Note that the practice apps contain **intentional** vulnerabilities — that is
-the point of the site. Every seeded defect is catalogued in
+the point of the site. Every seeded defect is cataloged in
 [`js/data/defects.js`](js/data/defects.js) before you report one.
 
-## Licence
+## License
 
 Copyright © 2026 Kyoshi Uriza. **All rights reserved** — see [LICENSE](LICENSE).
 
@@ -191,5 +191,5 @@ elsewhere.
 
 Use the [live site](https://kyoshiuriza.github.io/Critical-Hit-QA/) freely,
 including to prepare for a job. That is what it is for. If you want to do
-something the licence does not permit,
+something the license does not permit,
 [open an issue](https://github.com/KyoshiUriza/Critical-Hit-QA/issues) and ask.

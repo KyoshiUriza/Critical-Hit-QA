@@ -6,7 +6,7 @@
  * mounts the app's own defect checklist as a collapsible drawer inside the
  * app, so a find gets ticked at the moment it happens.
  *
- * Mounts ONLY on pages whose defects exist in the catalogue — it matches
+ * Mounts ONLY on pages whose defects exist in the catalog — it matches
  * location against APP_DEFECTS urls, so clean apps and ordinary pages get
  * nothing. The full Bug Bounty page remains the cross-app overview and the
  * place to reveal or clear; the drawer is deliberately just the checklist.
@@ -133,13 +133,13 @@
         var topLine = el("div", "");
         topLine.append(sev, document.createTextNode(" "), titleText);
 
-        // Auto-detected finds are labelled, not hidden among the rest. You
+        // Auto-detected finds are labeled, not hidden among the rest. You
         // still get the credit; the panel is just honest about whether you
         // claimed it or the app handed it to you.
         if (isFound && auto.indexOf(d.id) !== -1) {
           var badge = el("span", "bounty-auto-badge", "AUTO-DETECTED");
           badge.setAttribute("data-testid", "auto-badge");
-          badge.title = "You triggered this behaviour in the app, so it was revealed for you.";
+          badge.title = "You triggered this behavior in the app, so it was revealed for you.";
           topLine.append(document.createTextNode(" "), badge);
         }
         body.appendChild(topLine);

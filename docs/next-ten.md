@@ -45,7 +45,7 @@ It is also absent from `APP_DEFECTS`, so it has an answer key in prose that the
 Bug Bounty scorer, the auto-detector and the character sheet all know nothing
 about. A learner can work it and record nothing.
 
-Fixing it is instrumentation plus a catalogue entry. Adding test ids does not
+Fixing it is instrumentation plus a catalog entry. Adding test ids does not
 weaken the exercise — a `data-testid` is not an accessibility affordance, so
 the seeded a11y defects survive untouched.
 

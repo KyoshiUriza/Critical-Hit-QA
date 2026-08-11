@@ -1,5 +1,5 @@
 /*
- * Northwind Outfitters catalogue.
+ * Northwind Outfitters catalog.
  *
  * The first four entries are the original practice SKUs — widget, gadget,
  * gizmo, doohickey — at their original prices. They are load-bearing: the

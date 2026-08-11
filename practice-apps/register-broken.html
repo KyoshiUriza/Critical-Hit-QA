@@ -152,7 +152,7 @@
       // BUG 6: strength meter always says "Strong".
       pw.addEventListener("input", () => {
         strength.textContent = pw.value ? "Strength: Strong" : "";
-        // A demonstrably weak password still labelled Strong.
+        // A demonstrably weak password still labeled Strong.
         if (window.Detector && pw.value && pw.value.length < 8) {
           window.Detector.trigger("strength-lie");
         }

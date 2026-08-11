@@ -51,7 +51,7 @@ window.LOCATOR_EXERCISES = [
     brief: "Target the email input. Look at its id first — then decide whether to use it.",
     target: "#lab-signup input[type='email']",
     difficulty: "medium",
-    teaches: "Recognising generated ids before they burn you.",
+    teaches: "Recognizing generated ids before they burn you.",
     traps: [
       { pattern: /#input-\d{4,}|#mui-\d+|#:r[0-9a-z]+:/i,
         why: "That id is generated per render. It is different on the next page load — the single most common cause of \"it passed locally, failed in CI\"." }
@@ -121,7 +121,7 @@ window.LOCATOR_EXERCISES = [
   // ── Hard region: no data-testid exists anywhere in this section. ──────
   // These are the exercises the lab was missing. Every earlier target had a
   // testid available, so the "ideal" answer was always the same shortcut and
-  // the grading never tested judgement. Real applications rarely hand you one.
+  // the grading never tested judgment. Real applications rarely hand you one.
   {
     id: "team-row-action",
     title: "Revoke access for one person",

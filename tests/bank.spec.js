@@ -108,7 +108,7 @@ test.describe('Meridian Bank', () => {
     await expect(page.getByTestId('transfer-error')).toContainText('session limit');
   });
 
-  test('cancelling leaves balances untouched', async ({ page }) => {
+  test('canceling leaves balances untouched', async ({ page }) => {
     await page.goto(APP + '?reset');
     await page.getByTestId('amount').fill('50.00');
     await page.getByTestId('review-transfer').click();

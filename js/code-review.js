@@ -148,7 +148,7 @@
     byId("grade-btn").disabled = true;
 
     // Lock the notes at grading time. The value of the artifact is that it
-    // records your unaided judgement — editing it after reading the answer key
+    // records your unaided judgment — editing it after reading the answer key
     // would turn a review into a transcription.
     var notes = byId("cr-notes");
     notes.disabled = true;

@@ -3,7 +3,7 @@
  *
  * This site is served as static files, so there is no server to hold an
  * account against. Rather than fake a login — which on a static site means
- * either storing a password where any script can read it, or theatre that
+ * either storing a password where any script can read it, or theater that
  * teaches the wrong lesson on a site about testing — profiles are local and
  * named, and progress travels by an explicit sync code the user controls.
  *

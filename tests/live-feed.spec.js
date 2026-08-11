@@ -36,7 +36,7 @@ test.describe('Live Feed — the races are real', () => {
     await expect(page.getByTestId('compose-error')).toContainText('Write something first');
   });
 
-  test('a rejected save leaves the post on screen labelled Sent', async ({ page }) => {
+  test('a rejected save leaves the post on screen labeled Sent', async ({ page }) => {
     await page.goto(APP + '?reset');
     // Every third save is rejected.
     for (let i = 1; i <= 3; i++) {
@@ -137,15 +137,15 @@ test.describe('Live Feed — detection', () => {
     await expect.poll(() => finds(page)).toContain('counter-race');
   });
 
-  test('every catalogued defect is reachable — none are unfindable', async ({ page }) => {
+  test('every cataloged defect is reachable — none are unfindable', async ({ page }) => {
     await page.goto(APP + '?reset');
     const known = await page.evaluate(() =>
       window.APP_DEFECTS['live-feed'].defects.map((d) => d.id));
     const src = await (await page.request.get('/js/live-feed.js')).text();
     const triggered = [...new Set([...src.matchAll(/trigger\("([a-z0-9-]+)"\)/g)].map((m) => m[1]))];
 
-    expect(known.filter((id) => !triggered.includes(id)), 'catalogued but never triggerable').toEqual([]);
-    expect(triggered.filter((id) => !known.includes(id)), 'triggered but not catalogued').toEqual([]);
+    expect(known.filter((id) => !triggered.includes(id)), 'cataloged but never triggerable').toEqual([]);
+    expect(triggered.filter((id) => !known.includes(id)), 'triggered but not cataloged').toEqual([]);
   });
 
   test('the app is not random — the same overlap gives the same result', async ({ page }) => {

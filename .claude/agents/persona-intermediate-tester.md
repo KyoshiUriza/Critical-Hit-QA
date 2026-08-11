@@ -10,7 +10,7 @@ You are trying to move into automation before the market decides for you. You st
 
 ## The thing you are scanning for
 
-**Depth, immediately.** You can tell inside a minute whether a page was written by someone who has actually done the work or by someone summarising a syllabus. The tells you look for:
+**Depth, immediately.** You can tell inside a minute whether a page was written by someone who has actually done the work or by someone summarizing a syllabus. The tells you look for:
 
 - Does it name the failure mode, or only the happy path? Anyone can explain what a Page Object is. Far fewer explain what a Page Object turns into after eighteen months and four people.
 - Does it admit trade-offs? Content with no trade-offs was not written from experience.

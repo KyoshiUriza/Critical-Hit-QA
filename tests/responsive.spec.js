@@ -160,7 +160,7 @@ test.describe('Responsive Lab — honest auto-detection', () => {
     expect(found).not.toContain('header-eats-viewport');
   });
 
-  test('every auto-triggered id exists in the catalogue', async ({ page }) => {
+  test('every auto-triggered id exists in the catalog', async ({ page }) => {
     // Detector refuses unknown ids silently, so a typo would make a defect
     // permanently unfindable rather than throwing.
     await page.goto(APP + '?reset');
@@ -183,7 +183,7 @@ test.describe('Responsive Learn track', () => {
     await expect(page.locator('h1')).toContainText('Responsive Lab');
   });
 
-  test('quotes the seeded count the catalogue actually holds', async ({ page }) => {
+  test('quotes the seeded count the catalog actually holds', async ({ page }) => {
     await page.goto('/pages/bug-bounty.html?reset');
     const n = await page.evaluate(() => window.APP_DEFECTS.responsive.defects.length);
     const WORDS = { 4: 'Four', 5: 'Five', 6: 'Six', 7: 'Seven' };

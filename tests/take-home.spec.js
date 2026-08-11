@@ -121,14 +121,14 @@ test.describe('Take-Home Simulator', () => {
   });
 
   test('every brief points at an app that exists and has seeded defects', async ({ page }) => {
-    // A brief aimed at a missing app, or one with no catalogue, would be an
+    // A brief aimed at a missing app, or one with no catalog, would be an
     // assignment nobody can pass.
     await page.goto(PAGE + '?reset');
     const problems = await page.evaluate(() => {
       const out = [];
       window.TAKEHOME_BRIEFS.forEach((b) => {
         const cat = window.APP_DEFECTS[b.app];
-        if (!cat) { out.push(b.id + ': no defect catalogue for ' + b.app); return; }
+        if (!cat) { out.push(b.id + ': no defect catalog for ' + b.app); return; }
         if (!b.scope || !b.scope.length) out.push(b.id + ': no scope');
         if (!b.rubric || b.rubric.length < 3) out.push(b.id + ': rubric too thin');
         (b.expectHigh || []).forEach((id) => {

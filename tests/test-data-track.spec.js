@@ -27,7 +27,7 @@ test.describe('Test Data & Environments track', () => {
     // The rest of the site tells learners to eliminate flake. A page that
     // implied retries were the fix would contradict it.
     await page.goto(TRACK + '?reset');
-    // Normalised: the source wraps these sentences across lines, so a raw
+    // Normalized: the source wraps these sentences across lines, so a raw
     // textContent has newlines and indentation sitting inside the phrase.
     const text = (await page.locator('main').textContent()).replace(/\s+/g, ' ');
     expect(text).toMatch(/retries are the thing you add after/i);

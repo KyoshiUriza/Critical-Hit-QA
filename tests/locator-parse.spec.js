@@ -153,7 +153,7 @@ test.describe('the hard exercises have no escape hatch', () => {
 
   test('at least a third of exercises have no testid available', async ({ page }) => {
     // Guards the complaint that started this: every target having a testid
-    // made the lab a lookup rather than a judgement exercise.
+    // made the lab a lookup rather than a judgment exercise.
     await page.goto(LAB + '?reset');
     const { total, hard } = await page.evaluate(() => ({
       total: window.LOCATOR_EXERCISES.length,

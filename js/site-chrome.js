@@ -212,7 +212,7 @@
     // The source is readable, which for anyone evaluating the author is a
     // stronger signal than the site itself. "Source on GitHub" rather than
     // "open source" — the repo is source-available under an all-rights-reserved
-    // licence, and claiming otherwise would be inaccurate.
+    // license, and claiming otherwise would be inaccurate.
     line3.appendChild(document.createTextNode("  ·  "));
     var source = document.createElement("a");
     source.href = REPO_URL;

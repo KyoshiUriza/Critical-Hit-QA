@@ -47,11 +47,11 @@ function probeFocused() {
     `<${el.tagName.toLowerCase()}${el.id ? '#' + el.id : ''}> ` +
     `"${(el.textContent || el.getAttribute('aria-label') || '').trim().slice(0, 30)}"`;
 
-  // Collect every candidate ring colour, then judge by the best one.
+  // Collect every candidate ring color, then judge by the best one.
   //
   // A double ring — box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px var(--accent) —
   // deliberately draws the page background first so the accent ring is
-  // separated from the element. Reading only the first colour therefore
+  // separated from the element. Reading only the first color therefore
   // measures background against background, scores 1:1, and fails an
   // indicator that is in fact highly visible. What matters for 2.4.11 is
   // whether ANY layer of the indicator reaches 3:1 against the surface.

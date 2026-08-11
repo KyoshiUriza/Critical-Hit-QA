@@ -148,7 +148,7 @@ Tell me what already works and should be left alone. I would rather keep a good 
 
 ### Output format
 
-Markdown. Real CSS in fenced blocks, ready to paste. Contrast ratios in tables. If a suggestion is a judgement call rather than a rule, say so explicitly and give me the trade-off — I would rather have your honest opinion with its cost stated than a confident-sounding default.
+Markdown. Real CSS in fenced blocks, ready to paste. Contrast ratios in tables. If a suggestion is a judgment call rather than a rule, say so explicitly and give me the trade-off — I would rather have your honest opinion with its cost stated than a confident-sounding default.
 
 Do not give me a generic "modern UI checklist." I want decisions specific to *this* product, this audience, and these constraints.
 

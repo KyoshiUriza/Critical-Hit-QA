@@ -76,7 +76,7 @@
           </tr>
           <tr>
             <td>Text contrast below the ratio</td>
-            <td>Whether meaning is carried by colour alone</td>
+            <td>Whether meaning is carried by color alone</td>
           </tr>
           <tr>
             <td>Form inputs with no programmatic label</td>
@@ -104,7 +104,7 @@
       </p>
       <div class="panel panel-warn">
         <strong>The failure mode to name in an interview:</strong> a page that
-        passes an automated scan and is unusable. An image labelled
+        passes an automated scan and is unusable. An image labeled
         <code class="inline">alt="image"</code> passes. A div with
         <code class="inline">role="button"</code> and no key handler passes. A
         perfect scan with a broken keyboard path is common, and it is exactly
@@ -173,13 +173,13 @@
           <tr><td>Body text</td><td><strong>4.5:1</strong></td><td>1.4.3</td></tr>
           <tr><td>Large text (18.66px bold, or 24px)</td><td><strong>3:1</strong></td><td>1.4.3</td></tr>
           <tr><td>UI component boundaries and states</td><td><strong>3:1</strong></td><td>1.4.11</td></tr>
-          <tr><td>Focus indicators</td><td><strong>3:1</strong> against adjacent colours</td><td>2.4.11</td></tr>
+          <tr><td>Focus indicators</td><td><strong>3:1</strong> against adjacent colors</td><td>2.4.11</td></tr>
         </tbody>
       </table>
       <p class="mt-4">Two traps that catch people who think they have this covered:</p>
       <ul>
         <li>
-          <strong>Translucent colours composite.</strong> A focus ring at
+          <strong>Translucent colors composite.</strong> A focus ring at
           <code class="inline">rgba(79,157,255,0.55)</code> is not the ratio of
           that blue — it is the ratio of that blue <em>blended with whatever is
           behind it</em>. This site shipped exactly that defect: a ring whose own
@@ -196,7 +196,7 @@
       </ul>
       <div class="panel">
         <strong>This site computes its own.</strong> Its test suite measures
-        every colour pair against the real sRGB luminance formula, including
+        every color pair against the real sRGB luminance formula, including
         alpha compositing for translucent rings —
         <code class="inline">tests/contrast.spec.js</code> and
         <code class="inline">tests/focus-contrast.spec.js</code> in the
@@ -233,7 +233,7 @@
       <p class="mt-4">Four things to include every time:</p>
       <ol>
         <li><strong>The criterion and level</strong> — "2.1.1 Keyboard (Level A)". It converts an opinion into a standard, and Level A failures are hard to argue down.</li>
-        <li><strong>Who is blocked</strong> — keyboard-only, screen reader, low vision, colour blind, motor impairment. Naming the user makes the impact concrete.</li>
+        <li><strong>Who is blocked</strong> — keyboard-only, screen reader, low vision, color blind, motor impairment. Naming the user makes the impact concrete.</li>
         <li><strong>Whether there is a workaround.</strong> "Blocked entirely" and "awkward but possible" are different severities, and conflating them costs you credibility.</li>
         <li><strong>The fix, if it is obvious.</strong> Very often it is one semantic element. Saying so gets it done in the same sprint.</li>
       </ol>
@@ -259,7 +259,7 @@
     <section id="practice" class="panel panel-accent">
       <h2>Practice — earn Star-Dust</h2>
       <ol>
-        <li>Work the <a href="../../practice-apps/a11y-challenge.html">Accessibility Challenge</a> with the keyboard only, before you inspect anything. Thirteen defects are seeded and now catalogued — see how many the keyboard alone reveals.</li>
+        <li>Work the <a href="../../practice-apps/a11y-challenge.html">Accessibility Challenge</a> with the keyboard only, before you inspect anything. Thirteen defects are seeded and now cataloged — see how many the keyboard alone reveals.</li>
         <li>Repeat it with a screen reader on. Different defects surface.</li>
         <li>Run an automated scan over the same page and compare: which of the thirteen did it find? That comparison is the lesson.</li>
         <li>Write one of them up in the <a href="../bug-report-builder.html">Bug Report Builder</a> using the four-part structure above, citing the criterion.</li>

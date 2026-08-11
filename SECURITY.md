@@ -20,7 +20,7 @@ flattering one.
 **The practice apps contain intentional vulnerabilities.** Finding them is the
 entire point of the site. Before reporting anything under `practice-apps/`,
 check [`js/data/defects.js`](js/data/defects.js) — every seeded defect is
-catalogued there with an id and a severity.
+cataloged there with an id and a severity.
 
 Anything in a file whose name ends `-broken.html` is intentional by definition.
 

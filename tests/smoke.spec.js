@@ -165,3 +165,29 @@ test.describe('favicon', () => {
     });
   }
 });
+
+test.describe('local assets resolve', () => {
+  // Added after the American-English conversion rewrote the store catalog
+  // script's filename inside two script tags without renaming the file on
+  // disk. The console-error check above did catch it, but it reported "cart
+  // is broken" rather than "this file does not exist" — and a 404 on a script
+  // tag is worth naming directly.
+  for (const path of ALL_PAGES) {
+    test(`${path} references no missing script or stylesheet`, async ({ page }) => {
+      await page.goto(`/${path}?reset`);
+      const refs = await page.evaluate(() =>
+        [...document.querySelectorAll('script[src], link[href]')]
+          .map((el) => el.src || el.href)
+          .filter((u) => u.startsWith('http://localhost'))
+      );
+      expect(refs.length, `${path} loads nothing at all`).toBeGreaterThan(0);
+
+      const missing = [];
+      for (const url of [...new Set(refs)]) {
+        const resp = await page.request.get(url);
+        if (resp.status() !== 200) missing.push(`${url} -> ${resp.status()}`);
+      }
+      expect(missing, `${path} references files that do not exist`).toEqual([]);
+    });
+  }
+});

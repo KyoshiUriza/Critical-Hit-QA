@@ -1,5 +1,5 @@
 /*
- * Account page behaviour: profile CRUD and sync codes.
+ * Account page behavior: profile CRUD and sync codes.
  *
  * Everything user-supplied is written with textContent, never innerHTML.
  * Profile names come from a person who may be pasting anything, and they get
@@ -220,7 +220,7 @@
     var confirmBox = el("confirm-box");
     var pending = null;
 
-    function summarise(decoded) {
+    function summarize(decoded) {
       var d = decoded.data;
       var runs = d.quiz && d.quiz.runs ? d.quiz.runs.length : 0;
       var drafts = d.artifacts ? d.artifacts.length : 0;
@@ -246,7 +246,7 @@
         return;
       }
       el("target-name").textContent = window.Profiles.active().name;
-      el("confirm-summary").textContent = summarise(pending);
+      el("confirm-summary").textContent = summarize(pending);
       confirmBox.classList.remove("hidden");
     });
 

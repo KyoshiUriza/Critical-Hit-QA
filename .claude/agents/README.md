@@ -29,7 +29,7 @@ the thing they are reviewing stops being a reviewer.
 | Agent | Who they are | What only they can tell you |
 |---|---|---|
 | **[persona-curious](persona-curious.md)** | Priya — support lead wondering if QA is for her, 30-second attention span | Whether the first screen lands or loses people; which words on the entry path are jargon |
-| **[persona-new-tester](persona-new-tester.md)** | Marcus — 6 weeks in, course done, 11 applications out | Where beginners stall; whether content teaches *doing* or only *recognising* |
+| **[persona-new-tester](persona-new-tester.md)** | Marcus — 6 weeks in, course done, 11 applications out | Where beginners stall; whether content teaches *doing* or only *recognizing* |
 | **[persona-intermediate-tester](persona-intermediate-tester.md)** | Dana — 2.5yr manual QA moving to automation, studies tired at 9pm | Whether content has practitioner depth or is a rebadged beginner course; what earns a second visit |
 | **[persona-senior-qa](persona-senior-qa.md)** | Tomasz — 11yr senior, interviews monthly, checking the site for a mentee | Whether the content is *correct*; what a junior who learned here would need un-teaching |
 | **[persona-qa-lead](persona-qa-lead.md)** | Amara — hires and runs a team of 9, reviews candidate portfolios | Whether the exports impress the person who reads them; whether "prepared here" is a signal or a flag |

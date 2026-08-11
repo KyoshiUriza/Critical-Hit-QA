@@ -4,7 +4,7 @@ const { test, expect } = require('@playwright/test');
 // so you stop having to guess which hidden line your find corresponds to.
 //
 // The property these tests protect is the one that keeps it honest — detection
-// fires on the DEFECTIVE BEHAVIOUR, not on interaction. Using the app normally
+// fires on the DEFECTIVE BEHAVIOR, not on interaction. Using the app normally
 // must never hand out finds.
 
 test.describe('defect auto-detection', () => {
@@ -121,7 +121,7 @@ test.describe('defect auto-detection', () => {
     await expect(page.locator('input[data-defect="whitespace-todo"]')).toBeChecked();
   });
 
-  test('every seeded defect id used by a detector exists in the catalogue', async ({ page }) => {
+  test('every seeded defect id used by a detector exists in the catalog', async ({ page }) => {
     // A typo'd id would silently never fire, and the feature would look like
     // it worked while quietly covering less than it claims.
     await page.goto('/practice-apps/login-broken.html?reset');

@@ -129,7 +129,7 @@ test.describe('sync codes', () => {
     expect(after.artifacts[0].fields.summary).toBe('Totals are wrong');
   });
 
-  test('cancelling leaves existing progress untouched', async ({ page }) => {
+  test('canceling leaves existing progress untouched', async ({ page }) => {
     await page.goto(ACCOUNT + '?reset');
     await seedProgress(page);
     await page.getByTestId('export-code').click();
@@ -176,7 +176,7 @@ test.describe('sync codes', () => {
     await page.goto(ACCOUNT + '?reset');
 
     // Built by hand the way an attacker would, then run through the real
-    // decoder. Claimed finds are checked against the defect catalogue, so a
+    // decoder. Claimed finds are checked against the defect catalog, so a
     // fabricated id cannot inflate the dashboard.
     const hostile = await page.evaluate(() => {
       const payload = {
@@ -185,7 +185,7 @@ test.describe('sync codes', () => {
         savedAt: '2026-01-01',
         data: {
           quiz: { runs: [], byCategory: { notacategory: { attempted: 999, correct: 999, runs: 9 } } },
-          // 'login' is a real key in the defect catalogue with a fabricated
+          // 'login' is a real key in the defect catalog with a fabricated
           // defect id; 'no-such-app' is not a real key at all. Both routes in.
           bugBounty: { login: ['NOT-A-REAL-DEFECT'], 'no-such-app': ['x'] },
           studyPlan: { 'evil-plan': { 0: true } },

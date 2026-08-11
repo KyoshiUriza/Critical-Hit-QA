@@ -47,7 +47,7 @@ test.describe('Code Review Gauntlet', () => {
     await expect(page.getByTestId('cr-fixed')).toBeHidden();
   });
 
-  test('a perfect review is recognised as clean', async ({ page }) => {
+  test('a perfect review is recognized as clean', async ({ page }) => {
     await page.goto(PAGE + '?reset');
     // Tick exactly the real defects for the first exercise.
     const real = await page.evaluate(() =>
@@ -66,7 +66,7 @@ test.describe('Code Review Gauntlet', () => {
   });
 
   test('ticking everything scores badly — decoys are penalised', async ({ page }) => {
-    // The behaviour the feature exists to teach: over-flagging is a failure
+    // The behavior the feature exists to teach: over-flagging is a failure
     // mode, not a safe default.
     await page.goto(PAGE + '?reset');
     const boxes = page.locator('[data-issue-box]');
@@ -136,7 +136,7 @@ test.describe('Code Review Gauntlet', () => {
   });
 
   test('the two failure states do not share a glyph', async ({ page }) => {
-    // Colour alone separated "missed" from "wrongly flagged" (they measured
+    // Color alone separated "missed" from "wrongly flagged" (they measured
     // 1.01:1 apart), and both used the same mark.
     await page.goto(PAGE + '?reset');
     const decoy = await page.evaluate(() =>
@@ -170,7 +170,7 @@ test.describe('Code Review Gauntlet', () => {
     expect(md, 'the score should travel with the review').toMatch(/Scored \d+\/\d+/);
   });
 
-  test('notes lock at grading so the artifact is unaided judgement', async ({ page }) => {
+  test('notes lock at grading so the artifact is unaided judgment', async ({ page }) => {
     // Editing after seeing the answer key would turn a review into a
     // transcription, which is worth nothing to the person reading it.
     await page.goto(PAGE + '?reset');

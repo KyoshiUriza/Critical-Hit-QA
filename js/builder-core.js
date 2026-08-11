@@ -1,4 +1,4 @@
-// Shared behaviour for the Test Case Builder and the Bug Report Builder.
+// Shared behavior for the Test Case Builder and the Bug Report Builder.
 //
 // The two pages were near-clones: addStep / collect / preview / copy / save all
 // duplicated. More importantly, both threw the draft away — "Save to progress"

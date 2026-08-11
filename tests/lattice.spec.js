@@ -63,7 +63,7 @@ test.describe('character sheet', () => {
 
     await expect(page.getByTestId('skill-test-design').getByTestId('skill-tier')).toHaveText('Novice');
     await expect(page.getByTestId('skill-consistency')).toContainText('3-day streak');
-    // One low-severity find out of the whole catalogue is >0%, so Novice.
+    // One low-severity find out of the whole catalog is >0%, so Novice.
     await expect(page.getByTestId('skill-defect-hunting').getByTestId('skill-tier')).not.toHaveText('Untrained');
   });
 

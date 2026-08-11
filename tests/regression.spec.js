@@ -1,5 +1,5 @@
 // Regression suite — one test per bug the team review surfaced.
-// Each asserts the CORRECT behaviour, so if a fix is ever reverted the test
+// Each asserts the CORRECT behavior, so if a fix is ever reverted the test
 // goes red and names the defect.
 const { test, expect } = require('@playwright/test');
 
@@ -169,7 +169,7 @@ test.describe('progress + continuation (sprint-2)', () => {
     await expect(page.locator('.category-tab.active')).toHaveText(/1-month/);
   });
 
-  test('quiz honours a category deep-link', async ({ page }) => {
+  test('quiz honors a category deep-link', async ({ page }) => {
     await page.goto('/pages/practice-tests.html?reset&category=automation');
     await expect(page.locator('#category-select')).toHaveValue('automation');
   });

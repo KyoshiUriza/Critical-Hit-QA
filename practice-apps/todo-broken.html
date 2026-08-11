@@ -191,7 +191,7 @@
       document.getElementById("clear-completed").addEventListener("click", (e) => {
         e.preventDefault();
         // Detected only if something incomplete was destroyed — clearing a
-        // list where everything was already done is correct behaviour.
+        // list where everything was already done is correct behavior.
         var hadIncomplete = todos.some((t) => !t.done);
         todos = [];
         save(); render();
