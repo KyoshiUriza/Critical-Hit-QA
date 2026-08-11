@@ -29,7 +29,7 @@
       zero and below, to the same account, with more than two decimal places,
       and with the session limit already spent. Then check the statement actually
       reflects what you did. Every figure on this page is derived from one
-      integer-pence ledger — if you can make the header total disagree with the
+      integer-cent ledger — if you can make the header total disagree with the
       statement, that is a critical find.
     </div>
 
@@ -40,7 +40,7 @@
       <h2>Accounts</h2>
       <div class="two-col" id="accounts" data-testid="accounts"></div>
       <p class="mt-2">Total across accounts: <strong data-testid="total-balance"></strong></p>
-      <p class="text-dim text-sm">Transfer limit: <strong>£1,000.00</strong> per session · used: <span data-testid="limit-used">£0.00</span></p>
+      <p class="text-dim text-sm">Transfer limit: <strong>$1,000.00</strong> per session · used: <span data-testid="limit-used">$0.00</span></p>
     </section>
 
     <section class="app-frame">
@@ -56,7 +56,7 @@
         </div>
       </div>
       <div class="form-field">
-        <label for="amount">Amount (£)</label>
+        <label for="amount">Amount ($)</label>
         <input type="text" id="amount" data-testid="amount" placeholder="0.00" autocomplete="off" inputmode="decimal" />
       </div>
       <div class="form-field">
@@ -66,13 +66,13 @@
       <button class="btn btn-primary" data-testid="review-transfer">Review transfer</button>
       <p class="form-error" id="transfer-error" data-testid="transfer-error" role="alert"></p>
 
-      <!-- Step-up confirmation: transfers above £500 need a second factor.
+      <!-- Step-up confirmation: transfers above $500 need a second factor.
            A common real-world flow, and a good state-machine exercise. -->
       <div class="panel panel-warn hidden mt-4" id="confirm-box" data-testid="confirm-box">
         <h3 class="m-0">Confirm transfer</h3>
         <p id="confirm-summary" data-testid="confirm-summary"></p>
         <div class="form-field hidden" id="otp-field" data-testid="otp-field">
-          <label for="otp">Transfers over £500 need a code. Use <code class="inline">246810</code>.</label>
+          <label for="otp">Transfers over $500 need a code. Use <code class="inline">246810</code>.</label>
           <input type="text" id="otp" data-testid="otp" maxlength="6" autocomplete="off" inputmode="numeric" />
         </div>
         <p class="form-error" id="otp-error" data-testid="otp-error" role="alert"></p>
@@ -131,37 +131,37 @@
   <script src="../js/rpg.js"></script>
   <script src="../js/app-shell.js"></script>
   <script>
-    // ── Money is stored in integer pence, never floats. ───────────────────
+    // ── Money is stored in integer cents, never floats. ───────────────────
     // 0.1 + 0.2 !== 0.3 in binary floating point, and a bank that adds
     // balances in pounds accumulates error. This build is the correct
     // reference. There is no buggy variant of this app yet — if one is added,
     // breaking this rule is the first defect to seed.
     var ACCOUNTS = [
-      { id: "cur", name: "Everyday Current", number: "•••• 4417", pence: 128455 },
-      { id: "sav", name: "Rainy Day Saver",  number: "•••• 9032", pence: 542000 }
+      { id: "cur", name: "Everyday Current", number: "•••• 4417", cents: 128455 },
+      { id: "sav", name: "Rainy Day Saver",  number: "•••• 9032", cents: 542000 }
     ];
-    var SESSION_LIMIT_PENCE = 100000;
-    var OTP_THRESHOLD_PENCE = 50000;
+    var SESSION_LIMIT_CENTS = 100000;
+    var OTP_THRESHOLD_CENTS = 50000;
     var VALID_OTP = "246810";
 
     var TX = [
-      { date: "2026-08-04", acct: "cur", ref: "Salary",        pence:  210000, after: 338455 },
-      { date: "2026-08-05", acct: "cur", ref: "Coffee Roasters", pence: -450,  after: 338005 },
-      { date: "2026-08-06", acct: "sav", ref: "Standing order", pence:  50000, after: 542000 },
-      { date: "2026-08-07", acct: "cur", ref: "Rent",          pence: -209550, after: 128455 }
+      { date: "2026-08-04", acct: "cur", ref: "Salary",        cents:  210000, after: 338455 },
+      { date: "2026-08-05", acct: "cur", ref: "Coffee Roasters", cents: -450,  after: 338005 },
+      { date: "2026-08-06", acct: "sav", ref: "Standing order", cents:  50000, after: 542000 },
+      { date: "2026-08-07", acct: "cur", ref: "Rent",          cents: -209550, after: 128455 }
     ];
-    var limitUsedPence = 0;
+    var limitUsedCents = 0;
     var pending = null;
 
     function el(id) { return document.getElementById(id); }
     function testid(id) { return document.querySelector('[data-testid="' + id + '"]'); }
 
-    // Formatting happens once, here, from pence. Anything that formats
+    // Formatting happens once, here, from cents. Anything that formats
     // elsewhere is a chance for two figures to disagree.
-    function money(pence) {
-      var neg = pence < 0;
-      var abs = Math.abs(pence);
-      var s = "£" + Math.floor(abs / 100).toLocaleString("en-GB") + "." + String(abs % 100).padStart(2, "0");
+    function money(cents) {
+      var neg = cents < 0;
+      var abs = Math.abs(cents);
+      var s = "$" + Math.floor(abs / 100).toLocaleString("en-US") + "." + String(abs % 100).padStart(2, "0");
       return neg ? "-" + s : s;
     }
 
@@ -185,14 +185,14 @@
         var bal = document.createElement("div");
         bal.className = "account-balance";
         bal.setAttribute("data-testid", "balance-" + a.id);
-        bal.textContent = money(a.pence);
+        bal.textContent = money(a.cents);
         card.append(h, num, bal);
         wrap.appendChild(card);
       });
       testid("total-balance").textContent = money(
-        ACCOUNTS.reduce(function (s, a) { return s + a.pence; }, 0)
+        ACCOUNTS.reduce(function (s, a) { return s + a.cents; }, 0)
       );
-      testid("limit-used").textContent = money(limitUsedPence);
+      testid("limit-used").textContent = money(limitUsedCents);
     }
 
     function fillSelects() {
@@ -216,20 +216,20 @@
       });
     }
 
-    // Returns pence, or null with a message. Rejecting >2dp rather than
+    // Returns cents, or null with a message. Rejecting >2dp rather than
     // silently rounding is the deliberate choice — silent rounding is how
     // money quietly goes missing.
     function parseAmount(raw) {
-      var s = String(raw).trim().replace(/^£/, "").replace(/,/g, "");
+      var s = String(raw).trim().replace(/^\$/, "").replace(/,/g, "");
       if (!s) return { error: "Enter an amount." };
       if (!/^\d+(\.\d{1,2})?$/.test(s)) {
         if (/^\d+\.\d{3,}$/.test(s)) return { error: "Amounts cannot have more than 2 decimal places." };
         return { error: "Enter a valid amount, for example 25.00" };
       }
       var parts = s.split(".");
-      var pence = Number(parts[0]) * 100 + (parts[1] ? Number(parts[1].padEnd(2, "0")) : 0);
-      if (pence === 0) return { error: "Amount must be greater than zero." };
-      return { pence: pence };
+      var cents = Number(parts[0]) * 100 + (parts[1] ? Number(parts[1].padEnd(2, "0")) : 0);
+      if (cents === 0) return { error: "Amount must be greater than zero." };
+      return { cents: cents };
     }
 
     function validate() {
@@ -239,11 +239,11 @@
 
       if (from === to) return { error: "Choose two different accounts." };
       if (parsed.error) return { error: parsed.error };
-      if (parsed.pence > acct(from).pence) return { error: "Insufficient funds in " + acct(from).name + "." };
-      if (limitUsedPence + parsed.pence > SESSION_LIMIT_PENCE) {
-        return { error: "That exceeds the £1,000.00 session limit (" + money(limitUsedPence) + " already used)." };
+      if (parsed.cents > acct(from).cents) return { error: "Insufficient funds in " + acct(from).name + "." };
+      if (limitUsedCents + parsed.cents > SESSION_LIMIT_CENTS) {
+        return { error: "That exceeds the $1,000.00 session limit (" + money(limitUsedCents) + " already used)." };
       }
-      return { from: from, to: to, pence: parsed.pence, ref: testid("reference").value.trim() };
+      return { from: from, to: to, cents: parsed.cents, ref: testid("reference").value.trim() };
     }
 
     function showError(msg) {
@@ -267,9 +267,9 @@
 
       pending = result;
       testid("confirm-summary").textContent =
-        "Send " + money(result.pence) + " from " + acct(result.from).name +
+        "Send " + money(result.cents) + " from " + acct(result.from).name +
         " to " + acct(result.to).name + (result.ref ? ' with reference "' + result.ref + '"' : "") + ".";
-      var needsOtp = result.pence > OTP_THRESHOLD_PENCE;
+      var needsOtp = result.cents > OTP_THRESHOLD_CENTS;
       testid("otp-field").classList.toggle("hidden", !needsOtp);
       testid("otp").value = "";
       testid("confirm-box").classList.remove("hidden");
@@ -285,7 +285,7 @@
       if (!pending) return;
       clearMessages();
 
-      if (pending.pence > OTP_THRESHOLD_PENCE && testid("otp").value.trim() !== VALID_OTP) {
+      if (pending.cents > OTP_THRESHOLD_CENTS && testid("otp").value.trim() !== VALID_OTP) {
         var e = testid("otp-error");
         e.textContent = "That code is not correct.";
         e.classList.add("visible");
@@ -302,9 +302,9 @@
         return;
       }
 
-      acct(pending.from).pence -= pending.pence;
-      acct(pending.to).pence += pending.pence;
-      limitUsedPence += pending.pence;
+      acct(pending.from).cents -= pending.cents;
+      acct(pending.to).cents += pending.cents;
+      limitUsedCents += pending.cents;
 
       // Real date. A hardcoded one stamps every transfer with the same day
       // forever, which is itself a defect on a build billed as the reference.
@@ -312,11 +312,11 @@
       var today = d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") +
         "-" + String(d.getDate()).padStart(2, "0");
       var ref = pending.ref || "Transfer";
-      TX.unshift({ date: today, acct: pending.from, ref: ref, pence: -pending.pence, after: acct(pending.from).pence });
-      TX.unshift({ date: today, acct: pending.to, ref: ref, pence: pending.pence, after: acct(pending.to).pence });
+      TX.unshift({ date: today, acct: pending.from, ref: ref, cents: -pending.cents, after: acct(pending.from).cents });
+      TX.unshift({ date: today, acct: pending.to, ref: ref, cents: pending.cents, after: acct(pending.to).cents });
 
       var ok = testid("transfer-ok");
-      ok.textContent = "Sent " + money(pending.pence) + " to " + acct(pending.to).name + ".";
+      ok.textContent = "Sent " + money(pending.cents) + " to " + acct(pending.to).name + ".";
       ok.classList.remove("hidden");
 
       pending = null;
@@ -339,8 +339,8 @@
         return x.date === y.date ? 0 : (x.date < y.date ? 1 : -1);
       }).filter(function (tx) {
         if (a !== "all" && tx.acct !== a) return false;
-        if (t === "in" && tx.pence <= 0) return false;
-        if (t === "out" && tx.pence >= 0) return false;
+        if (t === "in" && tx.cents <= 0) return false;
+        if (t === "out" && tx.cents >= 0) return false;
         if (q && tx.ref.toLowerCase().indexOf(q) === -1) return false;
         return true;
       });
@@ -350,12 +350,12 @@
       rows.forEach(function (tx) {
         var tr = document.createElement("tr");
         tr.setAttribute("data-testid", "tx-row");
-        [tx.date, acct(tx.acct).name, tx.ref, money(tx.pence), money(tx.after)].forEach(function (v, i) {
+        [tx.date, acct(tx.acct).name, tx.ref, money(tx.cents), money(tx.after)].forEach(function (v, i) {
           var td = document.createElement("td");
           td.textContent = v;
           if (i === 3) {
             td.setAttribute("data-testid", "tx-amount");
-            td.style.color = tx.pence < 0 ? "var(--danger)" : "var(--accent-2)";
+            td.style.color = tx.cents < 0 ? "var(--danger)" : "var(--accent-2)";
           }
           tr.appendChild(td);
         });

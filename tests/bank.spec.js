@@ -20,8 +20,8 @@ test.describe('Meridian Bank', () => {
     await transfer(page, { amount: '25.50', ref: 'Books' });
 
     await expect(page.getByTestId('transfer-ok')).toBeVisible();
-    await expect(page.getByTestId('balance-cur')).toHaveText('£1,259.05');
-    await expect(page.getByTestId('balance-sav')).toHaveText('£5,445.50');
+    await expect(page.getByTestId('balance-cur')).toHaveText('$1,259.05');
+    await expect(page.getByTestId('balance-sav')).toHaveText('$5,445.50');
     // The invariant that matters: an internal transfer creates no money.
     await expect(page.getByTestId('total-balance')).toHaveText(totalBefore);
   });
@@ -55,14 +55,14 @@ test.describe('Meridian Bank', () => {
   test('boundaries: balance and session limit are reported separately', async ({ page }) => {
     await page.goto(APP + '?reset');
 
-    // A penny over the £1,284.55 balance. Both rules are broken here, and the
+    // A penny over the $1,284.55 balance. Both rules are broken here, and the
     // message must name the balance — telling someone they hit a session limit
     // when they are actually out of money sends them to the wrong fix.
     await page.getByTestId('amount').fill('1284.56');
     await page.getByTestId('review-transfer').click();
     await expect(page.getByTestId('transfer-error')).toContainText('Insufficient funds');
 
-    // Within balance but over the £1,000 limit: now the limit is the reason.
+    // Within balance but over the $1,000 limit: now the limit is the reason.
     await page.getByTestId('amount').fill('1100.00');
     await page.getByTestId('review-transfer').click();
     await expect(page.getByTestId('transfer-error')).toContainText('session limit');
@@ -73,7 +73,7 @@ test.describe('Meridian Bank', () => {
     await expect(page.getByTestId('confirm-box')).toBeVisible();
   });
 
-  test('transfers over £500 require the step-up code', async ({ page }) => {
+  test('transfers over $500 require the step-up code', async ({ page }) => {
     await page.goto(APP + '?reset');
     await page.getByTestId('amount').fill('600.00');
     await page.getByTestId('review-transfer').click();
@@ -83,12 +83,12 @@ test.describe('Meridian Bank', () => {
     await page.getByTestId('confirm-transfer').click();
     await expect(page.getByTestId('otp-error')).toContainText('not correct');
     // Nothing moved on a failed second factor.
-    await expect(page.getByTestId('balance-cur')).toHaveText('£1,284.55');
+    await expect(page.getByTestId('balance-cur')).toHaveText('$1,284.55');
 
     await page.getByTestId('otp').fill('246810');
     await page.getByTestId('confirm-transfer').click();
     await expect(page.getByTestId('transfer-ok')).toBeVisible();
-    await expect(page.getByTestId('balance-cur')).toHaveText('£684.55');
+    await expect(page.getByTestId('balance-cur')).toHaveText('$684.55');
   });
 
   test('small transfers skip the step-up', async ({ page }) => {
@@ -101,7 +101,7 @@ test.describe('Meridian Bank', () => {
   test('the session limit accumulates across transfers', async ({ page }) => {
     await page.goto(APP + '?reset');
     await transfer(page, { amount: '600.00', otp: '246810' });
-    await expect(page.getByTestId('limit-used')).toHaveText('£600.00');
+    await expect(page.getByTestId('limit-used')).toHaveText('$600.00');
 
     await page.getByTestId('amount').fill('500.00');
     await page.getByTestId('review-transfer').click();
@@ -114,7 +114,7 @@ test.describe('Meridian Bank', () => {
     await page.getByTestId('review-transfer').click();
     await page.getByTestId('cancel-transfer').click();
     await expect(page.getByTestId('confirm-box')).toBeHidden();
-    await expect(page.getByTestId('balance-cur')).toHaveText('£1,284.55');
+    await expect(page.getByTestId('balance-cur')).toHaveText('$1,284.55');
   });
 
   test('the statement records both sides of a transfer', async ({ page }) => {
@@ -124,8 +124,8 @@ test.describe('Meridian Bank', () => {
 
     await expect(page.getByTestId('tx-row')).toHaveCount(before + 2);
     await expect(page.getByTestId('statement')).toContainText('Split bill');
-    await expect(page.getByTestId('statement')).toContainText('-£15.00');
-    await expect(page.getByTestId('statement')).toContainText('£15.00');
+    await expect(page.getByTestId('statement')).toContainText('-$15.00');
+    await expect(page.getByTestId('statement')).toContainText('$15.00');
   });
 
   test('statement filters narrow by account, direction and reference', async ({ page }) => {
@@ -154,5 +154,35 @@ test.describe('Meridian Bank', () => {
     const topRow = page.getByTestId('tx-row').first();
     const balanceAfter = (await topRow.locator('td').nth(4).textContent()).trim();
     await expect(page.getByTestId('balance-cur')).toHaveText(balanceAfter);
+  });
+});
+
+test.describe('currency', () => {
+  test('every figure on the page is in USD, with no mixed symbols', async ({ page }) => {
+    // Converted from GBP. A half-done currency change is a classic real
+    // defect — the header switches and one formatter deep in the statement
+    // does not — so this checks every rendered money figure rather than a
+    // couple of headline ones.
+    await page.goto('/practice-apps/bank.html?reset');
+    const text = await page.locator('#main').textContent();
+    expect(text, 'a pound sign survived the conversion').not.toMatch(/£/);
+    expect(text, 'a euro sign appeared from somewhere').not.toMatch(/€/);
+    expect(text).toMatch(/\$[\d,]+\.\d{2}/);
+
+    const symbols = [...new Set((text.match(/[£€$¥]/g) || []))];
+    expect(symbols, 'more than one currency symbol on screen').toEqual(['$']);
+  });
+
+  test('a typed amount still parses when the user includes the symbol', async ({ page }) => {
+    // The parser strips a leading currency symbol. Converting £ to $ blindly
+    // would have turned /^£/ into /^$/ — a valid regex meaning end-of-string,
+    // which strips nothing and silently rejects "$25.00" as invalid.
+    await page.goto('/practice-apps/bank.html?reset');
+    await page.getByTestId('from-account').selectOption('cur');
+    await page.getByTestId('to-account').selectOption('sav');
+    await page.getByTestId('amount').fill('$25.00');
+    await page.getByTestId('review-transfer').click();
+    await expect(page.getByTestId('transfer-error')).toHaveText('');
+    await expect(page.getByTestId('confirm-summary')).toContainText('$25.00');
   });
 });
