@@ -25,7 +25,7 @@ Never report a suite as passing without having run it and seen it pass.
 Playwright locators are lazy handles that re-resolve on every use, so they never go stale.
 
 1. `getByRole('button', { name: 'Submit' })` — accessibility role plus accessible name. Always first: it matches how a real user and a screen reader find the element, so it doubles as an accessibility check.
-2. `getByLabel('Email')` — labelled form controls.
+2. `getByLabel('Email')` — labeled form controls.
 3. `getByPlaceholder` / `getByText` / `getByTitle` / `getByAltText`.
 4. `getByTestId(...)` — elements with no meaningful role or accessible name. Every practice-app interactive element in this project exposes a stable `data-testid`; using it is correct, not a compromise.
 5. CSS — only when nothing above works; say why in a comment.

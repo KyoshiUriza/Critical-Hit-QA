@@ -37,7 +37,7 @@ Notes:     Automatable? yes / no / partly, and why
 Run every feature through all six and say explicitly when a lens produced nothing:
 
 1. **Positive** — intended use, intended way.
-2. **Negative** — wrong input, wrong order, wrong state; empty and whitespace-only; cancelled halfway.
+2. **Negative** — wrong input, wrong order, wrong state; empty and whitespace-only; canceled halfway.
 3. **Boundary** — 0, 1, many; empty, one character, maximum length, one over. See the `edge-case-design` skill.
 4. **Security-flavored** — input dangerous if rendered or stored naively (`<script>`, HTML tags, quotes). On a client-only app the realistic risk is stored cross-site scripting (XSS) — text executed as code when redisplayed.
 5. **Accessibility** — see the `accessibility-testing` skill.
